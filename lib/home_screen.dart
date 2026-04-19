@@ -41,8 +41,8 @@ class HomeScreen extends StatelessWidget {
                 ),
               )
               .animate(onPlay: (controller) => controller.repeat(reverse: true))
-              .scaleXY(end: 1.05, duration: 1.seconds)
-              .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.5)),
+              .scaleXY(end: 1.15, duration: 2.seconds)
+              .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
 
               const SizedBox(height: 80),
 
