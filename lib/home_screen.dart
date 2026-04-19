@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'main.dart'; // Pour pouvoir accéder à PlayerScreen()
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // --- ÉCRAN D'ACCUEIL PRINCIPAL ---
 class HomeScreen extends StatelessWidget {
@@ -102,26 +103,148 @@ class HomeScreen extends StatelessWidget {
 }
 
 // --- ÉCRAN : CRÉER UN LOBBY ---
-class CreateLobbyScreen extends StatelessWidget {
+class CreateLobbyScreen extends StatefulWidget {
   const CreateLobbyScreen({super.key});
 
   @override
+  State<CreateLobbyScreen> createState() => _CreateLobbyScreenState();
+}
+
+class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  // FONCTION MAGIQUE : CRÉER LE LOBBY DANS LE CLOUD
+  Future<void> _createLobby() async {
+    String name = _nameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (name.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Remplis tous les champs !")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      DocumentReference lobbyRef = await FirebaseFirestore.instance.collection('lobbies').add({
+        'lobbyName': name,
+        'password': password,
+        'createdAt': FieldValue.serverTimestamp(),
+        'players': [], 
+        'status': 'waiting',
+      });
+
+      debugPrint("Lobby créé avec l'ID : ${lobbyRef.id}");
+      
+      // Ici on ajoutera la navigation vers la salle d'attente plus tard
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Lobby créé avec succès !")),
+      );
+      
+    } catch (e) {
+      debugPrint("Erreur lors de la création : $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return _buildLobbyForm(
-      context: context,
-      title: "NOUVEAU LOBBY",
-      buttonText: "CRÉER ET ATTENDRE LES JOUEURS",
-      buttonColor: Colors.pinkAccent,
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white), 
+          onPressed: () => Navigator.pop(context)
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFF101012),
+          image: DecorationImage(
+            image: const AssetImage('assets/images/background.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.7), BlendMode.darken),
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "NOUVEAU LOBBY", 
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)
+                ),
+                const SizedBox(height: 50),
+                
+                // CHAMP NOM DU LOBBY
+                TextField(
+                  controller: _nameController, // 👈 Lié au controller
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Nom du Lobby (ex: Soirée de Kylian)",
+                    hintStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.1),
+                    prefixIcon: const Icon(Icons.meeting_room, color: Colors.white70),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // CHAMP MOT DE PASSE
+                TextField(
+                  controller: _passwordController, // 👈 Lié au controller
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Mot de passe",
+                    hintStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.1),
+                    prefixIcon: const Icon(Icons.lock, color: Colors.white70),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                  ),
+                ),
+                
+                const SizedBox(height: 50),
+
+                // BOUTON D'ACTION
+                _isLoading 
+                  ? const CircularProgressIndicator(color: Colors.pinkAccent) // Affiche un chargement si on clique
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pinkAccent,
+                        minimumSize: const Size(double.infinity, 60),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      onPressed: _createLobby, // 👈 Appelle la fonction Firebase
+                      child: const Text("CRÉER ET ATTENDRE LES JOUEURS", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-// --- ÉCRAN : REJOINDRE UN LOBBY ---
+// L'écran Rejoindre reste en bas car il est plus simple
 class JoinLobbyScreen extends StatelessWidget {
   const JoinLobbyScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    // Tu peux garder la fonction _buildLobbyForm telle quelle pour cet écran
     return _buildLobbyForm(
       context: context,
       title: "REJOINDRE",
