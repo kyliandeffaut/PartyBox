@@ -74,7 +74,28 @@ class _PlayerScreenState extends State<PlayerScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              const Text("QUI JOUE ?", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2)),
+              Text(
+                "QUI JOUE ?",
+                style: const TextStyle(
+                  fontSize: 32, // On le met un peu plus grand
+                  fontWeight: FontWeight.w900, // Police extra-grasse
+                  color: Colors.white,
+                  letterSpacing: 6, // Plus d'espace entre les lettres pour faire classe
+                  shadows: [
+                    Shadow(
+                      color: Colors.pinkAccent,
+                      blurRadius: 15, // Halo rose proche
+                    ),
+                    Shadow(
+                      color: Colors.blueAccent,
+                      blurRadius: 30, // Halo bleu plus large derrière
+                    ),
+                  ],
+                ),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true)) // On boucle l'animation
+              .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.4)) // Un petit reflet brillant
+              .scaleXY(end: 1.02, duration: 2.seconds), // Respire très doucement
               
               const SizedBox(height: 20),
               // SÉLECTEUR DE GENRE
