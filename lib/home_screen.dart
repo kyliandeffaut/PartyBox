@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'main.dart'; // Pour pouvoir accéder à PlayerScreen()
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'waiting_room_screen.dart';
 
 // --- ÉCRAN D'ACCUEIL PRINCIPAL ---
 class HomeScreen extends StatelessWidget {
@@ -139,6 +140,18 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
       });
 
       debugPrint("Lobby créé avec l'ID : ${lobbyRef.id}");
+
+      if (!mounted) return; // Sécurité
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WaitingRoomScreen(
+            lobbyId: lobbyRef.id,
+            lobbyName: name,
+          ),
+        ),
+      );
       
       // Ici on ajoutera la navigation vers la salle d'attente plus tard
       ScaffoldMessenger.of(context).showSnackBar(
@@ -188,7 +201,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
                 
                 // CHAMP NOM DU LOBBY
                 TextField(
-                  controller: _nameController, // 👈 Lié au controller
+                  controller: _nameController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: "Nom du Lobby (ex: Soirée de Kylian)",
@@ -203,7 +216,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
 
                 // CHAMP MOT DE PASSE
                 TextField(
-                  controller: _passwordController, // 👈 Lié au controller
+                  controller: _passwordController,
                   obscureText: true,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
