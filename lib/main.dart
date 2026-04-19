@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
+import 'home_screen.dart';
 
 void main() {
   runApp(const ActionVeriteApp());
@@ -25,7 +26,7 @@ class ActionVeriteApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF101012),
       ),
-      home: const PlayerScreen(),
+      home: const HomeScreen(),
     );
   }
 }
