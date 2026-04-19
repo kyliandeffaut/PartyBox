@@ -122,7 +122,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   .slideX(begin: 0.5, end: 0, curve: Curves.easeOutBack),
                 ),
               ),
-              
+
               if (players.length >= 2)
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -132,18 +132,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       width: double.infinity,
                       height: 60,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)], 
+                        color: const Color(0xFF101012), 
+                        image: DecorationImage(
+                          image: const AssetImage('assets/images/background.jpg'), // 👈 Remplace par le bon nom !
+                          fit: BoxFit.cover, // Prends tout l'écran
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withValues(alpha: 0.5), // Ajuste l'alpha (0.0 à 1.0) pour assombrir plus ou moins
+                            BlendMode.darken,
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blue.withValues(alpha: 0.5), 
-                            blurRadius: 20, 
-                            spreadRadius: 2,
-                            offset: const Offset(0, 5)
-                          )
-                        ],
                       ),
                       child: const Center(
                         child: Text(
