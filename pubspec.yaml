@@ -58,7 +58,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/questions.json
+    - assets/action_verite.json
     - assets/images/app_logo.png
 
   # To add assets to your application, add an assets section, like this:

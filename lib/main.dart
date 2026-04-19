@@ -258,7 +258,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> loadQuestions() async {
-    final String response = await rootBundle.loadString('assets/questions.json');
+    final String response = await rootBundle.loadString('assets/action_verite.json');
     final data = await json.decode(response);
     setState(() { allQuestions = data; });
   }

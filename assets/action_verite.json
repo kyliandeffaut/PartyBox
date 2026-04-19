@@ -1506,7 +1506,7 @@
     "id": 280,
     "type": "action",
     "category": "Famille",
-    "text": "Sans Filtreplique ton métier/tes études comme si tu parlais à ton arrière-grand-mère."
+    "text": "Explique ton métier/tes études comme si tu parlais à ton arrière-grand-mère."
   },
   {
     "id": 655,
@@ -2926,7 +2926,7 @@
     "id": 333,
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Sans Filtreplique pourquoi ça n'a pas marché avec ton dernier ex en 10 secondes."
+    "text": "Explique pourquoi ça n'a pas marché avec ton dernier ex en 10 secondes."
   },
   {
     "id": 462,
@@ -2938,7 +2938,7 @@
     "id": 464,
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Sans Filtreplique ton plan pour devenir millionnaire avant tes 40 ans."
+    "text": "Explique ton plan pour devenir millionnaire avant tes 40 ans."
   },
   {
     "id": 466,
@@ -3073,7 +3073,7 @@
     "id": 714,
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Sans Filtreplique ton plan pour devenir millionnaire avant tes 30 ans."
+    "text": "Explique ton plan pour devenir millionnaire avant tes 30 ans."
   },
   {
     "id": 716,
@@ -3139,7 +3139,7 @@
     "id": 464,
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Sans Filtreplique ton plan pour devenir millionnaire avant tes 40 ans."
+    "text": "Explique ton plan pour devenir millionnaire avant tes 40 ans."
   },
   {
     "id": 86,
@@ -3413,7 +3413,7 @@
     "id": 210,
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Sans Filtreplique la raison de ta dernière rupture en utilisant seulement des mimes."
+    "text": "Explique la raison de ta dernière rupture en utilisant seulement des mimes."
   },
   {
     "id": 212,
@@ -4208,7 +4208,7 @@
     "id": 925,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique pourquoi les jeux rétro sont encore géniaux."
+    "text": "Explique pourquoi les jeux rétro sont encore géniaux."
   },
   {
     "id": 877,
@@ -4316,7 +4316,7 @@
     "id": 33,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique la théorie de la relativité en 30 secondes comme si j'avais 5 ans."
+    "text": "Explique la théorie de la relativité en 30 secondes comme si j'avais 5 ans."
   },
   {
     "id": 392,
@@ -4340,7 +4340,7 @@
     "id": 407,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
+    "text": "Explique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
   },
   {
     "id": 892,
@@ -4382,7 +4382,7 @@
     "id": 296,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique pourquoi les jeux vidéo ne sont pas que pour les enfants."
+    "text": "Explique pourquoi les jeux vidéo ne sont pas que pour les enfants."
   },
   {
     "text": "Fais un câlin de 10 secondes à {target}.",
@@ -4399,7 +4399,7 @@
     "id": 421,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
+    "text": "Explique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
   },
   {
     "id": 423,
@@ -4488,7 +4488,7 @@
     "id": 50,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique le principe de la Blockchain en 3 phrases."
+    "text": "Explique le principe de la Blockchain en 3 phrases."
   },
   {
     "id": 627,
@@ -4500,7 +4500,7 @@
     "id": 173,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique pourquoi PC est mieux que Console (ou l'inverse) avec passion."
+    "text": "Explique pourquoi PC est mieux que Console (ou l'inverse) avec passion."
   },
   {
     "id": 175,
@@ -4608,7 +4608,7 @@
     "id": 907,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique ce qu'est un trou noir avec des mots simples."
+    "text": "Explique ce qu'est un trou noir avec des mots simples."
   },
   {
     "id": 338,
@@ -4620,7 +4620,7 @@
     "id": 407,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
+    "text": "Explique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
   },
   {
     "id": 640,
@@ -4662,7 +4662,7 @@
     "id": 800,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique pourquoi PC est mieux que Console (ou l'inverse)."
+    "text": "Explique pourquoi PC est mieux que Console (ou l'inverse)."
   },
   {
     "id": 647,
@@ -4698,7 +4698,7 @@
     "id": 282,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique le concept d'un trou noir avec des couverts ou des verres."
+    "text": "Explique le concept d'un trou noir avec des couverts ou des verres."
   },
   {
     "id": 23,
@@ -4782,7 +4782,7 @@
     "id": 657,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique ce qu'est la photosynthèse comme si j'avais 4 ans."
+    "text": "Explique ce qu'est la photosynthèse comme si j'avais 4 ans."
   },
   {
     "id": 159,
@@ -4794,7 +4794,7 @@
     "id": 421,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
+    "text": "Explique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
   },
   {
     "id": 774,
@@ -4806,7 +4806,7 @@
     "id": 671,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique pourquoi les jeux vidéo sont de l'art en moins de 30 secondes."
+    "text": "Explique pourquoi les jeux vidéo sont de l'art en moins de 30 secondes."
   },
   {
     "id": 772,
@@ -4884,7 +4884,7 @@
     "id": 782,
     "type": "action",
     "category": "Soft",
-    "text": "Sans Filtreplique un concept scientifique complexe en 30 secondes."
+    "text": "Explique un concept scientifique complexe en 30 secondes."
   },
   {
     "id": 761,
