@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:math';
-import 'main.dart'; // 👈 Important pour accéder à la classe Player
+import 'main.dart';
 
 class JeNaiJamaisScreen extends StatefulWidget {
-  final List<Player> players; // 👈 On récupère la liste des joueurs
+  final List<Player> players;
   const JeNaiJamaisScreen({super.key, required this.players});
 
   @override
