@@ -3,7 +3,7 @@ import 'dart:io';
 
 void main() {
   // 1. Chemin vers ton fichier JSON
-  final file = File('assets/questions.json');
+  final file = File('assets/action_verite.json');
 
   if (!file.existsSync()) {
     print('❌ Erreur : Le fichier assets/questions.json est introuvable.');

@@ -10,7 +10,8 @@ void main() {
 class Player {
   String name;
   String gender; // 'H' pour Homme, 'F' pour Femme
-  Player({required this.name, required this.gender});
+  int score;
+  Player({required this.name, required this.gender, this.score = 0});
 }
 
 class ActionVeriteApp extends StatelessWidget {
@@ -188,7 +189,7 @@ class GameSelectionScreen extends StatelessWidget {
             const SizedBox(height: 20),
             
             _menuCard(context, "Je n'ai jamais", "🤫", Colors.deepPurpleAccent, () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const JeNaiJamaisScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => JeNaiJamaisScreen(players: players)));
             }),
           ],
         ),

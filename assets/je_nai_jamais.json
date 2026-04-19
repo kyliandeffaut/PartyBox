@@ -1,17 +1,29 @@
 {
   "Soft": [
     "Je n'ai jamais mangé de pizza avec de l'ananas.",
-    "Je n'ai jamais menti sur mon âge.",
-    "Je n'ai jamais chanté sous la douche."
-  ],
-  "Soirée": [
-    "Je n'ai jamais envoyé de message à mon ex en étant pompette.",
-    "Je n'ai jamais fini une bouteille seul(e).",
-    "Je n'ai jamais dansé sur une table."
+    "Je n'ai jamais menti sur mon prénom à un inconnu.",
+    "Je n'ai jamais pleuré devant un film d'animation.",
+    "Je n'ai jamais chanté à tue-tête alors que j'étais seul(e).",
+    "Je n'ai jamais fait semblant de téléphoner pour éviter quelqu'un.",
+    "Je n'ai jamais mangé de la nourriture tombée par terre.",
+    "Je n'ai jamais cassé un objet dans un magasin sans le dire."
   ],
   "Interdit": [
-    "Je n'ai jamais eu d'amende pour excès de vitesse.",
-    "Je n'ai jamais triché à un examen.",
-    "Je n'ai jamais pris le bus sans ticket."
+    "Je n'ai jamais triché à un examen à l'école.",
+    "Je n'ai jamais volé un petit truc (bonbon, stylo) étant enfant.",
+    "Je n'ai jamais conduit sans avoir mon permis sur moi.",
+    "Je n'ai jamais menti à mon/ma meilleur(e) ami(e).",
+    "Je n'ai jamais fouillé dans le téléphone de quelqu'un d'autre.",
+    "Je n'ai jamais pris le bus ou le train sans payer mon ticket.",
+    "Je n'ai jamais détesté un cadeau tout en disant que je l'adorais."
+  ],
+  "+18": [
+    "Je n'ai jamais eu de coup d'un soir.",
+    "Je n'ai jamais envoyé de photo osée par message.",
+    "Je n'ai jamais eu de 'fantasme' sur un(e) collègue ou un(e) prof.",
+    "Je n'ai jamais été surpris(e) en plein acte.",
+    "Je n'ai jamais utilisé d'application de rencontre.",
+    "Je n'ai jamais menti sur le nombre de mes partenaires.",
+    "Je n'ai jamais eu de béguin pour le/la partenaire d'un(e) ami(e)."
   ]
 }
