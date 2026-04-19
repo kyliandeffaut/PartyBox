@@ -266,96 +266,149 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
 }
 
 // L'écran Rejoindre reste en bas car il est plus simple
-class JoinLobbyScreen extends StatelessWidget {
+class JoinLobbyScreen extends StatefulWidget {
   const JoinLobbyScreen({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    // Tu peux garder la fonction _buildLobbyForm telle quelle pour cet écran
-    return _buildLobbyForm(
-      context: context,
-      title: "REJOINDRE",
-      buttonText: "SE CONNECTER",
-      buttonColor: Colors.blueAccent,
-    );
-  }
+  State<JoinLobbyScreen> createState() => _JoinLobbyScreenState();
 }
 
-// --- WIDGET COMMUN POUR LES FORMULAIRES DE LOBBY ---
-// Comme Créer et Rejoindre ont besoin de la même chose (Nom + Mdp), on fait une seule fonction !
-Widget _buildLobbyForm({required BuildContext context, required String title, required String buttonText, required Color buttonColor}) {
-  return Scaffold(
-    extendBodyBehindAppBar: true,
-    appBar: AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: Colors.white), onPressed: () => Navigator.pop(context)),
-    ),
-    body: Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFF101012),
-        image: DecorationImage(
-          image: const AssetImage('assets/images/background.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.7), BlendMode.darken),
+class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _pseudoController = TextEditingController(); // Nouveau !
+  bool _isLoading = false;
+
+  Future<void> _joinLobby() async {
+    String lobbyName = _nameController.text.trim();
+    String password = _passwordController.text.trim();
+    String pseudo = _pseudoController.text.trim();
+
+    if (lobbyName.isEmpty || password.isEmpty || pseudo.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Remplis tous les champs, même ton pseudo !")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 1. On cherche le lobby avec le bon nom et le bon mot de passe
+      var query = await FirebaseFirestore.instance
+          .collection('lobbies')
+          .where('lobbyName', isEqualTo: lobbyName)
+          .where('password', isEqualTo: password)
+          .where('status', isEqualTo: 'waiting')
+          .limit(1)
+          .get();
+
+      if (query.docs.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Lobby introuvable ou mauvais mot de passe.")),
+          );
+        }
+      } else {
+        // 2. Si on a trouvé, on récupère l'ID du document
+        var doc = query.docs.first;
+        String docId = doc.id;
+
+        // 3. On ajoute notre pseudo à la liste des joueurs sur Firebase
+        await FirebaseFirestore.instance.collection('lobbies').doc(docId).update({
+          'players': FieldValue.arrayUnion([pseudo])
+        });
+
+        if (!mounted) return;
+
+        // 4. On file dans la salle d'attente !
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WaitingRoomScreen(
+              lobbyId: docId,
+              lobbyName: lobbyName,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Erreur lors de la connexion : $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: const BackButton(color: Colors.white)),
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFF101012),
+          image: DecorationImage(
+            image: const AssetImage('assets/images/background.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.7), BlendMode.darken),
+          ),
         ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(title, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
-              const SizedBox(height: 50),
-              
-              // CHAMP NOM DU LOBBY
-              TextField(
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Nom du Lobby (ex: Soirée de Kylian)",
-                  hintStyle: const TextStyle(color: Colors.white54),
-                  filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.1),
-                  prefixIcon: const Icon(Icons.meeting_room, color: Colors.white70),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 20),
+        child: SafeArea(
+          child: SingleChildScrollView( // Pour éviter les bugs de clavier
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 50),
+                const Text("REJOINDRE", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
+                const SizedBox(height: 50),
 
-              // CHAMP MOT DE PASSE
-              TextField(
-                obscureText: true, // Cache le mot de passe
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Mot de passe",
-                  hintStyle: const TextStyle(color: Colors.white54),
-                  filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.1),
-                  prefixIcon: const Icon(Icons.lock, color: Colors.white70),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                ),
-              ),
-              
-              const SizedBox(height: 50),
+                // CHAMP PSEUDO
+                _buildInput(controller: _pseudoController, hint: "Ton Pseudo", icon: Icons.person),
+                const SizedBox(height: 20),
 
-              // BOUTON D'ACTION
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  minimumSize: const Size(double.infinity, 60),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                ),
-                onPressed: () {
-                  // Plus tard, c'est ici qu'on mettra la connexion à la base de données !
-                  debugPrint("Action Lobby déclenchée !");
-                },
-                child: Text(buttonText, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-              ),
-            ],
+                // CHAMP NOM DU LOBBY
+                _buildInput(controller: _nameController, hint: "Nom du Lobby", icon: Icons.meeting_room),
+                const SizedBox(height: 20),
+
+                // CHAMP MOT DE PASSE
+                _buildInput(controller: _passwordController, hint: "Mot de passe", icon: Icons.lock, isPassword: true),
+                
+                const SizedBox(height: 50),
+
+                _isLoading 
+                ? const CircularProgressIndicator(color: Colors.blueAccent)
+                : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      minimumSize: const Size(double.infinity, 60),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    ),
+                    onPressed: _joinLobby,
+                    child: const Text("SE CONNECTER", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
+
+  // Petit widget d'aide pour ne pas répéter le code des TextField
+  Widget _buildInput({required TextEditingController controller, required String hint, required IconData icon, bool isPassword = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withValues(alpha: 0.1),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+      ),
+    );
+  }
 }
