@@ -114,31 +114,20 @@ class CreateLobbyScreen extends StatefulWidget {
 class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _pseudoController = TextEditingController(); // 1. Ajouté
+  
+  String _selectedGender = 'H'; // 2. Ajouté
   bool _isLoading = false;
 
-  // FONCTION MAGIQUE : CRÉER LE LOBBY DANS LE CLOUD
   Future<void> _createLobby() async {
     String name = _nameController.text.trim();
     String password = _passwordController.text.trim();
+    String pseudo = _pseudoController.text.trim(); // 3. Récupère le pseudo
 
-    var existingLobby = await FirebaseFirestore.instance
-      .collection('lobbies')
-      .where('lobbyName', isEqualTo: name)
-      .where('status', isEqualTo: 'waiting') // On ne cherche que les lobbys actifs
-      .get();
-
-    if (existingLobby.docs.isNotEmpty) {
+    if (name.isEmpty || password.isEmpty || pseudo.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
-      );
-      return;
-    }
-
-    if (name.isEmpty || password.isEmpty) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Remplis tous les champs !")),
+        const SnackBar(content: Text("Remplis tous les champs, y compris ton pseudo !")),
       );
       return;
     }
@@ -146,17 +135,18 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // ✅ Création du Lobby avec le créateur déjà dans la liste
       DocumentReference lobbyRef = await FirebaseFirestore.instance.collection('lobbies').add({
         'lobbyName': name,
         'password': password,
         'createdAt': FieldValue.serverTimestamp(),
-        'players': [], 
         'status': 'waiting',
+        'players': [
+          {'name': pseudo, 'gender': _selectedGender} // ✅ Ajout direct ici
+        ], 
       });
 
-      debugPrint("Lobby créé avec l'ID : ${lobbyRef.id}");
-
-      if (!mounted) return; // Sécurité
+      if (!mounted) return;
 
       Navigator.push(
         context,
@@ -167,33 +157,44 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
           ),
         ),
       );
-      
-      // Ici on ajoutera la navigation vers la salle d'attente plus tard
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lobby créé avec succès !")),
-      );
-      
+
     } catch (e) {
       debugPrint("Erreur lors de la création : $e");
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  // Fonction pour les boutons de genre (à copier-coller aussi)
+  Widget _genderButton({required String label, required String value}) {
+    bool isSelected = _selectedGender == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedGender = value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? (value == 'H' ? Colors.blueAccent : Colors.pinkAccent) 
+                : Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Center(
+            child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white), 
-          onPressed: () => Navigator.pop(context)
-        ),
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: const BackButton(color: Colors.white)),
       body: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           color: const Color(0xFF101012),
           image: DecorationImage(
@@ -203,64 +204,74 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(30.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "NOUVEAU LOBBY", 
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)
+                const Text("CRÉER UN LOBBY", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 3)),
+                const SizedBox(height: 40),
+
+                // 🛠️ INTERFACE : Pseudo et Genre
+                _buildInput(controller: _pseudoController, hint: "Ton Pseudo", icon: Icons.person),
+                const SizedBox(height: 20),
+                const Text("TON GENRE :", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _genderButton(label: "HOMME", value: "H"),
+                    const SizedBox(width: 15),
+                    _genderButton(label: "FEMME", value: "F"),
+                  ],
                 ),
-                const SizedBox(height: 50),
                 
-                // CHAMP NOM DU LOBBY
-                TextField(
-                  controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "Nom du Lobby (ex: Soirée de Kylian)",
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.1),
-                    prefixIcon: const Icon(Icons.meeting_room, color: Colors.white70),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                  ),
-                ),
+                const SizedBox(height: 30),
+                const Divider(color: Colors.white24),
                 const SizedBox(height: 20),
 
-                // CHAMP MOT DE PASSE
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "Mot de passe",
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.1),
-                    prefixIcon: const Icon(Icons.lock, color: Colors.white70),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                  ),
-                ),
+                // Champs du Lobby
+                _buildInput(controller: _nameController, hint: "Nom du Lobby", icon: Icons.meeting_room),
+                const SizedBox(height: 20),
+                _buildInput(controller: _passwordController, hint: "Mot de passe", icon: Icons.lock, isPassword: true),
                 
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
 
-                // BOUTON D'ACTION
                 _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.pinkAccent) // Affiche un chargement si on clique
-                  : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
-                        minimumSize: const Size(double.infinity, 60),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      ),
-                      onPressed: _createLobby, // 👈 Appelle la fonction Firebase
-                      child: const Text("CRÉER ET ATTENDRE LES JOUEURS", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                ? const CircularProgressIndicator(color: Colors.pinkAccent)
+                : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      minimumSize: const Size(double.infinity, 60),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
+                    onPressed: _createLobby,
+                    child: const Text("CRÉER ET REJOINDRE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+  Widget _buildInput({
+    required TextEditingController controller, 
+    required String hint, 
+    required IconData icon, 
+    bool isPassword = false
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withValues(alpha: 0.1),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15), 
+          borderSide: BorderSide.none
         ),
       ),
     );

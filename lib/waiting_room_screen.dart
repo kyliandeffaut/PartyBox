@@ -30,7 +30,7 @@ class WaitingRoomScreen extends StatelessWidget {
               const SizedBox(height: 30),
               // NOM DU LOBBY EN NÉON
               Text(
-                lobbyName.toUpperCase(),
+                lobbyName,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 28,
