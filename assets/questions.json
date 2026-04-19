@@ -624,7 +624,7 @@
     "text": "Fais une déclaration d'amour d'une minute à un objet."
   },
   {
-    "text": "Fais un bisou là où {player} le décide.",
+    "text": "Fais un bisou là où {target} le décide.",
     "type": "action",
     "category": "Couple"
   },
@@ -718,7 +718,7 @@
     "text": "As-tu déjà envisagé de tromper ton partenaire ?"
   },
   {
-    "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {player} ?",
+    "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {target} ?",
     "type": "verite",
     "category": "Couple"
   },
@@ -1947,7 +1947,7 @@
     "text": "Chuchote quelque chose de coquin à l'oreille de la personne à ta gauche."
   },
   {
-    "text": "Fais un bisou dans le cou de {player}.",
+    "text": "Fais un bisou dans le cou de {target}.",
     "type": "action",
     "category": "Hot",
     "target": "femme"
@@ -1976,7 +1976,7 @@
     "target": "femme"
   },
   {
-    "text": "Masse le dos de {player} sous son t-shirt pendant 1 minute.",
+    "text": "Masse le dos de {target} sous son t-shirt pendant 1 minute.",
     "type": "action",
     "category": "Hot",
     "target": "homme"
@@ -2981,7 +2981,7 @@
     "text": "Essaie de négocier une gorgée de boisson à quelqu'un comme si c'était de l'or."
   },
   {
-    "text": "Regarde {player} dans les yeux pendant 1 minute sans rigoler. Si tu perds, tu fais 10 pompes.",
+    "text": "Regarde {target} dans les yeux pendant 1 minute sans rigoler. Si tu perds, tu fais 10 pompes.",
     "type": "action",
     "category": "Sans Filtre"
   },
@@ -3148,7 +3148,7 @@
     "text": "Parie 2€ avec le groupe sur le résultat d'un pile ou face."
   },
   {
-    "text": "Fais un massage des épaules de 2 minutes à {player}.",
+    "text": "Fais un massage des épaules de 2 minutes à {target}.",
     "type": "action",
     "category": "Sans Filtre"
   },
@@ -3207,7 +3207,7 @@
     "text": "Montre ta dernière photo 'cachée' dans ton téléphone."
   },
   {
-    "text": "Mets-toi à genoux et fais une fausse déclaration d'amour à {player}.",
+    "text": "Mets-toi à genoux et fais une fausse déclaration d'amour à {target}.",
     "type": "action",
     "category": "Sans Filtre"
   },
@@ -3602,7 +3602,7 @@
     "text": "Regrettes-tu ta dernière rupture ?"
   },
   {
-    "text": "Dis-nous le pire défaut de {player} selon toi.",
+    "text": "Dis-nous le pire défaut de {target} selon toi.",
     "type": "verite",
     "category": "Sans Filtre"
   },
@@ -3613,13 +3613,13 @@
     "text": "As-tu déjà essayé de recontacter un ex juste par ennui ?"
   },
   {
-    "text": "Trouves-tu que {player} a un beau style vestimentaire ? Sois honnête.",
+    "text": "Trouves-tu que {target} a un beau style vestimentaire ? Sois honnête.",
     "type": "verite",
     "category": "Sans Filtre",
     "target": "homme"
   },
   {
-    "text": "De 1 à 10, quelle note donnerais-tu au charme de {player} ?",
+    "text": "De 1 à 10, quelle note donnerais-tu au charme de {target} ?",
     "type": "verite",
     "category": "Sans Filtre",
     "target": "femme"
@@ -4385,7 +4385,7 @@
     "text": "Sans Filtreplique pourquoi les jeux vidéo ne sont pas que pour les enfants."
   },
   {
-    "text": "Fais un câlin de 10 secondes à {player}.",
+    "text": "Fais un câlin de 10 secondes à {target}.",
     "type": "action",
     "category": "Soft"
   },
@@ -4527,7 +4527,7 @@
     "text": "Raconte une rumeur (fausse ou vraie) que tu as déjà entendue sur un prof."
   },
   {
-    "text": "Laisse {player} te maquiller (ou te recoiffer) à l'aveugle pendant 1 minute.",
+    "text": "Laisse {target} te maquiller (ou te recoiffer) à l'aveugle pendant 1 minute.",
     "type": "action",
     "category": "Soft",
     "target": "femme"
@@ -4644,7 +4644,7 @@
     "id": 134,
     "type": "action",
     "category": "Soft",
-    "text": "Donne un surnom de super-héros à {player}."
+    "text": "Donne un surnom de super-héros à {target}."
   },
   {
     "id": 144,
@@ -4815,7 +4815,7 @@
     "text": "Chante le générique de ton dessin animé préféré d'enfance."
   },
   {
-    "text": "Laisse {player} te dessiner quelque chose sur le bras avec un stylo.",
+    "text": "Laisse {target} te dessiner quelque chose sur le bras avec un stylo.",
     "type": "action",
     "category": "Soft",
     "target": "homme"
@@ -5256,7 +5256,7 @@
     "id": 7,
     "type": "verite",
     "category": "Soft",
-    "text": "Quelle est la première impression que tu as eue de {player} ?"
+    "text": "Quelle est la première impression que tu as eue de {target} ?"
   },
   {
     "id": 891,
@@ -5330,7 +5330,7 @@
     "text": "Quelle est la capitale de la Mongolie ? (Gage si erreur : Oulan-Bator)."
   },
   {
-    "text": "Si tu devais choisir une personne dans cette pièce pour survivre sur une île déserte, est-ce que tu choisirais {player} ? Pourquoi ?",
+    "text": "Si tu devais choisir une personne dans cette pièce pour survivre sur une île déserte, est-ce que tu choisirais {target} ? Pourquoi ?",
     "type": "verite",
     "category": "Soft"
   },
@@ -5430,7 +5430,7 @@
     "text": "Quelle est la destination de tes rêves pour un voyage ?"
   },
   {
-    "text": "Quelle est la première chose que tu as pensée quand tu as rencontré {player} pour la première fois ?",
+    "text": "Quelle est la première chose que tu as pensée quand tu as rencontré {target} pour la première fois ?",
     "type": "verite",
     "category": "Soft"
   },
@@ -6051,7 +6051,7 @@
     "category": "Séduction"
   },
   {
-    "text": "Asseyez-vous sur les genoux de {player} pendant les 2 prochains tours.",
+    "text": "Asseyez-vous sur les genoux de {target} pendant les 2 prochains tours.",
     "type": "action",
     "category": "Séduction"
   },
@@ -6164,7 +6164,7 @@
     "target": "opposite"
   },
   {
-    "text": "Quel est l'endroit le plus insolite où tu aimerais emmener {player} pour un rendez-vous romantique ?",
+    "text": "Quel est l'endroit le plus insolite où tu aimerais emmener {target} pour un rendez-vous romantique ?",
     "type": "verite",
     "category": "Séduction"
   },

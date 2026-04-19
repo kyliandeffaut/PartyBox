@@ -274,7 +274,9 @@ class _GameScreenState extends State<GameScreen> {
     String text = questionData['text'];
 
     // 1. On prépare la liste des cibles possibles (tout le monde sauf le joueur actuel)
-    List<Player> potentialTargets = List.from(widget.players)..remove(currentPlayer);
+    List<Player> potentialTargets = widget.players
+    .where((p) => p.name != currentPlayer!.name)
+    .toList();
 
     // 2. LE FILTRE MAGIQUE HOMME/FEMME
     bool hasMen = widget.players.any((p) => p.gender == 'H');
