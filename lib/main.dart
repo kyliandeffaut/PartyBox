@@ -95,7 +95,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               )
               .animate(onPlay: (controller) => controller.repeat(reverse: true)) // On boucle l'animation
               .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.4)) // Un petit reflet brillant
-              .scaleXY(end: 1.10, duration: 2.seconds), // Respire très doucement
+              .scaleXY(end: 1.15, duration: 2.seconds), // Respire très doucement
               
               const SizedBox(height: 20),
               // SÉLECTEUR DE GENRE
