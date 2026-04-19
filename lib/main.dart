@@ -61,7 +61,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF240b36), Color(0xFFc31432)],
+            colors: [Color.fromARGB(255, 108, 32, 161), Color.fromARGB(255, 25, 8, 37)],
           ),
         ),
         child: SafeArea(
@@ -158,6 +158,15 @@ class GameSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context), // Retourne à l'ajout des joueurs
+        ),
+      ),
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
