@@ -32,7 +32,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print("Erreur : $e");
+      debugPrint("Erreur : $e");
     }
   }
 
@@ -161,10 +161,32 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("${player.score}", style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-                      const SizedBox(width: 10),
+                      // BOUTON MOINS
                       IconButton(
-                        icon: const Icon(Icons.add_circle, color: Colors.greenAccent),
+                        icon: Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 24),
+                        onPressed: () {
+                          setState(() {
+                            if (player.score > 0) player.score--; // Sécurité : pas de score négatif
+                          });
+                        },
+                      ),
+                      
+                      // AFFICHAGE DU SCORE
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          "${player.score}", 
+                          style: const TextStyle(
+                            color: Colors.amber, 
+                            fontSize: 22, 
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+
+                      // BOUTON PLUS
+                      IconButton(
+                        icon: const Icon(Icons.add_circle, color: Colors.greenAccent, size: 28),
                         onPressed: () => setState(() => player.score++),
                       ),
                     ],
