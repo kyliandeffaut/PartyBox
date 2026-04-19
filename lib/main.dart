@@ -163,7 +163,7 @@ class CategoryScreen extends StatelessWidget {
   {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
   {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
   {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
-  {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '👩‍❤️‍👨'},
+  {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
   {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
   {'name': 'BDSM', 'color': const Color(0xFF000000), 'emoji': '⛓️'},
 ];
@@ -378,7 +378,8 @@ class _GameScreenState extends State<GameScreen> {
                             fontSize: 26, 
                             fontWeight: FontWeight.w600, 
                             fontStyle: FontStyle.italic,
-                            shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(2, 2))],
+                            color: Colors.black,
+                            shadows: [Shadow(color: Color.fromARGB(255, 255, 255, 255), blurRadius: 10, offset: Offset(2, 2))],
                           ),
                         ),
                       ),
