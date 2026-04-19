@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Pour charger le JSON
 import 'dart:convert'; // Pour décoder le JSON
 import 'dart:math'; // Pour le hasard (Random)
-import 'main.dart';
 
 class JeNaiJamaisScreen extends StatefulWidget {
   const JeNaiJamaisScreen({super.key});

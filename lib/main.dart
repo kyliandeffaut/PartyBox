@@ -61,7 +61,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color.fromARGB(255, 108, 32, 161), Color.fromARGB(255, 25, 8, 37)],
+            colors: [Color(0xFF1A1A2E), Color(0xFF101012)],
           ),
         ),
         child: SafeArea(
