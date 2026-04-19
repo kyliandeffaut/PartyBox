@@ -89,7 +89,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   decoration: InputDecoration(
                     hintText: "Entrez un prénom...",
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.05),
+                    fillColor: Colors.white.withValues(alpha: 0.05),
                     suffixIcon: IconButton(icon: const Icon(Icons.add_circle, color: Colors.greenAccent), onPressed: addPlayer),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                   ),
@@ -157,19 +157,15 @@ class CategoryScreen extends StatelessWidget {
   CategoryScreen({super.key, required this.players});
 
   final List<Map<String, dynamic>> categories = [
-    {'name': 'Soft', 'color': Colors.greenAccent.shade400},
-    {'name': 'Famille', 'color': Colors.greenAccent.shade400},
-    {'name': 'Dehors', 'color': Colors.blueAccent.shade400},
-    {'name': 'Sport', 'color': Colors.blueAccent.shade400},
-    {'name': 'Bar', 'color': Colors.blueAccent.shade400},
-    {'name': 'Sans Filtre', 'color': Colors.orangeAccent.shade400},
-    {'name': 'Séduction', 'color': Colors.redAccent.shade400},
-    {'name': 'Couple', 'color': Colors.redAccent.shade400},
-    {'name': 'Hot', 'color': Colors.redAccent.shade400},
-    {'name': 'Hard', 'color': Colors.redAccent.shade400},
-    {'name': 'Nudité', 'color': Colors.redAccent.shade400},
-    {'name': 'BDSM', 'color': Colors.redAccent.shade400},
-  ];
+  {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
+  {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
+  {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
+  {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
+  {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
+  {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
+  {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
+  {'name': 'BDSM', 'color': const Color(0xFF000000), 'emoji': '⛓️'},
+];
 
   @override
   Widget build(BuildContext context) {
@@ -206,17 +202,23 @@ class CategoryScreen extends StatelessWidget {
                     final cat = categories[index];
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cat['color'].withOpacity(0.15),
-                        foregroundColor: cat['color'],
-                        side: BorderSide(color: cat['color'], width: 1.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        backgroundColor: cat['color'].withOpacity(0.2),
+                        foregroundColor: Colors.white,
+                        side: BorderSide(color: cat['color'], width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
                       ),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => GameScreen(category: cat['name'], players: players),
-                        ));
-                      },
-                      child: Text(cat['name'], textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => GameScreen(category: cat['name'], players: players),
+                      )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(cat['emoji'], style: const TextStyle(fontSize: 25)),
+                          const SizedBox(height: 5),
+                          Text(cat['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -327,20 +329,18 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final topColor = widget.category == 'Hot' || widget.category == 'Hard' || widget.category == 'BDSM'
-        ? const Color(0xFF450000)
-        : Colors.blueGrey.shade900;
+    final Color themeColor = widget.category == 'Hot' || widget.category == 'Hard' || widget.category == 'BDSM'
+      ? Colors.red.shade900
+      : Colors.indigo.shade900;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(title: Text(widget.category), centerTitle: true, backgroundColor: Colors.transparent, elevation: 0),
-      body: Container(
+      body: AnimatedContainer(
+        duration: const Duration(seconds: 1), // Transition douce du fond
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [topColor, const Color(0xFF101012)],
-            stops: const [0.0, 0.7],
+          gradient: RadialGradient(
+            center: const Alignment(-0.5, -0.6),
+            radius: 1.5,
+            colors: [themeColor.withValues(alpha: 0.8), const Color(0xFF101012)],
           ),
         ),
         child: SafeArea(
@@ -352,11 +352,35 @@ class _GameScreenState extends State<GameScreen> {
               Expanded(
                 child: Center(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
+                    duration: const Duration(milliseconds: 600),
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      // Animation de glissement + opacité
+                      return SlideTransition(
+                        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
                     child: Padding(
-                      key: ValueKey(currentQuestion),
-                      padding: const EdgeInsets.all(25),
-                      child: Text(currentQuestion, textAlign: TextAlign.center, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                      key: ValueKey(currentQuestion), // Crucial pour déclencher l'animation
+                      padding: const EdgeInsets.all(30),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white..withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Text(
+                          currentQuestion,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 26, 
+                            fontWeight: FontWeight.w600, 
+                            fontStyle: FontStyle.italic,
+                            shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(2, 2))],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
