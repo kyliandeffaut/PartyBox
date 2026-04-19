@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
 
@@ -60,9 +61,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            colors: [Color(0xFF0f0c29), Color(0xFF302b63), Color(0xFF24243e)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1A1A2E), Color(0xFF101012)],
           ),
         ),
         child: SafeArea(
@@ -100,31 +101,60 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Expanded(
                 child: ListView.builder(
                   itemCount: players.length,
-                  itemBuilder: (context, index) => ListTile(
-                    leading: Icon(
-                      players[index].gender == 'H' ? Icons.male : Icons.female,
-                      color: players[index].gender == 'H' ? Colors.blue : Colors.pinkAccent,
+                  itemBuilder: (context, index) => Card(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Ajoute de l'espace entre les joueurs
+                    child: ListTile(
+                      leading: Icon(
+                        players[index].gender == 'H' ? Icons.male : Icons.female,
+                        color: players[index].gender == 'H' ? Colors.blue : Colors.pinkAccent,
+                      ),
+                      title: Text(players[index].name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                        onPressed: () => setState(() => players.removeAt(index)),
+                      ),
                     ),
-                    title: Text(players[index].name),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
-                      onPressed: () => setState(() => players.removeAt(index)),
-                    ),
-                  ),
+                  )
+                  .animate() // L'animation !
+                  .fade(duration: 400.ms)
+                  .slideX(begin: 0.5, end: 0, curve: Curves.easeOutBack),
                 ),
               ),
-
+              
               if (players.length >= 2)
                 Padding(
                   padding: const EdgeInsets.all(20),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      minimumSize: const Size(double.infinity, 55),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    ),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => GameSelectionScreen(players: players))),
-                    child: const Text("C'EST PARTI !", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => GameSelectionScreen(players: players))),
+                    child: Container(
+                      width: double.infinity,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)], 
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withValues(alpha: 0.5), 
+                            blurRadius: 20, 
+                            spreadRadius: 2,
+                            offset: const Offset(0, 5)
+                          )
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "C'EST PARTI !",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2),
+                        ),
+                      ),
+                    )
+                    .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                    .scaleXY(end: 1.03, duration: 1.seconds)
+                    .shimmer(delay: 2.seconds, duration: 1.seconds),
                   ),
                 ),
             ],
