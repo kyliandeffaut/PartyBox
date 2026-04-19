@@ -79,23 +79,23 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 style: const TextStyle(
                   fontSize: 32, // On le met un peu plus grand
                   fontWeight: FontWeight.w900, // Police extra-grasse
-                  color: Colors.blueAccent,
+                  color: Color.fromARGB(255, 255, 255, 255),
                   letterSpacing: 6, // Plus d'espace entre les lettres pour faire classe
                   shadows: [
                     Shadow(
                       color: Colors.pinkAccent,
-                      blurRadius: 30, // Halo rose proche
+                      blurRadius: 10, // Halo rose proche
                     ),
                     Shadow(
                       color: Colors.blueAccent,
-                      blurRadius: 45, // Halo bleu plus large derrière
+                      blurRadius: 10, // Halo bleu plus large derrière
                     ),
                   ],
                 ),
               )
               .animate(onPlay: (controller) => controller.repeat(reverse: true)) // On boucle l'animation
-              .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.4)) // Un petit reflet brillant
-              .scaleXY(end: 1.02, duration: 2.seconds), // Respire très doucement
+              .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.4)) // Un petit reflet brillant
+              .scaleXY(end: 1.10, duration: 2.seconds), // Respire très doucement
               
               const SizedBox(height: 20),
               // SÉLECTEUR DE GENRE
