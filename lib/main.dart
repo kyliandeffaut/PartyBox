@@ -335,6 +335,15 @@ class _GameScreenState extends State<GameScreen> {
       : Colors.indigo.shade900;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: AnimatedContainer(
         duration: const Duration(seconds: 1), // Transition douce du fond
         decoration: BoxDecoration(
@@ -376,7 +385,7 @@ class _GameScreenState extends State<GameScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 26, 
-                            fontWeight: FontWeight.w600, 
+                            fontWeight: FontWeight.w600,
                             fontStyle: FontStyle.italic,
                             color: Colors.black,
                             shadows: [Shadow(color: Color.fromARGB(255, 255, 255, 255), blurRadius: 10, offset: Offset(2, 2))],
