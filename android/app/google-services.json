@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "779421460538",
+    "project_id": "partybox-98bce",
+    "storage_bucket": "partybox-98bce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779421460538:android:f84f23abfd1634cdfbed03",
+        "android_client_info": {
+          "package_name": "com.example.action_verite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtp_A4D1enVeSSlChOG1eXLRlL_7xJok4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

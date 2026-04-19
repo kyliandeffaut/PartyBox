@@ -3,8 +3,16 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
 import 'home_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Indispensable pour Firebase
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   runApp(const ActionVeriteApp());
 }
 
