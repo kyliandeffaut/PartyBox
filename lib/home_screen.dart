@@ -128,6 +128,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
       .get();
 
     if (existingLobby.docs.isNotEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
       );
@@ -135,6 +136,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     }
 
     if (name.isEmpty || password.isEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Remplis tous les champs !")),
       );
@@ -265,18 +267,19 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
   }
 }
 
-// L'écran Rejoindre reste en bas car il est plus simple
 class JoinLobbyScreen extends StatefulWidget {
   const JoinLobbyScreen({super.key});
 
   @override
   State<JoinLobbyScreen> createState() => _JoinLobbyScreenState();
 }
-
 class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _pseudoController = TextEditingController(); // Nouveau !
+  final TextEditingController _pseudoController = TextEditingController();
+  
+  // Étape A : La variable pour le genre (juste ici au début)
+  String _selectedGender = 'H'; 
   bool _isLoading = false;
 
   Future<void> _joinLobby() async {
@@ -286,7 +289,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
 
     if (lobbyName.isEmpty || password.isEmpty || pseudo.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Remplis tous les champs, même ton pseudo !")),
+        const SnackBar(content: Text("Remplis tous les champs !")),
       );
       return;
     }
@@ -294,7 +297,6 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. On cherche le lobby avec le bon nom et le bon mot de passe
       var query = await FirebaseFirestore.instance
           .collection('lobbies')
           .where('lobbyName', isEqualTo: lobbyName)
@@ -310,18 +312,18 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
           );
         }
       } else {
-        // 2. Si on a trouvé, on récupère l'ID du document
         var doc = query.docs.first;
         String docId = doc.id;
 
-        // 3. On ajoute notre pseudo à la liste des joueurs sur Firebase
+        // Étape B : On envoie le pseudo ET le genre sélectionné
         await FirebaseFirestore.instance.collection('lobbies').doc(docId).update({
-          'players': FieldValue.arrayUnion([pseudo])
+          'players': FieldValue.arrayUnion([
+            {'name': pseudo, 'gender': _selectedGender} 
+          ])
         });
 
         if (!mounted) return;
 
-        // 4. On file dans la salle d'attente !
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -333,10 +335,42 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
         );
       }
     } catch (e) {
-      debugPrint("Erreur lors de la connexion : $e");
+      debugPrint("Erreur : $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  // Petit widget pour créer les boutons Homme/Femme facilement
+  Widget _genderButton({required String label, required String value}) {
+    bool isSelected = _selectedGender == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedGender = value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? (value == 'H' ? Colors.blueAccent : Colors.pinkAccent) 
+                : Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: isSelected ? Colors.white : Colors.transparent,
+              width: 2
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white54,
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -346,6 +380,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: const BackButton(color: Colors.white)),
       body: Container(
         width: double.infinity,
+        height: double.infinity, // Pour remplir tout l'écran
         decoration: BoxDecoration(
           color: const Color(0xFF101012),
           image: DecorationImage(
@@ -355,26 +390,34 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView( // Pour éviter les bugs de clavier
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: [
-                const SizedBox(height: 50),
-                const Text("REJOINDRE", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
-                const SizedBox(height: 50),
-
-                // CHAMP PSEUDO
-                _buildInput(controller: _pseudoController, hint: "Ton Pseudo", icon: Icons.person),
                 const SizedBox(height: 20),
+                const Text("REJOINDRE", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 4)),
+                const SizedBox(height: 40),
 
-                // CHAMP NOM DU LOBBY
+                _buildInput(controller: _pseudoController, hint: "Ton Pseudo", icon: Icons.person),
+                const SizedBox(height: 25),
+
+                // Étape C : Les boutons de genre
+                const Text("TON GENRE :", style: TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 2)),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _genderButton(label: "HOMME", value: "H"),
+                    const SizedBox(width: 15),
+                    _genderButton(label: "FEMME", value: "F"),
+                  ],
+                ),
+                
+                const SizedBox(height: 25),
                 _buildInput(controller: _nameController, hint: "Nom du Lobby", icon: Icons.meeting_room),
                 const SizedBox(height: 20),
-
-                // CHAMP MOT DE PASSE
                 _buildInput(controller: _passwordController, hint: "Mot de passe", icon: Icons.lock, isPassword: true),
                 
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
 
                 _isLoading 
                 ? const CircularProgressIndicator(color: Colors.blueAccent)
@@ -395,7 +438,6 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
     );
   }
 
-  // Petit widget d'aide pour ne pas répéter le code des TextField
   Widget _buildInput({required TextEditingController controller, required String hint, required IconData icon, bool isPassword = false}) {
     return TextField(
       controller: controller,

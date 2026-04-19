@@ -73,6 +73,11 @@ class WaitingRoomScreen extends StatelessWidget {
                     return ListView.builder(
                       itemCount: players.length,
                       itemBuilder: (context, index) {
+                        // On transforme l'élément en Map pour lire le nom et le genre
+                        var player = players[index] as Map<String, dynamic>;
+                        String name = player['name'] ?? "Anonyme";
+                        String gender = player['gender'] ?? "H";
+
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
                           decoration: BoxDecoration(
@@ -80,9 +85,12 @@ class WaitingRoomScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: ListTile(
-                            leading: const Icon(Icons.person, color: Colors.blueAccent),
+                            leading: Icon(
+                              Icons.person, 
+                              color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent 
+                            ),
                             title: Text(
-                              players[index], 
+                              name, 
                               style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)
                             ),
                             trailing: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
