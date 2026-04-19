@@ -243,8 +243,8 @@ class _GameScreenState extends State<GameScreen> {
   List<dynamic> allQuestions = [];
   String currentQuestion = "Appuie sur un bouton !";
   Player? currentPlayer;
-
   int currentPlayerIndex = 0;
+  bool showNextButton = false;
 
   @override
   void initState() {
@@ -309,8 +309,19 @@ class _GameScreenState extends State<GameScreen> {
 
     setState(() {
       currentQuestion = text;
+      showNextButton = true;
+    });
+  }
+
+  void nextTurn() {
+    setState(() {
+      // On passe au joueur suivant mathématiquement
       currentPlayerIndex = (currentPlayerIndex + 1) % widget.players.length;
       currentPlayer = widget.players[currentPlayerIndex];
+      
+      // On remet l'écran à zéro
+      currentQuestion = "Appuie sur un bouton !";
+      showNextButton = false; // On cache le bouton "Suivant" pour remettre Action/Vérité
     });
   }
 
@@ -350,16 +361,22 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 ),
               ),
-              
               Padding(
                 padding: const EdgeInsets.all(40),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite')),
-                    _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action')),
-                  ],
-                ),
+                child: showNextButton
+                    ? // SI LA QUESTION EST AFFICHÉE : Bouton Suivant
+                      SizedBox(
+                        width: double.infinity, // Le bouton prend toute la largeur
+                        child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, nextTurn),
+                      )
+                    : // SINON : Boutons Action et Vérité
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite')),
+                          _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action')),
+                        ],
+                      ),
               ),
             ],
           ),
