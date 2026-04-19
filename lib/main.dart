@@ -5,6 +5,7 @@ import 'je_nai_jamais_screen.dart';
 import 'home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Indispensable pour Firebase
@@ -12,7 +13,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
+  cleanOldLobbies();
   runApp(const ActionVeriteApp());
 }
 
@@ -291,4 +293,24 @@ class GameSelectionScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> cleanOldLobbies() async {
+  print("🧹 Nettoyage des vieux lobbys en cours...");
+  
+  // On calcule l'heure d'il y a 24 heures
+  DateTime twentyFourHoursAgo = DateTime.now().subtract(const Duration(hours: 24));
+
+  // On récupère les lobbys plus vieux que ça
+  var oldLobbies = await FirebaseFirestore.instance
+      .collection('lobbies')
+      .where('createdAt', isLessThan: twentyFourHoursAgo)
+      .get();
+
+  // On les supprime un par un
+  for (var doc in oldLobbies.docs) {
+    await doc.reference.delete();
+  }
+  
+  debugPrint("✅ Nettoyage terminé : ${oldLobbies.docs.length} lobbys supprimés.");
 }
