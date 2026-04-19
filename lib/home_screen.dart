@@ -199,7 +199,7 @@ Widget _buildLobbyForm({required BuildContext context, required String title, re
                 ),
                 onPressed: () {
                   // Plus tard, c'est ici qu'on mettra la connexion à la base de données !
-                  print("Action Lobby déclenchée !");
+                  debugPrint("Action Lobby déclenchée !");
                 },
                 child: Text(buttonText, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
