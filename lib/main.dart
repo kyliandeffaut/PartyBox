@@ -79,16 +79,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 style: const TextStyle(
                   fontSize: 32, // On le met un peu plus grand
                   fontWeight: FontWeight.w900, // Police extra-grasse
-                  color: Colors.white,
+                  color: Colors.blueAccent,
                   letterSpacing: 6, // Plus d'espace entre les lettres pour faire classe
                   shadows: [
                     Shadow(
                       color: Colors.pinkAccent,
-                      blurRadius: 15, // Halo rose proche
+                      blurRadius: 30, // Halo rose proche
                     ),
                     Shadow(
                       color: Colors.blueAccent,
-                      blurRadius: 30, // Halo bleu plus large derrière
+                      blurRadius: 45, // Halo bleu plus large derrière
                     ),
                   ],
                 ),
