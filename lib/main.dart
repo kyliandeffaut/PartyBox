@@ -61,7 +61,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1A1A2E), Color(0xFF101012)],
+            colors: [Color(0xFF240b36), Color(0xFFc31432)],
           ),
         ),
         child: SafeArea(
@@ -172,13 +172,13 @@ class GameSelectionScreen extends StatelessWidget {
             const Text("CHOISIS TON JEU", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
             const SizedBox(height: 50),
             
-            _menuCard(context, "Action ou Vérité", "🎭", Colors.purpleAccent, () {
+            _menuCard(context, "Action ou Vérité", "🎭", const Color.fromARGB(255, 251, 64, 64), () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(players: players)));
             }),
             
             const SizedBox(height: 20),
             
-            _menuCard(context, "Je n'ai jamais", "🍺", Colors.orangeAccent, () {
+            _menuCard(context, "Je n'ai jamais", "🤫", Colors.deepPurpleAccent, () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const JeNaiJamaisScreen()));
             }),
           ],
@@ -194,9 +194,9 @@ class GameSelectionScreen extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.8,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.5), width: 2),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
         ),
         child: Row(
           children: [
