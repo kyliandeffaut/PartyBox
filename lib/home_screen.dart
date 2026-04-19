@@ -121,6 +121,19 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     String name = _nameController.text.trim();
     String password = _passwordController.text.trim();
 
+    var existingLobby = await FirebaseFirestore.instance
+      .collection('lobbies')
+      .where('lobbyName', isEqualTo: name)
+      .where('status', isEqualTo: 'waiting') // On ne cherche que les lobbys actifs
+      .get();
+
+    if (existingLobby.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
+      );
+      return;
+    }
+
     if (name.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Remplis tous les champs !")),
