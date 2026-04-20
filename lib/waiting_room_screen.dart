@@ -248,36 +248,90 @@ class WaitingRoomScreen extends StatelessWidget {
                   ),
                 ),
 
-                // BOUTON POUR LANCER (Seulement pour le créateur)
-                if (isHost)
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.greenAccent,
-                      minimumSize: const Size(double.infinity, 60),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ),
-                    onPressed: () {
-                      // On gérera le lancement de la partie juste après !
-                      debugPrint("Lancement de la partie !");
-                    },
-                    child: const Text(
-                      "LANCER LA PARTIE",
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  ),
-                )
-              else
-                // Message pour les invités
-                const Padding(
-                  padding: EdgeInsets.all(30.0),
-                  child: Center(
-                    child: Text(
-                      "En attente du chef pour lancer la partie...",
-                      style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic, fontSize: 16),
-                    ),
-                  ),
+                // BOUTON POUR LANCER ET SÉLECTEUR DE MODE (Avec son propre StreamBuilder !)
+                StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).snapshots(),
+                  builder: (context, snapshot) {
+                    // Si ça charge, on ne montre rien le temps d'une microseconde
+                    if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
+                    
+                    // On récupère les données de Firebase spécialement pour les boutons !
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+
+                    // 👑 AFFICHAGE POUR LE CHEF
+                    if (isHost) {
+                      return Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.greenAccent,
+                                minimumSize: const Size(double.infinity, 60),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              ),
+                              onPressed: () {
+                                debugPrint("Lancement de la partie !");
+                              },
+                              child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                            ),
+                            const SizedBox(height: 15),
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.white24),
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              ),
+                              onPressed: () {
+                                // 🔄 Logique pour changer de mode
+                                String nextMode = (data['gameMode'] == 'Action ou Vérité') 
+                                    ? 'Je n\'ai jamais' 
+                                    : 'Action ou Vérité';
+                                    
+                                FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                  'gameMode': nextMode
+                                });
+                              },
+                              child: Text(
+                                "MODE : ${data['gameMode'] ?? 'Action ou Vérité'}",
+                                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } 
+                    // 👤 AFFICHAGE POUR LES INVITÉS
+                    else {
+                      return Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.gamepad, color: Colors.pinkAccent, size: 20),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    "MODE PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            const Center(child: Text("En attente du chef...", style: TextStyle(color: Colors.white38, fontSize: 12, fontStyle: FontStyle.italic))),
+                          ],
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),

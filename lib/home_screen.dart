@@ -142,6 +142,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
         'createdAt': FieldValue.serverTimestamp(),
         'status': 'waiting',
         'host': pseudo,
+        'gameMode': 'Action ou Vérité',
         'players': [
           {'name': pseudo, 'gender': _selectedGender}
         ], 
