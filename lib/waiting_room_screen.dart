@@ -94,7 +94,7 @@ class WaitingRoomScreen extends StatelessWidget {
           child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 // NOM DU LOBBY EN NÉON
                 Text(
                   lobbyName,
@@ -133,7 +133,7 @@ class WaitingRoomScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              
+
                 const SizedBox(height: 40),
                 
                 const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
