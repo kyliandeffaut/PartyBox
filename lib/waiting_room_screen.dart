@@ -29,6 +29,7 @@ class WaitingRoomScreen extends StatefulWidget {
 class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   // 2. LE BOUCLIER ANTI-BUG EST ICI
   bool _isLeavingManually = false; 
+  bool _isNavigatingToGame = false;
 
   Future<void> _leaveLobby() async {
     setState(() {
@@ -215,23 +216,35 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         return const Center(child: Text("Expulsion en cours...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
                       }
 
-                      if (data['status'] == 'playing') {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (context.mounted) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ActionVeriteScreen(
-                                  lobbyId: widget.lobbyId,
-                                  category: data['category'] ?? 'Soft', 
-                                  isOnline: true,
-                                  currentPlayerName: widget.currentPlayerName,
+                      // LE TÉLÉPORTEUR INTELLIGENT (Modèle Hub)
+                      // On vérifie si je suis dans la liste des joueurs en train de jouer
+                      bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
+
+                      if (data['status'] == 'playing' && amIActive) {
+                        if (!_isNavigatingToGame) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (context.mounted) {
+                              setState(() { _isNavigatingToGame = true; }); // On verrouille
+                              Navigator.push( // 👈 PUSH NORMAL (On ne détruit plus le lobby !)
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ActionVeriteScreen(
+                                    lobbyId: widget.lobbyId,
+                                    category: data['category'] ?? 'Soft', 
+                                    isOnline: true,
+                                    currentPlayerName: widget.currentPlayerName,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                        });
-                        return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
+                              ).then((_) {
+                                // Quand le joueur quitte le jeu et revient au lobby, on déverrouille
+                                if (context.mounted) {
+                                  setState(() { _isNavigatingToGame = false; });
+                                }
+                              });
+                            }
+                          });
+                        }
+                        return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
                       }
 
                       if (players.isEmpty) {
