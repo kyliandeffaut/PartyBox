@@ -213,6 +213,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   lobbyId: widget.lobbyId,
                                   category: data['category'] ?? 'Soft', 
                                   isOnline: true,
+                                  currentPlayerName: widget.currentPlayerName,
                                 ),
                               ),
                             );

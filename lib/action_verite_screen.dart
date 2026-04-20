@@ -211,7 +211,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         ? (widget.currentPlayerName == currentPlayer.name) 
         : true;
 
-    final Color themeColor = widget.category == 'Hot' || widget.category == 'Extrême' || widget.category == 'Séduction' || widget.category == 'BDSM'
+    final Color themeColor = widget.category == 'Hot' || widget.category == 'Extrême' || widget.category == 'Séduction'
       ? Colors.red.shade900
       : Colors.indigo.shade900;
 
