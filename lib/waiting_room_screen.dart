@@ -164,24 +164,30 @@ class WaitingRoomScreen extends StatelessWidget {
                                   ]
                                 ],
                               ),
-                              trailing: isMe 
-                                  // Si c'est mon propre nom, on met juste le check vert (je me gère moi-même)
-                                  ? const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20)
-                                  // Si c'est quelqu'un d'autre :
-                                  : (amIHost 
-                                      // Si je suis le chef, je vois la croix rouge pour le kicker
-                                      ? IconButton(
-                                          icon: const Icon(Icons.close, color: Colors.redAccent),
-                                          onPressed: () {
-                                            FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
-                                              'players': FieldValue.arrayRemove([
-                                                {'name': name, 'gender': gender}
-                                              ])
-                                            });
-                                          },
-                                        )
-                                      // Si je ne suis pas le chef, je ne vois rien du tout
-                                      : null),
+                              // 4. L'affichage des statuts à droite
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min, // Très important pour ne pas casser l'affichage
+                                children: [
+                                  // Tout le monde a le check vert (pour dire qu'ils sont "Prêts/Connectés")
+                                  const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                                  
+                                  // Si je suis le CHEF ET que ce joueur n'est PAS moi, j'ajoute la croix rouge
+                                  if (amIHost && !isMe) ...[
+                                    const SizedBox(width: 5), // Petit espace entre le check et la croix
+                                    IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.redAccent),
+                                      onPressed: () {
+                                        // Logique d'expulsion
+                                        FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                          'players': FieldValue.arrayRemove([
+                                            {'name': name, 'gender': gender}
+                                          ])
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ),
                           ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
                         },
