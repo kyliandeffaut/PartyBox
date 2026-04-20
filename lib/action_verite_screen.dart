@@ -181,16 +181,23 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           
           var data = snapshot.data!.data() as Map<String, dynamic>;
           
-          // 1. On récupère TOUS les joueurs du lobby (ceux présents dans le salon)
+          // 1. LE BOUCLIER : On utilise tous les joueurs du lobby juste pour savoir si on n'a pas été kické
           List rawAllPlayers = data['players'] ?? [];
-          players = rawAllPlayers.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
-
-          // 🛡️ LE BOUCLIER : On ne quitte l'écran QUE si on n'est plus dans le lobby du tout
-          bool stillInLobby = players.any((p) => p.name == widget.currentPlayerName);          
+          bool stillInLobby = rawAllPlayers.any((p) => p['name'] == widget.currentPlayerName);
+          
           if (!stillInLobby) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) Navigator.pop(context);
             });
+            return const Scaffold(backgroundColor: Color(0xFF101012));
+          }
+
+          // 2. LA CORRECTION EST LÀ : Les tours de jeu se font UNIQUEMENT avec les joueurs actifs !
+          List rawActive = data['activePlayers'] ?? [];
+          players = rawActive.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
+
+          // Sécurité : si tout le monde a quitté l'écran de jeu, on évite un crash
+          if (players.isEmpty) {
             return const Scaffold(backgroundColor: Color(0xFF101012));
           }
 
@@ -281,7 +288,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
             }
             
             // LE RETOUR SE FAIT MAINTENANT DANS TOUS LES CAS !
-            if (context.mounted) {
+            if (mounted) {
               Navigator.pop(context);
             }
           },
