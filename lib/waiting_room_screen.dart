@@ -241,7 +241,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             if (context.mounted) {
                               setState(() { _isNavigatingToGame = true; }); // On verrouille
-                              Navigator.push( // 👈 PUSH NORMAL (On ne détruit plus le lobby !)
+                              Navigator.push( // PUSH NORMAL (On ne détruit plus le lobby !)
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ActionVeriteScreen(
@@ -249,6 +249,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                     category: data['category'] ?? 'Soft', 
                                     isOnline: true,
                                     currentPlayerName: widget.currentPlayerName,
+                                    currentPlayerGender: widget.currentPlayerGender,
                                   ),
                                 ),
                               ).then((_) {

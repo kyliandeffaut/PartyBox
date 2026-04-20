@@ -17,6 +17,7 @@ class ActionVeriteScreen extends StatefulWidget {
   final String? lobbyId;
   final List<GamePlayer>? localPlayers;
   final String? currentPlayerName;
+  final String? currentPlayerGender;
   
   const ActionVeriteScreen({
     super.key, 
@@ -25,6 +26,7 @@ class ActionVeriteScreen extends StatefulWidget {
     this.lobbyId,
     this.localPlayers,
     this.currentPlayerName,
+    this.currentPlayerGender,
   });
 
   @override
@@ -231,18 +233,23 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        // 🚀 LOGIQUE DE SORTIE : On retire seulement de 'activePlayers'
+        // LOGIQUE DE SORTIE : On retire seulement de 'activePlayers'
         if (widget.isOnline && widget.lobbyId != null) {
           // On retrouve ton genre dans la liste locale pour le remove
           String myGender = 'H';
           var me = players.where((p) => p.name == widget.currentPlayerName);
           if (me.isNotEmpty) myGender = me.first.gender;
 
-          await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+          await FirebaseFirestore.instance
+              .collection('lobbies')
+              .doc(widget.lobbyId)
+              .update({
             'activePlayers': FieldValue.arrayRemove([
-              {'name': widget.currentPlayerName, 'gender': myGender}
-            ]),
-            'lastAction': '${widget.currentPlayerName} est retourné au salon.'
+              {
+                'name': widget.currentPlayerName, 
+                'gender': myGender
+              }
+            ])
           });
         }
 
