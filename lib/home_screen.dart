@@ -154,6 +154,8 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
           builder: (context) => WaitingRoomScreen(
             lobbyId: lobbyRef.id,
             lobbyName: name,
+            currentPlayerName: pseudo,
+            currentPlayerGender: _selectedGender,
           ),
         ),
       );
@@ -341,6 +343,8 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
             builder: (context) => WaitingRoomScreen(
               lobbyId: docId,
               lobbyName: lobbyName,
+              currentPlayerName: pseudo,
+              currentPlayerGender: _selectedGender,
             ),
           ),
         );
