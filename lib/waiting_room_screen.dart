@@ -32,36 +32,34 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   bool _isNavigatingToGame = false;
 
   Future<void> _leaveLobby() async {
+    if (_isLeavingManually) return; // Sécurité anti-spam
     setState(() {
       _isLeavingManually = true;
     });
 
-    final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-    
-    // 1. On récupère les données actuelles du lobby avant de partir
-    final doc = await docRef.get();
-    if (!doc.exists) return;
+    try {
+      final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+      final doc = await docRef.get();
+      if (!doc.exists) return; // Si le lobby n'existe déjà plus, on s'arrête là
 
-    List players = List.from(doc.data()?['players'] ?? []);
-    String currentHost = doc.data()?['host'] ?? '';
+      List players = List.from(doc.data()?['players'] ?? []);
+      String currentHost = doc.data()?['host'] ?? '';
 
-    // 2. On retire le joueur actuel de la liste locale
-    players.removeWhere((p) => p['name'] == widget.currentPlayerName);
+      // On se retire de la liste
+      players.removeWhere((p) => p['name'] == widget.currentPlayerName);
 
-    if (players.isEmpty) {
-      // S'il n'y a plus personne, on supprime carrément le lobby
-      await docRef.delete();
-    } else {
-      Map<String, dynamic> updates = {
-        'players': players,
-      };
-
-      // 3. LA SUCCESSION : Si je suis le chef, je donne ma couronne au 1er de la liste restante
-      if (widget.currentPlayerName == currentHost) {
-        updates['host'] = players[0]['name']; 
+      if (players.isEmpty) {
+        await docRef.delete(); // On détruit tout s'il n'y a plus personne
+      } else {
+        Map<String, dynamic> updates = {'players': players};
+        // Succession : le chef donne la couronne au suivant s'il part
+        if (widget.currentPlayerName == currentHost) {
+          updates['host'] = players[0]['name']; 
+        }
+        await docRef.update(updates);
       }
-
-      await docRef.update(updates);
+    } catch (e) {
+      debugPrint("Petite erreur de sortie ignorée : $e"); // Empêche l'appli de planter
     }
   }
 
@@ -97,7 +95,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
         ) ?? false;
 
         if (shouldLeave) {
-          _leaveLobby(); 
+          await _leaveLobby();
           if (context.mounted) {
             Navigator.of(context).pop(); 
           }
