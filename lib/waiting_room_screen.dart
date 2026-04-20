@@ -113,14 +113,34 @@ class WaitingRoomScreen extends StatelessWidget {
                   child: StreamBuilder<DocumentSnapshot>(
                     stream: FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).snapshots(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasError) return const Center(child: Text("Erreur de connexion"));
+                      if (snapshot.hasError) return const Center(child: Text("Erreur de connexion", style: TextStyle(color: Colors.white)));
                       if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
-                      
+
                       var data = snapshot.data!.data() as Map<String, dynamic>?;
-                      if (data == null) return const Center(child: Text("Lobby introuvable"));
-                      
+                      if (data == null) return const Center(child: Text("Lobby introuvable", style: TextStyle(color: Colors.white)));
+
                       List players = data['players'] ?? [];
                       String hostName = data['host'] ?? '';
+
+                      // 🔥 3. LA VÉRIFICATION MAGIQUE : Est-ce que je suis toujours dans la liste ?
+                      bool isMeStillHere = players.any((p) => p['name'] == currentPlayerName);
+
+                      if (!isMeStillHere) {
+                        // Si je n'y suis plus, on me vire de l'écran !
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (context.mounted) {
+                            Navigator.of(context).pop(); // Retour à l'accueil
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Le chef du lobby t'a expulsé ❌", style: TextStyle(color: Colors.white)),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                          }
+                        });
+                        
+                        return const Center(child: Text("Expulsion en cours...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
+                      }
 
                       if (players.isEmpty) {
                         return const Center(
