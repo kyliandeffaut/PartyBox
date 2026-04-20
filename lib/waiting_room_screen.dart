@@ -286,20 +286,39 @@ class WaitingRoomScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(30.0),
                         child: Column(
                           children: [
+                            // 1. BOUTON LANCER (Corrigé avec la vraie téléportation !)
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.greenAccent,
                                 minimumSize: const Size(double.infinity, 60),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                               ),
-                              onPressed: () {
-                                debugPrint("Lancement de la partie !");
+                              onPressed: () async {
+                                // On dit à Firebase que la partie commence
+                                await FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                  'status': 'playing'
+                                });
+                                
+                                // Le chef change d'écran
+                                if (context.mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ActionVeriteScreen(
+                                        lobbyId: lobbyId,
+                                        category: data['category'] ?? 'Soft', 
+                                        isOnline: true,
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                               child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                             ),
+                            
                             const SizedBox(height: 15),
                             
-                            // 🔥 LE NOUVEAU BOUTON SÉLECTEUR DE MODE AVEC LE MENU
+                            // 2. BOUTON SÉLECTEUR DE MODE
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.white24),
@@ -307,81 +326,6 @@ class WaitingRoomScreen extends StatelessWidget {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               ),
                               onPressed: () {
-                                // Affichage du menu déroulant depuis le bas
-                                showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: const Color(0xFF1A1A1D), // Fond sombre
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                  ),
-                                  builder: (BuildContext context) {
-                                    // 📋 LA LISTE DE TOUS TES JEUX
-                                    List<String> gameModes = [
-                                      'Action ou Vérité',
-                                      'Je n\'ai jamais'
-                                    ];
-
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min, // Le menu prend juste la place nécessaire
-                                        children: [
-                                          const Text(
-                                            "CHOISIS UN JEU",
-                                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2),
-                                          ),
-                                          const SizedBox(height: 15),
-                                          
-                                          // On génère un élément de liste pour chaque jeu
-                                          ...gameModes.map((mode) {
-                                            bool isSelected = data['gameMode'] == mode;
-                                            
-                                            return ListTile(
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                                              title: Text(
-                                                mode,
-                                                style: TextStyle(
-                                                  color: isSelected ? Colors.pinkAccent : Colors.white70,
-                                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                                  fontSize: 16
-                                                ),
-                                              ),
-                                              // Ajoute un petit check rose si c'est le jeu actuellement sélectionné
-                                              trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
-                                              onTap: () {
-                                                // 1. Mise à jour de Firebase
-                                                FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
-                                                  'gameMode': mode
-                                                });
-                                                // 2. On ferme le pop-up
-                                                Navigator.pop(context);
-                                              },
-                                            );
-                                          }),
-                                          const SizedBox(height: 10), // Petite marge en bas
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ); // Fin du showModalBottomSheet
-                              },
-                              child: Text(
-                                "MODE : ${data['gameMode'] ?? 'Action ou Vérité'}",
-                                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                              ),
-                            ),
-
-                            const SizedBox(height: 15), // Espace avant le bouton paramètres
-
-                            // 3. NOUVEAU : BOUTON PARAMÈTRES DU JEU
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.white24),
-                                minimumSize: const Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              ),
-                              onPressed: () {
-                                // Affichage du menu des paramètres
                                 showModalBottomSheet(
                                   context: context,
                                   backgroundColor: const Color(0xFF1A1A1D),
@@ -389,87 +333,141 @@ class WaitingRoomScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                   ),
                                   builder: (BuildContext context) {
-                                    String currentMode = data['gameMode'] ?? 'Action ou Vérité';
-                                    String currentCategory = data['category'] ?? 'Classique';
-
+                                    List<String> gameModes = ['Action ou Vérité', 'Je n\'ai jamais'];
                                     return Padding(
-                                      padding: const EdgeInsets.all(25.0),
+                                      padding: const EdgeInsets.symmetric(vertical: 20),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text(
-                                            "PARAMÈTRES : ${currentMode.toUpperCase()}",
-                                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          const SizedBox(height: 25),
-                                          
-                                          // SI LE JEU EST ACTION OU VÉRITÉ : On affiche les catégories
-                                          if (currentMode == 'Action ou Vérité') ...[
-                                            const Text("Choisis l'intensité :", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                                            const SizedBox(height: 15),
-                                            Wrap(
-                                              spacing: 10,
-                                              runSpacing: 10,
-                                              alignment: WrapAlignment.center,
-                                              children: ['Classique', 'Soft', 'Hot', 'Extrême'].map((cat) {
-                                                bool isSelected = currentCategory == cat;
-                                                return ChoiceChip(
-                                                  label: Text(cat, style: TextStyle(color: isSelected ? Colors.white : Colors.white70)),
-                                                  selected: isSelected,
-                                                  selectedColor: Colors.pinkAccent,
-                                                  backgroundColor: Colors.white.withValues(alpha: 0.1),
-                                                  side: BorderSide.none,
-                                                  onSelected: (bool selected) {
-                                                    // Mise à jour de la catégorie dans Firebase
-                                                    FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
-                                                      'category': cat
-                                                    });
-                                                  },
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ] 
-                                          // SI C'EST UN AUTRE JEU (Pour plus tard)
-                                          else ...[
-                                            const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
-                                            const SizedBox(height: 15),
-                                            const Text("Paramètres à venir pour ce mode.", style: TextStyle(color: Colors.white70)),
-                                          ],
-                                          
-                                          const SizedBox(height: 30),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.pinkAccent,
-                                              minimumSize: const Size(double.infinity, 50),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                            ),
-                                            onPressed: () => Navigator.pop(context),
-                                            child: const Text("VALIDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                          ),
+                                          const Text("CHOISIS UN JEU", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                          const SizedBox(height: 15),
+                                          ...gameModes.map((mode) {
+                                            bool isSelected = data['gameMode'] == mode;
+                                            return ListTile(
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                                              title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
+                                              trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
+                                              onTap: () {
+                                                FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({'gameMode': mode});
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          }),
+                                          const SizedBox(height: 10),
                                         ],
                                       ),
                                     );
                                   },
-                                ); // Fin du menu paramètres
+                                );
                               },
-                              // Le design du bouton avec la petite icône
+                              child: Text("MODE : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                            ),
+
+                            const SizedBox(height: 15),
+
+                            // 3. BOUTON PARAMÈTRES DU JEU (Avec les emojis !)
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.white24),
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: const Color(0xFF1A1A1D),
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                  ),
+                                  builder: (BuildContext context) {
+                                    return StreamBuilder<DocumentSnapshot>(
+                                      stream: FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
+                                        var sheetData = snapshot.data!.data() as Map<String, dynamic>;
+                                        
+                                        String currentMode = sheetData['gameMode'] ?? 'Action ou Vérité';
+                                        String currentCategory = sheetData['category'] ?? 'Soft';
+
+                                        final List<Map<String, dynamic>> fullCategories = [
+                                          {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
+                                          {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
+                                          {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
+                                          {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
+                                          {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
+                                          {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
+                                          {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
+                                          {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
+                                          {'name': 'BDSM', 'color': const Color(0xFF000000), 'emoji': '⛓️'},
+                                        ];
+
+                                        return Padding(
+                                          padding: const EdgeInsets.all(25.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text("PARAMÈTRES : ${currentMode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1), textAlign: TextAlign.center),
+                                              const SizedBox(height: 25),
+                                              
+                                              if (currentMode == 'Action ou Vérité') ...[
+                                                const Text("Choisis l'intensité :", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                                const SizedBox(height: 15),
+                                                Wrap(
+                                                  spacing: 8,
+                                                  runSpacing: 8,
+                                                  alignment: WrapAlignment.center,
+                                                  children: fullCategories.map((cat) {
+                                                    bool isSelected = currentCategory == cat['name'];
+                                                    return ChoiceChip(
+                                                      label: Text("${cat['emoji']} ${cat['name']}", style: TextStyle(color: isSelected ? Colors.white : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                                                      selected: isSelected,
+                                                      selectedColor: cat['color'], 
+                                                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                                      side: BorderSide.none,
+                                                      onSelected: (bool selected) {
+                                                        FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({'category': cat['name']});
+                                                      },
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ] else ...[
+                                                const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
+                                                const SizedBox(height: 15),
+                                                const Text("Paramètres à venir pour ce mode.", style: TextStyle(color: Colors.white70)),
+                                              ],
+                                              
+                                              const SizedBox(height: 30),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.pinkAccent,
+                                                  minimumSize: const Size(double.infinity, 50),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                                ),
+                                                onPressed: () => Navigator.pop(context),
+                                                child: const Text("VALIDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    );
+                                  },
+                                );
+                              },
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.settings, color: Colors.white70, size: 18),
                                   SizedBox(width: 8),
-                                  Text(
-                                    "PARAMÈTRES DU JEU",
-                                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                                  ),
+                                  Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white70, fontSize: 14)),
                                 ],
                               ),
                             ),
                           ],
                         ),
                       );
-                    } 
+                    }
                     // 👤 AFFICHAGE POUR LES INVITÉS
                     else {
                       return Padding(
