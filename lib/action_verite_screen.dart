@@ -178,19 +178,34 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Scaffold(
               backgroundColor: Color(0xFF101012),
-              body: Center(child: CircularProgressIndicator(color: Colors.pinkAccent)),
+              body: Center(child: Text("La partie est terminée.", style: TextStyle(color: Colors.white70))),
             );
           }
           
           var data = snapshot.data!.data() as Map<String, dynamic>;
           
-          // On lit les données synchronisées (avec des valeurs par défaut au tout début)
+          // 🔥 NOUVEAUTÉ : ON MET À JOUR LES JOUEURS EN DIRECT !
+          // Dès que quelqu'un quitte, il disparaît instantanément de la mémoire du jeu
+          List rawPlayers = data['players'] ?? [];
+          players = rawPlayers.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
+
+          // S'il n'y a plus de joueurs, on affiche un message
+          if (players.isEmpty) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF101012),
+              body: Center(child: Text("Tout le monde a quitté la partie.", style: TextStyle(color: Colors.white70))),
+            );
+          }
+
           int cIndex = data['currentPlayerIndex'] ?? 0;
           String cQuestion = data['currentQuestion'] ?? "Appuie sur un bouton !";
           bool showNext = data['showNextButton'] ?? false;
           
-          // Sécurité anti-crash si un joueur a quitté la partie
-          if (cIndex >= players.length) cIndex = 0;
+          // 🔥 MAGIE : Si c'était au tour de Romain, et que Romain quitte, 
+          // le jeu passe automatiquement au joueur suivant sans planter !
+          if (cIndex >= players.length) {
+            cIndex = 0; 
+          }
 
           return _buildGameUI(cIndex, cQuestion, showNext);
         }
@@ -222,8 +237,36 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context); 
+          onPressed: () async {
+            // SORTIE INDIVIDUELLE : On ne retire que MOI de la base de données
+            if (widget.isOnline && widget.lobbyId != null) {
+              final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+              final doc = await docRef.get();
+              
+              if (doc.exists) {
+                List currentPlayers = List.from(doc.data()?['players'] ?? []);
+                String currentHost = doc.data()?['host'] ?? '';
+
+                // On s'enlève de la liste
+                currentPlayers.removeWhere((p) => p['name'] == widget.currentPlayerName);
+
+                if (currentPlayers.isEmpty) {
+                  await docRef.delete(); // S'il n'y a plus personne, on détruit le lobby
+                } else {
+                  Map<String, dynamic> updates = {'players': currentPlayers};
+                  // Si j'étais le chef, je donne la couronne au suivant avant de partir
+                  if (widget.currentPlayerName == currentHost) {
+                    updates['host'] = currentPlayers[0]['name']; 
+                  }
+                  await docRef.update(updates);
+                }
+              }
+            }
+            
+            // On retourne TOUT à l'accueil pour éviter la boucle avec le lobby
+            if (context.mounted) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            }
           },
         ),
       ),
