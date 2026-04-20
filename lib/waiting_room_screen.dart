@@ -322,23 +322,15 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                               ),
                               onPressed: () async {
+                                // On récupère la liste actuelle des joueurs pour l'injecter dans le jeu
+                                final doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
+                                List allPlayers = doc.data()?['players'] ?? [];
+
                                 await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-                                  'status': 'playing'
+                                  'status': 'playing',
+                                  'activePlayers': allPlayers, // 👈 On crée la session de jeu ici avec tous les joueurs du salon !
+                                  'lastAction': '${widget.currentPlayerName} a lancé la partie !' 
                                 });
-                                
-                                if (context.mounted) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ActionVeriteScreen(
-                                        lobbyId: widget.lobbyId,
-                                        category: data['category'] ?? 'Soft', 
-                                        isOnline: true,
-                                        currentPlayerName: widget.currentPlayerName,
-                                      ),
-                                    ),
-                                  );
-                                }
                               },
                               child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                             ),

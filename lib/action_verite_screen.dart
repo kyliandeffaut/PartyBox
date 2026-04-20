@@ -175,26 +175,21 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF101012),
-              body: Center(child: Text("La partie est terminée.", style: TextStyle(color: Colors.white70))),
-            );
-          }
+          if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
           
           var data = snapshot.data!.data() as Map<String, dynamic>;
           
-          // 🔥 NOUVEAUTÉ : ON MET À JOUR LES JOUEURS EN DIRECT !
-          // Dès que quelqu'un quitte, il disparaît instantanément de la mémoire du jeu
-          List rawPlayers = data['players'] ?? [];
-          players = rawPlayers.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
+          // ON ÉCOUTE LES JOUEURS ACTIFS UNIQUEMENT
+          List rawActive = data['activePlayers'] ?? [];
+          players = rawActive.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
 
-          // S'il n'y a plus de joueurs, on affiche un message
-          if (players.isEmpty) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF101012),
-              body: Center(child: Text("Tout le monde a quitté la partie.", style: TextStyle(color: Colors.white70))),
-            );
+          // Si je ne suis plus dans la liste activePlayers, c'est que j'ai quitté :
+          // Mon téléphone me renvoie automatiquement au Lobby (qui est resté ouvert en dessous)
+          bool stillInGame = players.any((p) => p.name == widget.currentPlayerName);
+          if (!stillInGame && widget.isOnline) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) Navigator.pop(context);
+            });
           }
 
           int cIndex = data['currentPlayerIndex'] ?? 0;
@@ -238,34 +233,22 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () async {
-            // SORTIE INDIVIDUELLE : On ne retire que MOI de la base de données
             if (widget.isOnline && widget.lobbyId != null) {
-              final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-              final doc = await docRef.get();
-              
-              if (doc.exists) {
-                List currentPlayers = List.from(doc.data()?['players'] ?? []);
-                String currentHost = doc.data()?['host'] ?? '';
+              // ASTUCE : On retrouve ton genre directement dans la mémoire du jeu !
+              String myGender = 'H'; 
+              var me = players.where((p) => p.name == widget.currentPlayerName);
+              if (me.isNotEmpty) myGender = me.first.gender;
 
-                // On s'enlève de la liste
-                currentPlayers.removeWhere((p) => p['name'] == widget.currentPlayerName);
-
-                if (currentPlayers.isEmpty) {
-                  await docRef.delete(); // S'il n'y a plus personne, on détruit le lobby
-                } else {
-                  Map<String, dynamic> updates = {'players': currentPlayers};
-                  // Si j'étais le chef, je donne la couronne au suivant avant de partir
-                  if (widget.currentPlayerName == currentHost) {
-                    updates['host'] = currentPlayers[0]['name']; 
-                  }
-                  await docRef.update(updates);
-                }
-              }
-            }
-            
-            // On retourne TOUT à l'accueil pour éviter la boucle avec le lobby
-            if (context.mounted) {
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              // On se retire seulement de 'activePlayers', mais on RESTE dans le lobby !
+              await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+                'activePlayers': FieldValue.arrayRemove([
+                  {'name': widget.currentPlayerName, 'gender': myGender}
+                ]),
+                'lastAction': '${widget.currentPlayerName} est retourné au salon.'
+              });
+            } else {
+              // En mode local, on fait juste un retour arrière normal
+              Navigator.pop(context);
             }
           },
         ),
