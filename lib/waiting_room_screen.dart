@@ -20,12 +20,40 @@ class WaitingRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope( 
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          // 2. BOUM ! C'est ici qu'on utilise la fameuse fonction !
-          _leaveLobby(); 
+    return PopScope(
+      canPop: false, // 1. On bloque le retour automatique
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return; // Si c'est déjà fermé, on ne fait rien
+        // 2. On affiche le Pop-up magique
+        final bool shouldLeave = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1D), // Couleur sombre pour coller au thème
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text('Quitter le lobby ?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            content: const Text('Es-tu sûr de vouloir retourner à l\'accueil ?', style: TextStyle(color: Colors.white70)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false), // Le joueur annule
+                child: const Text('ANNULER', style: TextStyle(color: Colors.white54)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pinkAccent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () => Navigator.pop(context, true), // Le joueur confirme
+                child: const Text('QUITTER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ) ?? false; // false par défaut si le joueur clique à côté du pop-up
+        // 3. Si le joueur a cliqué sur "QUITTER"
+        if (shouldLeave) {
+          _leaveLobby(); // On le supprime de Firebase
+          if (context.mounted) {
+            Navigator.pop(context); // On ferme vraiment l'écran
+          }
         }
       },
       child: Scaffold( 
