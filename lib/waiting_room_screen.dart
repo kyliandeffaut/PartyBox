@@ -140,32 +140,44 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     shadows: [Shadow(color: Colors.blueAccent, blurRadius: 20)],
                   ),
                 ),
-                const Text(
-                  "SALLE D'ATTENTE", 
-                  style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold, letterSpacing: 2)
-                ),
+                // Le mot de passe écoute Firebase en direct pour s'afficher si on DEVIENT chef !
+                StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
+                    
+                    var data = snapshot.data!.data() as Map<String, dynamic>;
+                    bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
 
-                if (widget.isHost) ...[
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1), 
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
-                        const SizedBox(width: 8),
-                        Text(
-                          "MDP : ${widget.password}",
-                          style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1),
+                    // Si je suis le chef actuellement dans la base de données, j'affiche le MDP
+                    if (amITheHost) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1), 
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
+                              const SizedBox(width: 8),
+                              Text(
+                                "MDP : ${widget.password}",
+                                style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      );
+                    }
+                    
+                    // Si je ne suis pas le chef, je n'affiche rien (une boite vide invisible)
+                    return const SizedBox(); 
+                  },
+                ),
 
                 const SizedBox(height: 40),
                 const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
