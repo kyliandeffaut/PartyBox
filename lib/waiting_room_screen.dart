@@ -152,6 +152,18 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
                     
                     var data = snapshot.data!.data() as Map<String, dynamic>;
+
+                    List activePlayers = data['activePlayers'] ?? [];
+                    String status = data['status'] ?? 'waiting';
+
+                    if (status == 'playing' && activePlayers.isEmpty) {
+                      // Si le salon dit qu'on joue mais que tout le monde est revenu au lobby
+                      FirebaseFirestore.instance
+                          .collection('lobbies')
+                          .doc(widget.lobbyId)
+                          .update({'status': 'waiting'});
+                    }
+
                     bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
 
                     // Si je suis le chef actuellement dans la base de données, j'affiche le MDP
@@ -345,7 +357,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
                                 await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
                                   'status': 'playing',
-                                  'activePlayers': allPlayers, // 👈 On crée la session de jeu ici avec tous les joueurs du salon !
+                                  'activePlayers': allPlayers, // On crée la session de jeu ici avec tous les joueurs du salon !
                                   'lastAction': '${widget.currentPlayerName} a lancé la partie !' 
                                 });
                               },

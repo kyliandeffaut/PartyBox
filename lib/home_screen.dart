@@ -333,7 +333,6 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
           .collection('lobbies')
           .where('lobbyName', isEqualTo: lobbyName)
           .where('password', isEqualTo: password)
-          .where('status', isEqualTo: 'waiting')
           .limit(1)
           .get();
 
