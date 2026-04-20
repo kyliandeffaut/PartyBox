@@ -296,9 +296,7 @@ class WaitingRoomScreen extends StatelessWidget {
                                     // 📋 LA LISTE DE TOUS TES JEUX
                                     List<String> gameModes = [
                                       'Action ou Vérité',
-                                      'Je n\'ai jamais',
-                                      'Le Tribunal',
-                                      'Qui pourrait ?'
+                                      'Je n\'ai jamais'
                                     ];
 
                                     return Padding(
