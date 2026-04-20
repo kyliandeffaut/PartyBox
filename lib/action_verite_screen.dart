@@ -295,10 +295,14 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     CategoryScreen({super.key, required this.players});
 
     final List<Map<String, dynamic>> categories = [
-      {'name': 'Classique', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
-      {'name': 'Soft', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
-      {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
-      {'name': 'Extrême', 'color': const Color(0xFF8B5CF6), 'emoji': '😈'},
+    {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
+    {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
+    {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
+    {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
+    {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
+    {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
+    {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
+    {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
     ];
 
     @override

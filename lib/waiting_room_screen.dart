@@ -399,7 +399,6 @@ class WaitingRoomScreen extends StatelessWidget {
                                           {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
                                           {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
                                           {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
-                                          {'name': 'BDSM', 'color': const Color(0xFF000000), 'emoji': '⛓️'},
                                         ];
 
                                         return Padding(
