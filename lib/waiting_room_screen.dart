@@ -276,6 +276,8 @@ class WaitingRoomScreen extends StatelessWidget {
                               child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                             ),
                             const SizedBox(height: 15),
+                            
+                            // 🔥 LE NOUVEAU BOUTON SÉLECTEUR DE MODE AVEC LE MENU
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.white24),
@@ -283,14 +285,65 @@ class WaitingRoomScreen extends StatelessWidget {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               ),
                               onPressed: () {
-                                // 🔄 Logique pour changer de mode
-                                String nextMode = (data['gameMode'] == 'Action ou Vérité') 
-                                    ? 'Je n\'ai jamais' 
-                                    : 'Action ou Vérité';
-                                    
-                                FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
-                                  'gameMode': nextMode
-                                });
+                                // Affichage du menu déroulant depuis le bas
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: const Color(0xFF1A1A1D), // Fond sombre
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                  ),
+                                  builder: (BuildContext context) {
+                                    // 📋 LA LISTE DE TOUS TES JEUX
+                                    List<String> gameModes = [
+                                      'Action ou Vérité',
+                                      'Je n\'ai jamais',
+                                      'Le Tribunal',
+                                      'Qui pourrait ?'
+                                    ];
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min, // Le menu prend juste la place nécessaire
+                                        children: [
+                                          const Text(
+                                            "CHOISIS UN JEU",
+                                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                          ),
+                                          const SizedBox(height: 15),
+                                          
+                                          // On génère un élément de liste pour chaque jeu
+                                          ...gameModes.map((mode) {
+                                            bool isSelected = data['gameMode'] == mode;
+                                            
+                                            return ListTile(
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                                              title: Text(
+                                                mode,
+                                                style: TextStyle(
+                                                  color: isSelected ? Colors.pinkAccent : Colors.white70,
+                                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                                  fontSize: 16
+                                                ),
+                                              ),
+                                              // Ajoute un petit check rose si c'est le jeu actuellement sélectionné
+                                              trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
+                                              onTap: () {
+                                                // 1. Mise à jour de Firebase
+                                                FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                                  'gameMode': mode
+                                                });
+                                                // 2. On ferme le pop-up
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          }),
+                                          const SizedBox(height: 10), // Petite marge en bas
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ); // Fin du showModalBottomSheet
                               },
                               child: Text(
                                 "MODE : ${data['gameMode'] ?? 'Action ou Vérité'}",
