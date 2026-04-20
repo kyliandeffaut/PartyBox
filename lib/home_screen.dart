@@ -135,14 +135,15 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // ✅ Création du Lobby avec le créateur déjà dans la liste
+      // Création du Lobby
       DocumentReference lobbyRef = await FirebaseFirestore.instance.collection('lobbies').add({
         'lobbyName': name,
         'password': password,
         'createdAt': FieldValue.serverTimestamp(),
         'status': 'waiting',
+        'host': pseudo,
         'players': [
-          {'name': pseudo, 'gender': _selectedGender} // ✅ Ajout direct ici
+          {'name': pseudo, 'gender': _selectedGender}
         ], 
       });
 

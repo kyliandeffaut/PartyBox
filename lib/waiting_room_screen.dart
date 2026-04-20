@@ -65,7 +65,6 @@ class WaitingRoomScreen extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            // 🔥 LA COMMANDE MAGIQUE EST LÀ :
             onPressed: () => Navigator.maybePop(context), 
           ),
         ),
@@ -121,6 +120,7 @@ class WaitingRoomScreen extends StatelessWidget {
                       if (data == null) return const Center(child: Text("Lobby introuvable"));
                       
                       List players = data['players'] ?? [];
+                      String hostName = data['host'] ?? '';
 
                       if (players.isEmpty) {
                         return const Center(
@@ -136,6 +136,10 @@ class WaitingRoomScreen extends StatelessWidget {
                           String name = player['name'] ?? "Anonyme";
                           String gender = player['gender'] ?? "H";
 
+                          bool isMe = name == currentPlayerName; // Est-ce que c'est moi ?
+                          bool isHost = name == hostName; // Est-ce que ce joueur est le chef ?
+                          bool amIHost = currentPlayerName == hostName; // Est-ce que MOI je suis le chef ?
+
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
                             decoration: BoxDecoration(
@@ -147,11 +151,37 @@ class WaitingRoomScreen extends StatelessWidget {
                                 Icons.person, 
                                 color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent 
                               ),
-                              title: Text(
-                                name, 
-                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)
+                              title: Row(
+                                children: [
+                                  Text(
+                                    name, 
+                                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)
+                                  ),
+                                  if (isHost) ...[
+                                    const SizedBox(width: 8),
+                                    // L'icône étoile/couronne dorée !
+                                    const Icon(Icons.star, color: Colors.amber, size: 20), 
+                                  ]
+                                ],
                               ),
-                              trailing: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                              trailing: isMe 
+                                  // Si c'est mon propre nom, on met juste le check vert (je me gère moi-même)
+                                  ? const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20)
+                                  // Si c'est quelqu'un d'autre :
+                                  : (amIHost 
+                                      // Si je suis le chef, je vois la croix rouge pour le kicker
+                                      ? IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.redAccent),
+                                          onPressed: () {
+                                            FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                              'players': FieldValue.arrayRemove([
+                                                {'name': name, 'gender': gender}
+                                              ])
+                                            });
+                                          },
+                                        )
+                                      // Si je ne suis pas le chef, je ne vois rien du tout
+                                      : null),
                             ),
                           ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
                         },
