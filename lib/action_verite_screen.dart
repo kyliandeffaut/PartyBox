@@ -186,8 +186,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           players = rawAllPlayers.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
 
           // 🛡️ LE BOUCLIER : On ne quitte l'écran QUE si on n'est plus dans le lobby du tout
-          bool stillInLobby = players.any((p) => p.name == widget.currentPlayerName);  
-
+          bool stillInLobby = players.any((p) => p.name == widget.currentPlayerName);          
           if (!stillInLobby) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) Navigator.pop(context);
@@ -268,7 +267,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           onPressed: () async {
             if (widget.isOnline && widget.lobbyId != null) {
               // ASTUCE : On retrouve ton genre directement dans la mémoire du jeu !
-              String myGender = 'H'; 
+              String myGender = 'H';
               var me = players.where((p) => p.name == widget.currentPlayerName);
               if (me.isNotEmpty) myGender = me.first.gender;
 
@@ -279,8 +278,10 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 ]),
                 'lastAction': '${widget.currentPlayerName} est retourné au salon.'
               });
-            } else {
-              // En mode local, on fait juste un retour arrière normal
+            }
+            
+            // LE RETOUR SE FAIT MAINTENANT DANS TOUS LES CAS !
+            if (context.mounted) {
               Navigator.pop(context);
             }
           },
