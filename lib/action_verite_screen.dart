@@ -16,6 +16,7 @@ class ActionVeriteScreen extends StatefulWidget {
   final bool isOnline; 
   final String? lobbyId;
   final List<GamePlayer>? localPlayers;
+  final String? currentPlayerName;
   
   const ActionVeriteScreen({
     super.key, 
@@ -23,6 +24,7 @@ class ActionVeriteScreen extends StatefulWidget {
     required this.isOnline,
     this.lobbyId,
     this.localPlayers,
+    this.currentPlayerName,
   });
 
   @override
@@ -200,9 +202,14 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // 🎨 L'INTERFACE GRAPHIQUE (Déplacée ici pour ne pas écrire le code en double)
+  // L'INTERFACE GRAPHIQUE (Déplacée ici pour ne pas écrire le code en double)
   Widget _buildGameUI(int cIndex, String cQuestion, bool showNext) {
     GamePlayer currentPlayer = players[cIndex];
+
+    // 1. ON AJOUTE LA VARIABLE ICI
+    bool isMyTurn = widget.isOnline 
+        ? (widget.currentPlayerName == currentPlayer.name) 
+        : true;
 
     final Color themeColor = widget.category == 'Hot' || widget.category == 'Extrême' || widget.category == 'Séduction' || widget.category == 'BDSM'
       ? Colors.red.shade900
@@ -287,20 +294,37 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 ),
               ),
               
+              // 2. ON A MODIFIÉ LA ZONE DES BOUTONS ICI
               Padding(
                 padding: const EdgeInsets.all(40),
-                child: showNext
-                    ? SizedBox(
-                        width: double.infinity, 
-                        child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, () => _updateTurn(cIndex)),
+                child: !isMyTurn 
+                    ? // SI CE N'EST PAS MON TOUR : On affiche un message d'attente
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          "Attends que ${currentPlayer.name} joue...",
+                          style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
                       )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite', cIndex)),
-                          _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action', cIndex)),
-                        ],
-                      ),
+                    : // SI C'EST MON TOUR : On affiche les boutons normalement
+                      showNext
+                          ? SizedBox(
+                              width: double.infinity, 
+                              child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, () => _updateTurn(cIndex)),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite', cIndex)),
+                                _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action', cIndex)),
+                              ],
+                            ),
               ),
             ],
           ),
