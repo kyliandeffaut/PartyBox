@@ -157,7 +157,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
     text = text.replaceAll("{player}", currentPlayer.name); 
 
-    // 🔥 On met à jour pour TOUT LE MONDE
+    // On met à jour pour TOUT LE MONDE
     _updateGameState(text, true); 
   }
 
@@ -170,7 +170,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       );
     }
 
-    // 🌐 MODE ONLINE : On "écoute" Firebase en permanence
+    // MODE ONLINE : On "écoute" Firebase en permanence
     if (widget.isOnline && widget.lobbyId != null) {
       return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
@@ -226,8 +226,33 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       ? Colors.red.shade900
       : Colors.indigo.shade900;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
+    return PopScope(
+      canPop: false, // Bloque le retour auto pour exécuter notre logique
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // 🚀 LOGIQUE DE SORTIE : On retire seulement de 'activePlayers'
+        if (widget.isOnline && widget.lobbyId != null) {
+          // On retrouve ton genre dans la liste locale pour le remove
+          String myGender = 'H';
+          var me = players.where((p) => p.name == widget.currentPlayerName);
+          if (me.isNotEmpty) myGender = me.first.gender;
+
+          await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+            'activePlayers': FieldValue.arrayRemove([
+              {'name': widget.currentPlayerName, 'gender': myGender}
+            ]),
+            'lastAction': '${widget.currentPlayerName} est retourné au salon.'
+          });
+        }
+
+        // On revient au lobby sans le quitter
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -357,6 +382,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
