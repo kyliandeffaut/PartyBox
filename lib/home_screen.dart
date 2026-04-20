@@ -157,6 +157,7 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
             lobbyName: name,
             currentPlayerName: pseudo,
             currentPlayerGender: _selectedGender,
+            isHost: true,
           ),
         ),
       );
@@ -346,6 +347,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
               lobbyName: lobbyName,
               currentPlayerName: pseudo,
               currentPlayerGender: _selectedGender,
+              isHost: false,
             ),
           ),
         );

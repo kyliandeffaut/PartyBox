@@ -7,8 +7,9 @@ class WaitingRoomScreen extends StatelessWidget {
   final String lobbyName;
   final String currentPlayerName; 
   final String currentPlayerGender;
+  final bool isHost;
 
-  const WaitingRoomScreen({super.key, required this.lobbyId, required this.lobbyName, required this.currentPlayerName, required this.currentPlayerGender});
+  const WaitingRoomScreen({super.key, required this.lobbyId, required this.lobbyName, required this.currentPlayerName, required this.currentPlayerGender, required this.isHost});
 
   void _leaveLobby() {
     FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
@@ -217,6 +218,7 @@ class WaitingRoomScreen extends StatelessWidget {
                 ),
 
                 // BOUTON POUR LANCER (Seulement pour le créateur)
+                if (isHost)
                 Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: ElevatedButton(
@@ -227,10 +229,22 @@ class WaitingRoomScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       // On gérera le lancement de la partie juste après !
+                      debugPrint("Lancement de la partie !");
                     },
                     child: const Text(
-                      "LANCER LA PARTIE", 
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)
+                      "LANCER LA PARTIE",
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                  ),
+                )
+              else
+                // Message pour les invités
+                const Padding(
+                  padding: EdgeInsets.all(30.0),
+                  child: Center(
+                    child: Text(
+                      "En attente du chef pour lancer la partie...",
+                      style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic, fontSize: 16),
                     ),
                   ),
                 ),
