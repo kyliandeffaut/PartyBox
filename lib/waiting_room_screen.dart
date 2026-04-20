@@ -348,6 +348,81 @@ class WaitingRoomScreen extends StatelessWidget {
                                 style: const TextStyle(color: Colors.white70, fontSize: 14),
                               ),
                             ),
+
+                            const SizedBox(height: 15), // Espace avant le bouton paramètres
+
+                            // 3. NOUVEAU : BOUTON PARAMÈTRES DU JEU
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.white24),
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              ),
+                              onPressed: () {
+                                // Affichage du menu des paramètres
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: const Color(0xFF1A1A1D),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                  ),
+                                  builder: (BuildContext context) {
+                                    // On récupère le mode actuel pour afficher le bon titre
+                                    String currentMode = data['gameMode'] ?? 'Action ou Vérité';
+
+                                    return Padding(
+                                      padding: const EdgeInsets.all(25.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Titre dynamique selon le jeu choisi
+                                          Text(
+                                            "PARAMÈTRES : ${currentMode.toUpperCase()}",
+                                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 25),
+                                          
+                                          // ZONE DE PARAMÈTRES (À remplir plus tard selon tes idées)
+                                          const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
+                                          const SizedBox(height: 15),
+                                          const Text(
+                                            "Ici, tu pourras ajouter tes switchs pour choisir les catégories (Soft, Hot, Fun, etc...) spécifiques à ce jeu.",
+                                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          
+                                          const SizedBox(height: 30),
+                                          
+                                          // Bouton pour fermer/valider
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.pinkAccent,
+                                              minimumSize: const Size(double.infinity, 50),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                            ),
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text("VALIDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ); // Fin du menu paramètres
+                              },
+                              // Le design du bouton avec la petite icône
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.settings, color: Colors.white70, size: 18),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "PARAMÈTRES DU JEU",
+                                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       );
