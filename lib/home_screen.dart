@@ -123,6 +123,21 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     String name = _nameController.text.trim();
     String password = _passwordController.text.trim();
     String pseudo = _pseudoController.text.trim(); // 3. Récupère le pseudo
+    String lobbyName = _nameController.text.trim();
+
+    // 1. Vérifier si le nom est déjà pris
+    var existingLobby = await FirebaseFirestore.instance
+        .collection('lobbies')
+        .where('lobbyName', isEqualTo: lobbyName)
+        .get();
+
+    if (existingLobby.docs.isNotEmpty) {
+      // Si la liste n'est pas vide, le nom existe déjà
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
+      );
+      return; // On arrête la fonction ici
+    }
 
     if (name.isEmpty || password.isEmpty || pseudo.isEmpty) {
       if (!mounted) return;

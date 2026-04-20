@@ -32,7 +32,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
   bool _isNavigatingToGame = false;
 
   Future<void> _leaveLobby() async {
-    if (_isLeavingManually) return; // Sécurité anti-spam
+    if (_isLeavingManually) return; 
     setState(() {
       _isLeavingManually = true;
     });
@@ -40,26 +40,32 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     try {
       final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
       final doc = await docRef.get();
-      if (!doc.exists) return; // Si le lobby n'existe déjà plus, on s'arrête là
+      if (!doc.exists) return;
 
-      List players = List.from(doc.data()?['players'] ?? []);
-      String currentHost = doc.data()?['host'] ?? '';
+      var data = doc.data() as Map<String, dynamic>;
+      List players = List.from(data['players'] ?? []);
+      String currentHost = data['host'] ?? '';
 
-      // On se retire de la liste
+      // 1. On retire le joueur de la liste
       players.removeWhere((p) => p['name'] == widget.currentPlayerName);
 
+      // 2. LE CHECK DE SUPPRESSION
       if (players.isEmpty) {
-        await docRef.delete(); // On détruit tout s'il n'y a plus personne
+        // PLUS PERSONNE : On supprime le lobby définitivement
+        await docRef.delete();
       } else {
+        // IL RESTE DU MONDE : On met à jour la liste et on gère le nouveau chef
         Map<String, dynamic> updates = {'players': players};
-        // Succession : le chef donne la couronne au suivant s'il part
+        
+        // Si celui qui part est le chef, on donne la couronne au premier de la liste restante
         if (widget.currentPlayerName == currentHost) {
           updates['host'] = players[0]['name']; 
         }
+        
         await docRef.update(updates);
       }
     } catch (e) {
-      debugPrint("Petite erreur de sortie ignorée : $e"); // Empêche l'appli de planter
+      debugPrint("Erreur lors de la sortie du lobby : $e");
     }
   }
 
