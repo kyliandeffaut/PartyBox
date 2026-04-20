@@ -8,8 +8,17 @@ class WaitingRoomScreen extends StatelessWidget {
   final String currentPlayerName; 
   final String currentPlayerGender;
   final bool isHost;
+  final String password;
 
-  const WaitingRoomScreen({super.key, required this.lobbyId, required this.lobbyName, required this.currentPlayerName, required this.currentPlayerGender, required this.isHost});
+  const WaitingRoomScreen({
+    super.key, 
+    required this.lobbyId, 
+    required this.lobbyName, 
+    required this.currentPlayerName, 
+    required this.currentPlayerGender, 
+    required this.isHost, 
+    required this.password
+    });
 
   void _leaveLobby() {
     FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
@@ -102,8 +111,30 @@ class WaitingRoomScreen extends StatelessWidget {
                   "SALLE D'ATTENTE", 
                   style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold, letterSpacing: 2)
                 ),
+
+                if (isHost) ...[
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1), // Un fond légèrement transparent
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          "MDP : $password",
+                          style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 
                 const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
                 
