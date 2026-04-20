@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'action_verite_screen.dart';
 
 class WaitingRoomScreen extends StatelessWidget {
   final String lobbyId;
@@ -154,7 +155,7 @@ class WaitingRoomScreen extends StatelessWidget {
                       List players = data['players'] ?? [];
                       String hostName = data['host'] ?? '';
 
-                      // 🔥 3. LA VÉRIFICATION MAGIQUE : Est-ce que je suis toujours dans la liste ?
+                      // 3. LA VÉRIFICATION MAGIQUE : Est-ce que je suis toujours dans la liste ?
                       bool isMeStillHere = players.any((p) => p['name'] == currentPlayerName);
 
                       if (!isMeStillHere) {
@@ -172,6 +173,27 @@ class WaitingRoomScreen extends StatelessWidget {
                         });
                         
                         return const Center(child: Text("Expulsion en cours...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
+                      }
+
+                      // 4. LE LANCEMENT DE LA PARTIE (La nouveauté)
+                      if (data['status'] == 'playing') {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (context.mounted) {
+                            // On remplace la salle d'attente par l'écran de jeu !
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ActionVeriteScreen(
+                                  lobbyId: lobbyId,
+                                  category: data['category'] ?? 'Classique', // On envoie la catégorie choisie !
+                                  isOnline: true,
+                                ),
+                              ),
+                            );
+                          }
+                        });
+                        // Écran de chargement ultra rapide le temps de changer de page
+                        return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
                       }
 
                       if (players.isEmpty) {
@@ -367,15 +389,14 @@ class WaitingRoomScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                   ),
                                   builder: (BuildContext context) {
-                                    // On récupère le mode actuel pour afficher le bon titre
                                     String currentMode = data['gameMode'] ?? 'Action ou Vérité';
+                                    String currentCategory = data['category'] ?? 'Classique';
 
                                     return Padding(
                                       padding: const EdgeInsets.all(25.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          // Titre dynamique selon le jeu choisi
                                           Text(
                                             "PARAMÈTRES : ${currentMode.toUpperCase()}",
                                             style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
@@ -383,18 +404,40 @@ class WaitingRoomScreen extends StatelessWidget {
                                           ),
                                           const SizedBox(height: 25),
                                           
-                                          // ZONE DE PARAMÈTRES (À remplir plus tard selon tes idées)
-                                          const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
-                                          const SizedBox(height: 15),
-                                          const Text(
-                                            "Ici, tu pourras ajouter tes switchs pour choisir les catégories (Soft, Hot, Fun, etc...) spécifiques à ce jeu.",
-                                            style: TextStyle(color: Colors.white70, fontSize: 14),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                          // SI LE JEU EST ACTION OU VÉRITÉ : On affiche les catégories
+                                          if (currentMode == 'Action ou Vérité') ...[
+                                            const Text("Choisis l'intensité :", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                            const SizedBox(height: 15),
+                                            Wrap(
+                                              spacing: 10,
+                                              runSpacing: 10,
+                                              alignment: WrapAlignment.center,
+                                              children: ['Classique', 'Soft', 'Hot', 'Extrême'].map((cat) {
+                                                bool isSelected = currentCategory == cat;
+                                                return ChoiceChip(
+                                                  label: Text(cat, style: TextStyle(color: isSelected ? Colors.white : Colors.white70)),
+                                                  selected: isSelected,
+                                                  selectedColor: Colors.pinkAccent,
+                                                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                                  side: BorderSide.none,
+                                                  onSelected: (bool selected) {
+                                                    // Mise à jour de la catégorie dans Firebase
+                                                    FirebaseFirestore.instance.collection('lobbies').doc(lobbyId).update({
+                                                      'category': cat
+                                                    });
+                                                  },
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ] 
+                                          // SI C'EST UN AUTRE JEU (Pour plus tard)
+                                          else ...[
+                                            const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
+                                            const SizedBox(height: 15),
+                                            const Text("Paramètres à venir pour ce mode.", style: TextStyle(color: Colors.white70)),
+                                          ],
                                           
                                           const SizedBox(height: 30),
-                                          
-                                          // Bouton pour fermer/valider
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.pinkAccent,
