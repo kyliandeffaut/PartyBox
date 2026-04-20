@@ -215,9 +215,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
                       bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
 
-                      // 🔥 3. ON UTILISE LE BOUCLIER ICI !
+                      // 3. ON UTILISE LE BOUCLIER ICI !
                       // Si je n'y suis plus ET que ce n'est pas moi qui suis parti...
-                      if (!isMeStillHere && !_isLeavingManually) {
+                      if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (context.mounted) {
                             Navigator.of(context).pop(); 
