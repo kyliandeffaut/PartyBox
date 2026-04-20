@@ -13,11 +13,9 @@ class GamePlayer {
 // --- L'ÉCRAN DE JEU HYBRIDE (Local & Online) ---
 class ActionVeriteScreen extends StatefulWidget {
   final String category;
-  
-  // 🔥 LES NOUVEAUTÉS POUR LE MODE LOCAL/ONLINE
   final bool isOnline; 
-  final String? lobbyId; // Optionnel maintenant
-  final List<GamePlayer>? localPlayers; // Optionnel (utilisé que si isOnline = false)
+  final String? lobbyId;
+  final List<GamePlayer>? localPlayers;
   
   const ActionVeriteScreen({
     super.key, 
@@ -33,37 +31,34 @@ class ActionVeriteScreen extends StatefulWidget {
 
 class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
   List<dynamic> allQuestions = [];
-  String currentQuestion = "Appuie sur un bouton !";
   List<GamePlayer> players = [];
   
-  int currentPlayerIndex = 0;
-  bool showNextButton = false;
+  // Variables locales (utilisées UNIQUEMENT si on joue hors-ligne sur 1 seul téléphone)
+  int localCurrentPlayerIndex = 0;
+  String localCurrentQuestion = "Appuie sur un bouton !";
+  bool localShowNextButton = false;
 
   @override
   void initState() {
     super.initState();
     loadQuestions();
     
-    // 🔥 LE SWITCH MAGIQUE EST ICI
+    // Au lancement, on récupère les joueurs
     if (widget.isOnline && widget.lobbyId != null) {
-      // MODE ONLINE : On va chercher sur Internet
       fetchPlayersFromFirebase(); 
     } else {
-      // MODE LOCAL : On utilise directement la liste qu'on lui a donnée
       setState(() {
         players = widget.localPlayers ?? [];
       });
     }
   }
 
-  // 1. Charger les questions depuis le JSON
   Future<void> loadQuestions() async {
     final String response = await rootBundle.loadString('assets/action_verite.json');
     final data = await json.decode(response);
     setState(() { allQuestions = data; });
   }
 
-  // 2. Charger les joueurs depuis Firebase (juste pour le mode Online)
   Future<void> fetchPlayersFromFirebase() async {
     DocumentSnapshot doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
     
@@ -80,29 +75,57 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // 3. La logique de tirage de question (Ta bonne vieille fonction !)
-  void pickQuestion(String type) {
+  // 🔄 LA MAGIE : On envoie la question dans Firebase pour que tout le monde la voie !
+  void _updateGameState(String question, bool showNext) {
+    if (widget.isOnline && widget.lobbyId != null) {
+      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+        'currentQuestion': question,
+        'showNextButton': showNext,
+      });
+    } else {
+      setState(() {
+        localCurrentQuestion = question;
+        localShowNextButton = showNext;
+      });
+    }
+  }
+
+  // 🔄 LA MAGIE : On change de tour dans Firebase
+  void _updateTurn(int currentIndex) {
+    int nextIndex = (currentIndex + 1) % players.length;
+    
+    if (widget.isOnline && widget.lobbyId != null) {
+      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+        'currentPlayerIndex': nextIndex,
+        'currentQuestion': "Appuie sur un bouton !",
+        'showNextButton': false,
+      });
+    } else {
+      setState(() {
+        localCurrentPlayerIndex = nextIndex;
+        localCurrentQuestion = "Appuie sur un bouton !";
+        localShowNextButton = false;
+      });
+    }
+  }
+
+  // Tirage de la question
+  void pickQuestion(String type, int cIndex) {
     if (allQuestions.isEmpty || players.isEmpty) return;
 
     var filtered = allQuestions.where((q) => q['type'] == type && q['category'] == widget.category).toList();
-    
-    // Si la catégorie est vide, on prend tout pour éviter de planter
     if (filtered.isEmpty) {
       filtered = allQuestions.where((q) => q['type'] == type).toList();
     }
-    
     if (filtered.isEmpty) return;
 
     final random = Random();
     var questionData = filtered[random.nextInt(filtered.length)];
     String text = questionData['text'];
 
-    GamePlayer currentPlayer = players[currentPlayerIndex];
-
-    // On prépare les cibles
+    GamePlayer currentPlayer = players[cIndex];
     List<GamePlayer> potentialTargets = players.where((p) => p.name != currentPlayer.name).toList();
 
-    // Filtre Mixte
     bool hasMen = players.any((p) => p.gender == 'H');
     bool hasWomen = players.any((p) => p.gender == 'F');
     bool isMixedGroup = hasMen && hasWomen;
@@ -119,40 +142,25 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       }
     }
 
-    // Sécurité
     if (potentialTargets.isEmpty) {
       potentialTargets = List.from(players)..removeWhere((p) => p.name == currentPlayer.name);
     }
     
-    // Remplacement du texte
     if (potentialTargets.isNotEmpty) {
       potentialTargets.shuffle();
       GamePlayer target = potentialTargets[0];
       text = text.replaceAll("{target}", target.name);
     } else {
-      text = text.replaceAll("{target}", "quelqu'un"); // S'il joue tout seul lol
+      text = text.replaceAll("{target}", "quelqu'un"); 
     }
-    
     text = text.replaceAll("{player}", currentPlayer.name); 
 
-    setState(() {
-      currentQuestion = text;
-      showNextButton = true;
-    });
-  }
-
-  // 4. Passer au tour suivant
-  void nextTurn() {
-    setState(() {
-      currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-      currentQuestion = "Appuie sur un bouton !";
-      showNextButton = false;
-    });
+    // 🔥 On met à jour pour TOUT LE MONDE
+    _updateGameState(text, true); 
   }
 
   @override
   Widget build(BuildContext context) {
-    // Écran de chargement si les joueurs ne sont pas encore arrivés de Firebase
     if (players.isEmpty) {
       return const Scaffold(
         backgroundColor: Color(0xFF101012),
@@ -160,10 +168,43 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       );
     }
 
-    GamePlayer currentPlayer = players[currentPlayerIndex];
+    // 🌐 MODE ONLINE : On "écoute" Firebase en permanence
+    if (widget.isOnline && widget.lobbyId != null) {
+      return StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Scaffold(
+              backgroundColor: Color(0xFF101012),
+              body: Center(child: CircularProgressIndicator(color: Colors.pinkAccent)),
+            );
+          }
+          
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          
+          // On lit les données synchronisées (avec des valeurs par défaut au tout début)
+          int cIndex = data['currentPlayerIndex'] ?? 0;
+          String cQuestion = data['currentQuestion'] ?? "Appuie sur un bouton !";
+          bool showNext = data['showNextButton'] ?? false;
+          
+          // Sécurité anti-crash si un joueur a quitté la partie
+          if (cIndex >= players.length) cIndex = 0;
 
-    // Design en fonction de la catégorie
-    final Color themeColor = widget.category == 'Hot' || widget.category == 'Extrême'
+          return _buildGameUI(cIndex, cQuestion, showNext);
+        }
+      );
+    } 
+    // 🏠 MODE LOCAL : On utilise l'état du téléphone
+    else {
+      return _buildGameUI(localCurrentPlayerIndex, localCurrentQuestion, localShowNextButton);
+    }
+  }
+
+  // 🎨 L'INTERFACE GRAPHIQUE (Déplacée ici pour ne pas écrire le code en double)
+  Widget _buildGameUI(int cIndex, String cQuestion, bool showNext) {
+    GamePlayer currentPlayer = players[cIndex];
+
+    final Color themeColor = widget.category == 'Hot' || widget.category == 'Extrême' || widget.category == 'Séduction' || widget.category == 'BDSM'
       ? Colors.red.shade900
       : Colors.indigo.shade900;
 
@@ -175,7 +216,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            // Ici, plus tard, on pourra remettre le status du lobby sur 'waiting'
             Navigator.pop(context); 
           },
         ),
@@ -194,7 +234,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
             children: [
               const SizedBox(height: 20),
               
-              // Affichage du Mode et Catégorie en haut
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 decoration: BoxDecoration(
@@ -226,25 +265,21 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       );
                     },
                     child: Padding(
-                      key: ValueKey(currentQuestion),
+                      key: ValueKey(cQuestion),
                       padding: const EdgeInsets.all(30),
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9), // J'ai rendu la case blanche pour qu'on lise mieux
+                          color: Colors.white.withValues(alpha: 0.9), 
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(color: themeColor.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: 5)
                           ]
                         ),
                         child: Text(
-                          currentQuestion,
+                          cQuestion,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 24, 
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black87),
                         ),
                       ),
                     ),
@@ -254,16 +289,16 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
               
               Padding(
                 padding: const EdgeInsets.all(40),
-                child: showNextButton
+                child: showNext
                     ? SizedBox(
                         width: double.infinity, 
-                        child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, nextTurn),
+                        child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, () => _updateTurn(cIndex)),
                       )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite')),
-                          _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action')),
+                          _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite', cIndex)),
+                          _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action', cIndex)),
                         ],
                       ),
               ),
@@ -288,77 +323,76 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     );
   }
 }
-  // --- ÉCRAN 2 : SÉLECTION DES CATÉGORIES (SPÉCIAL MODE LOCAL) ---
-  class CategoryScreen extends StatelessWidget {
-    final List<dynamic> players; // Accepte ta liste de joueurs locaux
 
-    CategoryScreen({super.key, required this.players});
+// --- ÉCRAN 2 : SÉLECTION DES CATÉGORIES (SPÉCIAL MODE LOCAL) ---
+class CategoryScreen extends StatelessWidget {
+  final List<dynamic> players; 
 
-    final List<Map<String, dynamic>> categories = [
-    {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
-    {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
-    {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
-    {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
-    {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
-    {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
-    {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
-    {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
-    ];
+  CategoryScreen({super.key, required this.players});
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        backgroundColor: const Color(0xFF101012),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text("CHOISIS UNE CATÉGORIE", style: TextStyle(color: Colors.white, fontSize: 16)),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+  final List<Map<String, dynamic>> categories = [
+  {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
+  {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
+  {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
+  {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
+  {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
+  {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
+  {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
+  {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF101012),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text("CHOISIS UNE CATÉGORIE", style: TextStyle(color: Colors.white, fontSize: 16)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: GridView.builder(
-          padding: const EdgeInsets.all(20),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, childAspectRatio: 1.5, crossAxisSpacing: 15, mainAxisSpacing: 15
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final cat = categories[index];
-            return ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cat['color'].withValues(alpha: 0.2),
-                side: BorderSide(color: cat['color'], width: 2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
-              onPressed: () {
-                // 1. On convertit tes anciens joueurs au nouveau format "GamePlayer"
-                List<GamePlayer> formattedPlayers = players.map((p) => GamePlayer(
-                  name: p.name, 
-                  gender: p.gender
-                )).toList();
-
-                // 2. 🔥 ON LANCE LE JEU EN MODE LOCAL !
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => ActionVeriteScreen(
-                    category: cat['name'], // La catégorie cliquée
-                    isOnline: false,       // LE FAMEUX SWITCH MODE LOCAL
-                    localPlayers: formattedPlayers, // On lui donne la liste des joueurs
-                  ),
-                ));
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(cat['emoji'], style: const TextStyle(fontSize: 30)),
-                  const SizedBox(height: 10),
-                  Text(cat['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            );
-          },
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(20),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, childAspectRatio: 1.5, crossAxisSpacing: 15, mainAxisSpacing: 15
         ),
-      );
-    }
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          return ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: cat['color'].withValues(alpha: 0.2),
+              side: BorderSide(color: cat['color'], width: 2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            onPressed: () {
+              List<GamePlayer> formattedPlayers = players.map((p) => GamePlayer(
+                name: p.name, 
+                gender: p.gender
+              )).toList();
+
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => ActionVeriteScreen(
+                  category: cat['name'], 
+                  isOnline: false,       
+                  localPlayers: formattedPlayers, 
+                ),
+              ));
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(cat['emoji'], style: const TextStyle(fontSize: 30)),
+                const SizedBox(height: 10),
+                Text(cat['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
+}
