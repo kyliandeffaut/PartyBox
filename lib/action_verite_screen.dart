@@ -181,14 +181,14 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           
           var data = snapshot.data!.data() as Map<String, dynamic>;
           
-          // ON ÉCOUTE LES JOUEURS ACTIFS UNIQUEMENT
-          List rawActive = data['activePlayers'] ?? [];
-          players = rawActive.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
+          // 1. On récupère TOUS les joueurs du lobby (ceux présents dans le salon)
+          List rawAllPlayers = data['players'] ?? [];
+          players = rawAllPlayers.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
 
-          // Si je ne suis plus dans la liste activePlayers, c'est que j'ai quitté :
-          // Mon téléphone me renvoie automatiquement au Lobby (qui est resté ouvert en dessous)
-          bool stillInGame = players.any((p) => p.name == widget.currentPlayerName);
-          if (!stillInGame && widget.isOnline) {
+          // 🛡️ LE BOUCLIER : On ne quitte l'écran QUE si on n'est plus dans le lobby du tout
+          bool stillInLobby = players.any((p) => p.name == widget.currentPlayerName);  
+
+          if (!stillInLobby) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) Navigator.pop(context);
             });
