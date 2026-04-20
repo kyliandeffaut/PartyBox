@@ -308,7 +308,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     
                     var data = snapshot.data!.data() as Map<String, dynamic>;
 
-                    if (widget.isHost) {
+                    bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
+
+                    if (amITheHost) {
                       return Padding(
                         padding: const EdgeInsets.all(30.0),
                         child: Column(
