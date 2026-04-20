@@ -190,6 +190,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) Navigator.pop(context);
             });
+            return const Scaffold(backgroundColor: Color(0xFF101012));
           }
 
           int cIndex = data['currentPlayerIndex'] ?? 0;
