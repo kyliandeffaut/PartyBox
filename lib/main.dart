@@ -296,7 +296,7 @@ class GameSelectionScreen extends StatelessWidget {
 }
 
 Future<void> cleanOldLobbies() async {
-  print("🧹 Nettoyage des vieux lobbys en cours...");
+  debugPrint("🧹 Nettoyage des vieux lobbys en cours...");
   
   // On calcule l'heure d'il y a 24 heures
   DateTime twentyFourHoursAgo = DateTime.now().subtract(const Duration(hours: 24));
