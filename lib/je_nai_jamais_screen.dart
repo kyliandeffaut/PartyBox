@@ -31,6 +31,8 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   bool isLoading = true;
   bool isHost = false;
   bool hasVotedThisTurn = false;
+  
+  bool _canPop = false; // 🛡️ Autorise la fermeture propre de l'écran
 
   bool _localSecretMode = false;
   bool _localGameEnded = false;
@@ -64,11 +66,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         var data = snapshot.data()!;
         if (mounted) {
           setState(() {
-            // ✅ Permet de lancer le jeu immédiatement si le lobby a une catégorie
             selectedCategory = data['category'] ?? data['selectedCategory'] ?? ""; 
             currentQuestion = data['currentQuestion'] ?? "Le chef choisit...";
             
-            List<dynamic> fbPlayers = data['players'] ?? [];
+            // ✅ ON LIT SEULEMENT LES JOUEURS ACTIFS EN JEU !
+            List<dynamic> fbPlayers = data['activePlayers'] ?? [];
             widget.players.clear();
             bool amIVoted = false;
             
@@ -84,7 +86,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
             isLoading = false;
           });
 
-          // ✅ LE CHEF PIOCHE LA PREMIÈRE QUESTION AUTOMATIQUEMENT
+          // ✅ PIOCHE AUTO SI NOUVELLE PARTIE
           if (isHost && selectedCategory.isNotEmpty && (data['currentQuestion'] == null || data['currentQuestion'] == "Le chef choisit...")) {
             nextQuestionOnline();
           }
@@ -107,16 +109,26 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
-    List<dynamic> players = List.from(doc.data()?['players'] ?? []);
     
-    for (var p in players) {
+    // On met à jour activePlayers ET players pour tout garder en sécurité
+    List<dynamic> activeP = List.from(doc.data()?['activePlayers'] ?? []);
+    List<dynamic> allP = List.from(doc.data()?['players'] ?? []);
+    
+    for (var p in activeP) {
       if (p['name'] == widget.currentPlayerName) {
         p['hasVoted'] = true;
         p['lastVote'] = hasDoneIt ? 'deja_fait' : 'jamais';
         if (hasDoneIt) p['score'] = (p['score'] ?? 0) + 1;
       }
     }
-    await docRef.update({'players': players});
+    for (var p in allP) {
+      if (p['name'] == widget.currentPlayerName) {
+        p['hasVoted'] = true;
+        p['lastVote'] = hasDoneIt ? 'deja_fait' : 'jamais';
+        if (hasDoneIt) p['score'] = (p['score'] ?? 0) + 1;
+      }
+    }
+    await docRef.update({'activePlayers': activeP, 'players': allP});
   }
 
   void nextQuestionOnline() async {
@@ -127,16 +139,23 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
-    List<dynamic> players = List.from(doc.data()?['players'] ?? []);
+    
+    List<dynamic> activeP = List.from(doc.data()?['activePlayers'] ?? []);
+    List<dynamic> allP = List.from(doc.data()?['players'] ?? []);
 
-    for (var p in players) {
+    for (var p in activeP) {
+      p['hasVoted'] = false;
+      p['lastVote'] = null; 
+    }
+    for (var p in allP) {
       p['hasVoted'] = false;
       p['lastVote'] = null; 
     }
 
     await docRef.update({
       'currentQuestion': newQ,
-      'players': players,
+      'activePlayers': activeP,
+      'players': allP,
     });
   }
 
@@ -179,23 +198,25 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   // ✅ CORRECTION DU BOUTON RETOUR QUI ÉJECTAIT LE JOUEUR
   void _quit() async {
     if (widget.isOnline && widget.lobbyId != null) {
-      String myGender = 'H';
-      var me = widget.players.where((p) => p.name == widget.currentPlayerName);
-      if (me.isNotEmpty) myGender = me.first.gender;
-
-      // On le retire JUSTE de la partie (activePlayers) pas du lobby !
-      await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-        'activePlayers': FieldValue.arrayRemove([{'name': widget.currentPlayerName, 'gender': myGender}])
-      });
+      var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+      var doc = await docRef.get();
+      if (doc.exists) {
+        // On le retire JUSTE de activePlayers pour qu'il retourne au lobby en mode prêt/attente
+        List activeP = List.from(doc.data()?['activePlayers'] ?? []);
+        activeP.removeWhere((p) => p['name'] == widget.currentPlayerName);
+        await docRef.update({'activePlayers': activeP});
+      }
     }
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      setState(() => _canPop = true); // Autorise la fermeture
+      Navigator.pop(context); // Retourne en arrière
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Englobe tout le Scaffold pour protéger le bouton retour matériel (Android)
     return PopScope(
-      canPop: false,
+      canPop: _canPop, // Utilise la sécurité pour le bouton retour natif
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         _quit();
@@ -312,7 +333,10 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
         if (widget.isOnline && snapshot.hasData && snapshot.data!.exists) {
           var data = snapshot.data!.data() as Map<String, dynamic>;
-          currentPlayersFB = data['players'] ?? [];
+          
+          // ✅ ON UTILISE ACTIVE PLAYERS ICI !
+          currentPlayersFB = data['activePlayers'] ?? [];
+          
           allVoted = currentPlayersFB.isNotEmpty && currentPlayersFB.every((p) => p['hasVoted'] == true);
           visibilityMode = data['jnjVisibility'] ?? 'visible';
           gameEnded = data['jnjGameEnded'] ?? false;
@@ -458,8 +482,8 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
           Widget actionWidget = const SizedBox();
 
           if (gameEnded) {
+            // ✅ CORRECTION DU CLASSEMENT FINAL : JUSTE LE SCORE
             displayScore = score.toString();
-            // ✅ CORRECTION CLASSEMENT FINAL (N'affiche QUE le score, plus le vote du dernier tour)
             actionWidget = const SizedBox(); 
           } else if (visibilityMode == 'visible') {
             displayScore = score.toString();

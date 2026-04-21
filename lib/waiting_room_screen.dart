@@ -246,6 +246,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           bool isMe = name == widget.currentPlayerName; 
                           bool isHost = name == hostName; 
                           bool amIHost = widget.currentPlayerName == hostName; 
+                          
+                          // ✅ LOGIQUE "EN JEU" OU "PRÊT"
+                          bool gameIsActive = data['status'] == 'playing' || (data['activePlayers'] as List? ?? []).isNotEmpty;
+                          bool isInGame = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == name);
 
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
@@ -261,15 +265,24 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min, 
                                 children: [
-                                  const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                                  if (gameIsActive && isInGame)
+                                    const Text("En jeu 🎮", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold))
+                                  else
+                                    const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                                    
                                   if (amIHost && !isMe) ...[
                                     const SizedBox(width: 5), 
                                     IconButton(
                                       icon: const Icon(Icons.close, color: Colors.redAccent),
-                                      onPressed: () {
-                                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-                                          'players': FieldValue.arrayRemove([{'name': name, 'gender': gender}])
-                                        });
+                                      onPressed: () async {
+                                        var doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
+                                        if (doc.exists) {
+                                          List pList = List.from(doc.data()?['players'] ?? []);
+                                          pList.removeWhere((p) => p['name'] == name);
+                                          List aList = List.from(doc.data()?['activePlayers'] ?? []);
+                                          aList.removeWhere((p) => p['name'] == name);
+                                          await doc.reference.update({'players': pList, 'activePlayers': aList});
+                                        }
                                       },
                                     ),
                                   ],
@@ -298,9 +311,29 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                               onPressed: () async {
-                                final doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
-                                List allPlayers = doc.data()?['players'] ?? [];
-                                await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'playing', 'activePlayers': allPlayers});
+                                final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+                                final doc = await docRef.get();
+                                var currentData = doc.data() as Map<String, dynamic>;
+                                List allPlayers = currentData['players'] ?? [];
+                                
+                                // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
+                                List updatedPlayers = allPlayers.map((p) {
+                                  var newP = Map<String, dynamic>.from(p);
+                                  newP['hasVoted'] = false;
+                                  newP['lastVote'] = null;
+                                  return newP;
+                                }).toList();
+
+                                await docRef.update({
+                                  'status': 'playing',
+                                  'activePlayers': updatedPlayers,
+                                  'players': updatedPlayers,
+                                  'jnjGameEnded': false,
+                                  'currentQuestion': null, // Force une nouvelle pioche
+                                  'lastChoice': null,
+                                  'showNextButton': false,
+                                  'currentPlayerIndex': 0,
+                                });
                               },
                               child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                             ),
@@ -400,8 +433,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
   Widget _buildParamsSheet(Map<String, dynamic> data) {
     String mode = data['gameMode'] ?? 'Action ou Vérité';
+    String currentCategory = data['category'] ?? 'Soft'; // ✅ On récupère la catégorie en cours
     
-    // ✅ LA CORRECTION DU BOUTON CLICQUABLE EST ICI (variable en dehors du builder)
     bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
 
     final List<Map<String, dynamic>> actionCats = [
@@ -410,7 +443,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       {'n': 'Couple', 'e': '💞'}, {'n': 'Hot', 'e': '🔥'},
     ];
     final List<Map<String, dynamic>> jnjCats = [
-      // ✅ CORRECTION DU DOUBLE EMOJI 🌶️ ICI
       {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '+18', 'e': '🌶️'}, 
     ];
     final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
@@ -454,14 +486,18 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
                 const SizedBox(height: 10),
                 
-                ...cats.map((c) => ListTile(
-                  leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
-                  title: Text(c['n'], style: const TextStyle(color: Colors.white)),
-                  onTap: () {
-                    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
-                    Navigator.pop(context);
-                  },
-                )),
+                ...cats.map((c) {
+                  bool isSelected = c['n'] == currentCategory;
+                  return ListTile(
+                    leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
+                    title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                    trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
+                    onTap: () {
+                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
+                      Navigator.pop(context);
+                    },
+                  );
+                }),
               ],
             ),
           ),
