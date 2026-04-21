@@ -48,29 +48,44 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1D),
-        title: const Text("🤫 Espace VIP", style: TextStyle(color: Colors.white)),
+        title: const Text("CODE :", style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: secretController,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            hintText: "Code magique...",
+            hintText: "Code",
             hintStyle: TextStyle(color: Colors.white54),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () async {
-              if (secretController.text == "MAMAN2024" || secretController.text == "POTEKYLIAN") {
+              // CODE POUR DÉBLOQUER
+              if (secretController.text == "KYKS606") {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('isPremium', true);
                 
-                if (mounted) {
+                if (context.mounted) {
                   setState(() => _isPremiumUnlocked = true);
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("✨ Modes Premium débloqués à vie !"), backgroundColor: Colors.green),
                   );
                 }
+                // NOUVEAU CODE POUR REVERROUILLER
+                else if (secretController.text == "RESET") {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isPremium', false); // On remet la mémoire à false
+                
+                if (context.mounted) {
+                  setState(() => _isPremiumUnlocked = false); // On met à false pour l'affichage
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("🔒 Premium désactivé (Mode test)"), backgroundColor: Colors.orange),
+                  );
+                }
+              }
+              // MAUVAIS CODE
               } else {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
