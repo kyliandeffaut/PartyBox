@@ -174,10 +174,9 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(typeTitle, style: const TextStyle(fontSize: 20, color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 4)),
-          const SizedBox(height: 40),
+          const SizedBox(height: 180),
           Text(
             localCurrentQuestion,
             style: const TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3),
