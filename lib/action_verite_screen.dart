@@ -175,14 +175,13 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
 
   Widget _buildExpandedContent(String typeTitle, int cIndex, String actualQuestion, bool isMyTurn, GamePlayer currentPlayer) {
     return Padding(
-      padding: const EdgeInsets.all(30.0),
-      child: Column(
+        padding: const EdgeInsets.only(top: 220.0, left: 30.0, right: 30.0, bottom: 30.0),      child: Column(
         children: [
           const SizedBox(height: 130),
           Text(typeTitle, style: const TextStyle(fontSize: 20, color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 4)),
           const SizedBox(height: 30),
           Text(
-            actualQuestion, // ✨ On utilise la vraie question synchronisée !
+            actualQuestion, // On utilise la vraie question synchronisée !
             style: const TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3),
             textAlign: TextAlign.center,
           ),
