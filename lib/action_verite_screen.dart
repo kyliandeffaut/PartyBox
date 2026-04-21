@@ -301,7 +301,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         }
 
         // On revient au lobby sans le quitter
-        if (context.mounted) {
+        if (mounted) {
           Navigator.of(context).pop();
         }
       },
@@ -335,125 +335,139 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           },
         ),
       ),
-      body: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(-0.5, -0.6),
-            radius: 1.5,
-            colors: [themeColor.withValues(alpha: 0.8), const Color(0xFF101012)],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                child: Text(
-                  "Action ou Vérité • ${widget.category}", 
-                  style: const TextStyle(color: Colors.white70, fontSize: 12)
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              const Text("C'EST AU TOUR DE :", style: TextStyle(color: Colors.white54, letterSpacing: 2)),
-              Text(
-                currentPlayer.name.toUpperCase(), 
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)
-              ),
-
-              const SizedBox(height: 30),
-              
-              // LA ZONE SPLIT-SCREEN QUI PREND TOUT LE RESTE DE L'ÉCRAN
-              Expanded(
-                child: !isMyTurn
-                    ? Center(
-                        child: Text(
-                          "Attends que ${currentPlayer.name} joue...",
-                          style: const TextStyle(color: Colors.white54, fontSize: 18, fontStyle: FontStyle.italic),
+      body: Stack(
+        children: [
+          // COUCHE 1 : LE FOND (Les murs géants)
+          !isMyTurn
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(-0.5, -0.6),
+                      radius: 1.5,
+                      colors: [themeColor.withValues(alpha: 0.8), const Color(0xFF101012)],
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Attends que ${currentPlayer.name} joue...",
+                      style: const TextStyle(color: Colors.white54, fontSize: 18, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                )
+              : Row(
+                  children: [
+                    // MUR VÉRITÉ
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutExpo,
+                      width: showNext
+                          ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
+                          : MediaQuery.of(context).size.width / 2,
+                      child: ClipRRect(
+                        child: Material(
+                          color: const Color.fromARGB(255, 28, 126, 36).withValues(alpha: 0.95),
+                          child: InkWell(
+                            onTap: showNext ? null : () => pickQuestion('verite', cIndex),
+                            child: SizedBox(
+                              height: double.infinity,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 400),
+                                child: showNext && _lastChoice == 'verite'
+                                    ? _buildExpandedContent("VÉRITÉ", cIndex)
+                                    : const Center(
+                                        child: RotatedBox(
+                                          quarterTurns: 3,
+                                          child: Text("VÉRITÉ", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
                         ),
                       )
-                    : Row(
-                        children: [
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.easeOutExpo,
-                            width: showNext
-                                ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
-                                : MediaQuery.of(context).size.width / 2,
-                            child: ClipRRect(
-                              child: Material(
-                                color: const Color.fromARGB(255, 26, 138, 63).withValues(alpha: 0.95), // Vert Forêt profond
-                                child: InkWell(
-                                  onTap: showNext ? null : () => pickQuestion('verite', cIndex),
-                                  child: SizedBox(
-                                    height: double.infinity,
-                                    child: AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 400),
-                                      child: showNext && _lastChoice == 'verite'
-                                          ? _buildExpandedContent("VÉRITÉ", cIndex)
-                                          : const Center(
-                                              child: RotatedBox(
-                                                quarterTurns: 3,
-                                                child: Text("VÉRITÉ", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
-                                              ),
-                                            ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                            // LE MIROITEMENT ANIMÉ
-                            .animate(onPlay: (controller) => controller.repeat())
-                            .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.15), angle: 1.5),
-                          ),
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
+                    ),
 
-                          // MUR ACTION
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.easeOutExpo,
-                            width: showNext
-                                ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width : 0)
-                                : MediaQuery.of(context).size.width / 2,
-                            child: ClipRRect(
-                              child: Material(
-                                color: const Color(0xFF6B1124).withValues(alpha: 0.95), // Bordeaux luxueux
-                                child: InkWell(
-                                  onTap: showNext ? null : () => pickQuestion('action', cIndex),
-                                  child: SizedBox(
-                                    height: double.infinity,
-                                    child: AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 400),
-                                      child: showNext && _lastChoice == 'action'
-                                          ? _buildExpandedContent("ACTION", cIndex)
-                                          : const Center(
-                                              child: RotatedBox(
-                                                quarterTurns: 1, 
-                                                child: Text("ACTION", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
-                                              ),
-                                            ),
-                                    ),
-                                  ),
-                                ),
+                    // MUR ACTION
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutExpo,
+                      width: showNext
+                          ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width : 0)
+                          : MediaQuery.of(context).size.width / 2,
+                      child: ClipRRect(
+                        child: Material(
+                          color: const Color(0xFF6B1124).withValues(alpha: 0.95),
+                          child: InkWell(
+                            onTap: showNext ? null : () => pickQuestion('action', cIndex),
+                            child: SizedBox(
+                              height: double.infinity,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 400),
+                                child: showNext && _lastChoice == 'action'
+                                    ? _buildExpandedContent("ACTION", cIndex)
+                                    : const Center(
+                                        child: RotatedBox(
+                                          quarterTurns: 1,
+                                          child: Text("ACTION", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
+                                        ),
+                                      ),
                               ),
-                            )
-                            // LE MIROITEMENT ANIMÉ (Avec un petit décalage pour faire naturel)
-                            .animate(onPlay: (controller) => controller.repeat())
-                            .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.15), angle: 1.5, delay: 1.5.seconds),
+                            ),
                           ),
-                        ],
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
+                    ),
+                  ],
+                ),
+
+          // ==========================================
+          // COUCHE 2 : LES TEXTES DU HAUT (Flottants)
+          // ==========================================
+          SafeArea(
+            child: IgnorePointer( // 👈 Hyper important : Permet de cliquer À TRAVERS le texte !
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: showNext ? 0.0 : 1.0, // ✨ Disparaît en douceur quand on clique !
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // La colonne ne prend que la place nécessaire en haut
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.3), // Pilule semi-transparente sombre
+                          borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: Text(
+                          "Action ou Vérité • ${widget.category}",
+                          style: const TextStyle(color: Colors.white70, fontSize: 12)
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 30),
+                    const Center(
+                      child: Text("C'EST AU TOUR DE :", style: TextStyle(color: Colors.white54, letterSpacing: 2, fontWeight: FontWeight.bold))
+                    ),
+                    Center(
+                      child: Text(
+                        currentPlayer.name.toUpperCase(),
+                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     ),
     );
