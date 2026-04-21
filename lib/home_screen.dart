@@ -74,27 +74,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
                 // NOUVEAU CODE POUR REVERROUILLER
                 else if (secretController.text == "RESET") {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('isPremium', false); // On remet la mémoire à false
-                
-                if (context.mounted) {
-                  setState(() => _isPremiumUnlocked = false); // On met à false pour l'affichage
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('isPremium', false); // On remet la mémoire à false
+                  
+                  if (context.mounted) {
+                    setState(() => _isPremiumUnlocked = false); // On met à false pour l'affichage
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("🔒 Premium désactivé"), backgroundColor: Colors.orange),
+                    );
+                  }
+                }
+                // MAUVAIS CODE
+                } else {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("🔒 Premium désactivé"), backgroundColor: Colors.orange),
+                    const SnackBar(content: Text("❌ Code invalide."), backgroundColor: Colors.red),
                   );
                 }
-              }
-              // MAUVAIS CODE
-              } else {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("❌ Code invalide."), backgroundColor: Colors.red),
-                );
-              }
-            },
-            child: const Text("VALIDER", style: TextStyle(color: Colors.pinkAccent)),
-          )
+              },
+              child: const Text("VALIDER", style: TextStyle(color: Colors.pinkAccent)),
+            )
         ],
       ),
     );
