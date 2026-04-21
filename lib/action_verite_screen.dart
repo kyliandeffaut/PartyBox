@@ -41,6 +41,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
   int localCurrentPlayerIndex = 0;
   String localCurrentQuestion = "Appuie sur un bouton !";
   bool localShowNextButton = false;
+  String _lastChoice = '';
 
   @override
   void initState() {
@@ -109,12 +110,17 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         localCurrentPlayerIndex = nextIndex;
         localCurrentQuestion = "Appuie sur un bouton !";
         localShowNextButton = false;
+        _lastChoice = '';
       });
     }
   }
 
   // Tirage de la question
   void pickQuestion(String type, int cIndex) {
+    setState(() {
+      _lastChoice = type;
+    });
+
     if (allQuestions.isEmpty || players.isEmpty) return;
 
     var filtered = allQuestions.where((q) => q['type'] == type && q['category'] == widget.category).toList();
@@ -361,11 +367,11 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 ),
               ),
               
-              // 2. ON A MODIFIÉ LA ZONE DES BOUTONS ICI
+              // 2. LA NOUVELLE ZONE DES BOUTONS ANIMÉE ✨
               Padding(
                 padding: const EdgeInsets.all(40),
                 child: !isMyTurn 
-                    ? // SI CE N'EST PAS MON TOUR : On affiche un message d'attente
+                    ? // SI CE N'EST PAS MON TOUR
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
@@ -379,19 +385,86 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                           textAlign: TextAlign.center,
                         ),
                       )
-                    : // SI C'EST MON TOUR : On affiche les boutons normalement
-                      showNext
-                          ? SizedBox(
-                              width: double.infinity, 
-                              child: _gameButton("TOUR SUIVANT ➔", Colors.blueAccent, () => _updateTurn(cIndex)),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _gameButton("VÉRITÉ", const Color(0xFF22C55E), () => pickQuestion('verite', cIndex)),
-                                _gameButton("ACTION", const Color(0xFFEC4899), () => pickQuestion('action', cIndex)),
-                              ],
+                    : // SI C'EST MON TOUR
+                      SizedBox(
+                        height: 65, // Hauteur fixe pour une belle animation
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // 🟢 BOUTON VÉRITÉ
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.fastOutSlowIn,
+                              width: showNext
+                                  ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width - 80 : 0)
+                                  : (MediaQuery.of(context).size.width - 100) / 2,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF22C55E),
+                                    padding: EdgeInsets.zero,
+                                    elevation: 10,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  ),
+                                  onPressed: showNext 
+                                      ? () { 
+                                          setState(() => _lastChoice = ''); 
+                                          _updateTurn(cIndex); 
+                                        } 
+                                      : () => pickQuestion('verite', cIndex),
+                                  child: Text(
+                                    showNext ? "TOUR SUIVANT ➔" : "VÉRITÉ",
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    overflow: TextOverflow.fade, // Empêche les erreurs quand le bouton rétrécit
+                                  ),
+                                ),
+                              ),
                             ),
+
+                            // ⬛ ESPACEMENT (Disparaît si un choix est fait)
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              width: showNext ? 0 : 20,
+                            ),
+
+                            // 🔴 BOUTON ACTION
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.fastOutSlowIn,
+                              width: showNext
+                                  ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width - 80 : 0)
+                                  : (MediaQuery.of(context).size.width - 100) / 2,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFEC4899),
+                                    padding: EdgeInsets.zero,
+                                    elevation: 10,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  ),
+                                  onPressed: showNext 
+                                      ? () { 
+                                          setState(() => _lastChoice = ''); 
+                                          _updateTurn(cIndex); 
+                                        } 
+                                      : () => pickQuestion('action', cIndex),
+                                  child: Text(
+                                    showNext ? "TOUR SUIVANT ➔" : "ACTION",
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ],
           ),
