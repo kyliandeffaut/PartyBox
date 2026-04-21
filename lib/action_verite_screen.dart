@@ -388,7 +388,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                         ),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
+                      .shimmer(duration: 4.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
                     ),
 
                     // MUR ACTION
@@ -421,19 +421,14 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                         ),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
+                      .shimmer(duration: 4.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
                     ),
                   ],
                 ),
 
-          // ==========================================
-          // COUCHE 2 : LES TEXTES DU HAUT (Flottants)
-          // ==========================================
+          // COUCHE 2 : LES TEXTES DU HAUT
           SafeArea(
-            child: IgnorePointer( // 👈 Hyper important : Permet de cliquer À TRAVERS le texte !
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: showNext ? 0.0 : 1.0, // ✨ Disparaît en douceur quand on clique !
+            child: IgnorePointer( //Permet de cliquer À TRAVERS le texte !
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // La colonne ne prend que la place nécessaire en haut
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -466,7 +461,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 ),
               ),
             ),
-          ),
         ],
       ),
     ),
