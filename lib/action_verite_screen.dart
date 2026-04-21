@@ -473,20 +473,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     ),
     );
   }
-
-  Widget _gameButton(String label, Color color, VoidCallback onPress) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 10,
-      ),
-      onPressed: onPress,
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-    );
-  }
 }
 
 // --- ÉCRAN 2 : SÉLECTION DES CATÉGORIES (SPÉCIAL MODE LOCAL) ---
