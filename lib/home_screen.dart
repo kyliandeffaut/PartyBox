@@ -1,12 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'main.dart'; // Pour pouvoir accéder à PlayerScreen()
+import 'main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'waiting_room_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // --- ÉCRAN D'ACCUEIL PRINCIPAL ---
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // 1. LES VARIABLES DE L'EASTER EGG
+  int _secretTapCount = 0;
+  bool _isPremiumUnlocked = false; 
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPremiumStatus(); // On vérifie si c'est déjà débloqué au lancement
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isPremiumUnlocked = prefs.getBool('isPremium') ?? false;
+    });
+  }
+
+  // 2. LA FONCTION DES CLICS SECRETS
+  void _handleSecretTap() {
+    _secretTapCount++;
+    if (_secretTapCount >= 7) {
+      _secretTapCount = 0; 
+      _showSecretDialog(); 
+    }
+  }
+
+  // 3. LA FENÊTRE MAGIQUE
+  void _showSecretDialog() {
+    TextEditingController secretController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1D),
+        title: const Text("🤫 Espace VIP", style: TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: secretController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: "Code magique...",
+            hintStyle: TextStyle(color: Colors.white54),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (secretController.text == "MAMAN2024" || secretController.text == "POTEKYLIAN") {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isPremium', true);
+                
+                if (mounted) {
+                  setState(() => _isPremiumUnlocked = true);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("✨ Modes Premium débloqués à vie !"), backgroundColor: Colors.green),
+                  );
+                }
+              } else {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("❌ Code invalide."), backgroundColor: Colors.red),
+                );
+              }
+            },
+            child: const Text("VALIDER", style: TextStyle(color: Colors.pinkAccent)),
+          )
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +96,7 @@ class HomeScreen extends StatelessWidget {
             image: const AssetImage('assets/images/background.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withValues(alpha: 0.6), // Assombrit un peu pour bien voir les boutons
+              Colors.black.withValues(alpha: 0.6),
               BlendMode.darken,
             ),
           ),
@@ -28,34 +105,42 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // LE TITRE DU JEU
-              const Text(
-                "PARTYBOX",
-                style: TextStyle(
-                  fontSize: 45,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: 8,
-                  shadows: [
-                    Shadow(color: Colors.pinkAccent, blurRadius: 20),
-                    Shadow(color: Colors.blueAccent, blurRadius: 40),
-                  ],
+              // ON REND LE TITRE CLIQUABLE
+              GestureDetector(
+                onTap: _handleSecretTap,
+                child: const Text(
+                  "PARTYBOX",
+                  style: TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 8,
+                    shadows: [
+                      Shadow(color: Colors.pinkAccent, blurRadius: 20),
+                      Shadow(color: Colors.blueAccent, blurRadius: 40),
+                    ],
+                  ),
+                )
+                .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                .scaleXY(end: 1.15, duration: 2.seconds)
+                .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
+              ),
+
+              // Petit indicateur discret (optionnel, pour que tu saches si c'est activé)
+              if (_isPremiumUnlocked)
+                const Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Text("👑 Version VIP", style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
-              )
-              .animate(onPlay: (controller) => controller.repeat(reverse: true))
-              .scaleXY(end: 1.15, duration: 2.seconds)
-              .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
 
               const SizedBox(height: 80),
 
-              // BOUTON : CRÉER UN LOBBY
               _mainButton(context, "CRÉER UN LOBBY", Icons.add_moderator, Colors.pinkAccent, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateLobbyScreen()));
               }),
 
               const SizedBox(height: 20),
 
-              // BOUTON : REJOINDRE UN LOBBY
               _mainButton(context, "REJOINDRE UN LOBBY", Icons.login, Colors.blueAccent, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const JoinLobbyScreen()));
               }),
@@ -64,7 +149,6 @@ class HomeScreen extends StatelessWidget {
               const Divider(color: Colors.white24, indent: 50, endIndent: 50),
               const SizedBox(height: 30),
 
-              // BOUTON : JOUER EN LOCAL (Ramène vers l'ancien écran)
               _mainButton(context, "JOUER EN LOCAL", Icons.phone_android, Colors.greenAccent, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const PlayerScreen()));
               }),
@@ -75,7 +159,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Design générique pour les 3 gros boutons de l'accueil
   Widget _mainButton(BuildContext context, String text, IconData icon, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
