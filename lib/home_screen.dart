@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
               }
               // NOUVEAU CODE POUR REVERROUILLER
-              else if (secretController.text == "RESET") {
+              else if (secretController.text == "DEFF606") {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('isPremium', false); // On remet la mémoire à false
                 
