@@ -81,22 +81,24 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // 🔄 LA MAGIE : On envoie la question dans Firebase pour que tout le monde la voie !
-  void _updateGameState(String question, bool showNext) {
+  // 🔄 LA MAGIE : On envoie la question ET le choix dans Firebase pour que tout le monde voie le bon écran !
+  void _updateGameState(String question, bool showNext, String choice) {
     if (widget.isOnline && widget.lobbyId != null) {
       FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
         'currentQuestion': question,
         'showNextButton': showNext,
+        'lastChoice': choice, // ✨ On synchronise le mur qui s'ouvre !
       });
     } else {
       setState(() {
         localCurrentQuestion = question;
         localShowNextButton = showNext;
+        _lastChoice = choice;
       });
     }
   }
 
-  // 🔄 LA MAGIE : On change de tour dans Firebase
+  // 🔄 LA MAGIE : On change de tour dans Firebase et on referme les murs
   void _updateTurn(int currentIndex) {
     int nextIndex = (currentIndex + 1) % players.length;
     
@@ -105,6 +107,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         'currentPlayerIndex': nextIndex,
         'currentQuestion': "Appuie sur un bouton !",
         'showNextButton': false,
+        'lastChoice': '', // ✨ On referme les murs pour tout le monde
       });
     } else {
       setState(() {
@@ -166,37 +169,44 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
     text = text.replaceAll("{player}", currentPlayer.name); 
 
-    // On met à jour pour TOUT LE MONDE
-    _updateGameState(text, true); 
+    // On met à jour pour TOUT LE MONDE (avec le type Action/Vérité)
+    _updateGameState(text, true, type); 
   }
 
-  Widget _buildExpandedContent(String typeTitle, int cIndex) {
+  Widget _buildExpandedContent(String typeTitle, int cIndex, String actualQuestion, bool isMyTurn, GamePlayer currentPlayer) {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Column(
         children: [
+          const SizedBox(height: 130),
           Text(typeTitle, style: const TextStyle(fontSize: 20, color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 4)),
-          const SizedBox(height: 180),
+          const SizedBox(height: 30),
           Text(
-            localCurrentQuestion,
+            actualQuestion, // ✨ On utilise la vraie question synchronisée !
             style: const TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3),
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              minimumSize: const Size(double.infinity, 70),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              elevation: 10,
-            ),
-            onPressed: () {
-              setState(() => _lastChoice = ''); // On referme l'écran
-              _updateTurn(cIndex);
-            },
-            child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-          ),
+          isMyTurn
+            ? ElevatedButton( // Le bouton actif pour celui qui joue
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  minimumSize: const Size(double.infinity, 70),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  elevation: 10,
+                ),
+                onPressed: () {
+                  setState(() => _lastChoice = ''); 
+                  _updateTurn(cIndex);
+                },
+                child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+              )
+            : Text( // Le texte pour ceux qui regardent
+                "Attends que ${currentPlayer.name} passe au tour suivant...",
+                style: const TextStyle(color: Colors.white70, fontSize: 16, fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
           const SizedBox(height: 20),
         ],
       ),
@@ -212,7 +222,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       );
     }
 
-    // MODE ONLINE : On "écoute" Firebase en permanence
     if (widget.isOnline && widget.lobbyId != null) {
       return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
@@ -221,7 +230,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           
           var data = snapshot.data!.data() as Map<String, dynamic>;
           
-          // 1. LE BOUCLIER : On utilise tous les joueurs du lobby juste pour savoir si on n'a pas été kické
           List rawAllPlayers = data['players'] ?? [];
           bool stillInLobby = rawAllPlayers.any((p) => p['name'] == widget.currentPlayerName);
           
@@ -232,11 +240,9 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
             return const Scaffold(backgroundColor: Color(0xFF101012));
           }
 
-          // 2. LA CORRECTION EST LÀ : Les tours de jeu se font UNIQUEMENT avec les joueurs actifs !
           List rawActive = data['activePlayers'] ?? [];
           players = rawActive.map((p) => GamePlayer(name: p['name'], gender: p['gender'])).toList();
 
-          // Sécurité : si tout le monde a quitté l'écran de jeu, on évite un crash
           if (players.isEmpty) {
             return const Scaffold(backgroundColor: Color(0xFF101012));
           }
@@ -244,28 +250,24 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           int cIndex = data['currentPlayerIndex'] ?? 0;
           String cQuestion = data['currentQuestion'] ?? "Appuie sur un bouton !";
           bool showNext = data['showNextButton'] ?? false;
+          String cChoice = data['lastChoice'] ?? ''; // ✨ ON RÉCUPÈRE LE CHOIX DE FIREBASE
           
-          // 🔥 MAGIE : Si c'était au tour de Romain, et que Romain quitte, 
-          // le jeu passe automatiquement au joueur suivant sans planter !
           if (cIndex >= players.length) {
             cIndex = 0; 
           }
 
-          return _buildGameUI(cIndex, cQuestion, showNext);
+          return _buildGameUI(cIndex, cQuestion, showNext, cChoice);
         }
       );
     } 
-    // 🏠 MODE LOCAL : On utilise l'état du téléphone
     else {
-      return _buildGameUI(localCurrentPlayerIndex, localCurrentQuestion, localShowNextButton);
+      return _buildGameUI(localCurrentPlayerIndex, localCurrentQuestion, localShowNextButton, _lastChoice);
     }
   }
 
-  // L'INTERFACE GRAPHIQUE (Déplacée ici pour ne pas écrire le code en double)
-  Widget _buildGameUI(int cIndex, String cQuestion, bool showNext) {
+  Widget _buildGameUI(int cIndex, String cQuestion, bool showNext, String currentChoice) {
     GamePlayer currentPlayer = players[cIndex];
 
-    // 1. ON AJOUTE LA VARIABLE ICI
     bool isMyTurn = widget.isOnline 
         ? (widget.currentPlayerName == currentPlayer.name) 
         : true;
@@ -275,13 +277,11 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       : Colors.indigo.shade900;
 
     return PopScope(
-      canPop: false, // Bloque le retour auto pour exécuter notre logique
+      canPop: false, 
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        // LOGIQUE DE SORTIE : On retire seulement de 'activePlayers'
         if (widget.isOnline && widget.lobbyId != null) {
-          // On retrouve ton genre dans la liste locale pour le remove
           String myGender = 'H';
           var me = players.where((p) => p.name == widget.currentPlayerName);
           if (me.isNotEmpty) myGender = me.first.gender;
@@ -299,7 +299,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           });
         }
 
-        // On revient au lobby sans le quitter
         if (mounted) {
           Navigator.of(context).pop();
         }
@@ -313,12 +312,10 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () async {
             if (widget.isOnline && widget.lobbyId != null) {
-              // ASTUCE : On retrouve ton genre directement dans la mémoire du jeu !
               String myGender = 'H';
               var me = players.where((p) => p.name == widget.currentPlayerName);
               if (me.isNotEmpty) myGender = me.first.gender;
 
-              // On se retire seulement de 'activePlayers', mais on RESTE dans le lobby !
               await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
                 'activePlayers': FieldValue.arrayRemove([
                   {'name': widget.currentPlayerName, 'gender': myGender}
@@ -327,7 +324,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
               });
             }
             
-            // LE RETOUR SE FAIT MAINTENANT DANS TOUS LES CAS !
             if (mounted) {
               Navigator.pop(context);
             }
@@ -336,8 +332,8 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       ),
       body: Stack(
         children: [
-          // COUCHE 1 : LE FOND (Les murs géants)
-          !isMyTurn
+          // COUCHE 1 : LE FOND
+          (!isMyTurn && !showNext) // ON MONTRE L'ÉCRAN BLEU SEULEMENT SI LE JOUEUR N'A PAS ENCORE CLIQUÉ
               ? Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -362,7 +358,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutExpo,
                       width: showNext
-                          ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
+                          ? (currentChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
                           : MediaQuery.of(context).size.width / 2,
                       child: ClipRRect(
                         child: Material(
@@ -373,8 +369,8 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                               height: double.infinity,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 400),
-                                child: showNext && _lastChoice == 'verite'
-                                    ? _buildExpandedContent("VÉRITÉ", cIndex)
+                                child: showNext && currentChoice == 'verite'
+                                    ? _buildExpandedContent("VÉRITÉ", cIndex, cQuestion, isMyTurn, currentPlayer)
                                     : const Center(
                                         child: RotatedBox(
                                           quarterTurns: 3,
@@ -395,7 +391,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutExpo,
                       width: showNext
-                          ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width : 0)
+                          ? (currentChoice == 'action' ? MediaQuery.of(context).size.width : 0)
                           : MediaQuery.of(context).size.width / 2,
                       child: ClipRRect(
                         child: Material(
@@ -406,8 +402,8 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                               height: double.infinity,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 400),
-                                child: showNext && _lastChoice == 'action'
-                                    ? _buildExpandedContent("ACTION", cIndex)
+                                child: showNext && currentChoice == 'action'
+                                    ? _buildExpandedContent("ACTION", cIndex, cQuestion, isMyTurn, currentPlayer)
                                     : const Center(
                                         child: RotatedBox(
                                           quarterTurns: 1,
@@ -427,9 +423,9 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
 
           // COUCHE 2 : LES TEXTES DU HAUT
           SafeArea(
-            child: IgnorePointer( //Permet de cliquer À TRAVERS le texte !
+            child: IgnorePointer(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // La colonne ne prend que la place nécessaire en haut
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 20),
@@ -437,7 +433,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.3), // Pilule semi-transparente sombre
+                          color: Colors.black.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(20)
                         ),
                         child: Text(
