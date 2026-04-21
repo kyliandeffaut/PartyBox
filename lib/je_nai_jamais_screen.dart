@@ -30,6 +30,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   String selectedCategory = "";
   bool isLoading = true;
   bool isHost = false;
+  bool hasVotedThisTurn = false;
+
+  // Variables pour le mode LOCAL
+  bool _localSecretMode = false;
+  bool _localGameEnded = false;
 
   @override
   void initState() {
@@ -60,18 +65,22 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         var data = snapshot.data()!;
         if (mounted) {
           setState(() {
-            currentQuestion = data['currentQuestion'] ?? "Le chef va choisir...";
-            selectedCategory = data['selectedCategory'] ?? "";
+            currentQuestion = data['currentQuestion'] ?? "En attente du chef...";
+            selectedCategory = data['selectedCategory'] ?? ""; 
             
             List<dynamic> fbPlayers = data['players'] ?? [];
             widget.players.clear();
+            bool amIVoted = false;
+            
             for (var p in fbPlayers) {
+              if (p['name'] == widget.currentPlayerName) amIVoted = p['hasVoted'] ?? false;
               widget.players.add(Player(
                 name: p['name'], 
                 gender: p['gender'], 
-                score: p['score'] ?? 0
+                score: p['score'] ?? 0,
               ));
             }
+            hasVotedThisTurn = amIVoted;
             isLoading = false;
           });
         }
@@ -88,6 +97,44 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     }
   }
 
+  // --- LOGIQUE ONLINE ---
+  void _voteOnline(bool hasDoneIt) async {
+    if (hasVotedThisTurn || widget.lobbyId == null) return;
+
+    var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+    var doc = await docRef.get();
+    List<dynamic> players = List.from(doc.data()?['players'] ?? []);
+    
+    for (var p in players) {
+      if (p['name'] == widget.currentPlayerName) {
+        p['hasVoted'] = true;
+        p['lastVote'] = hasDoneIt ? 'deja_fait' : 'jamais';
+        if (hasDoneIt) p['score'] = (p['score'] ?? 0) + 1;
+      }
+    }
+    await docRef.update({'players': players});
+  }
+
+  void nextQuestionOnline() async {
+    final questions = allQuestions[selectedCategory] as List;
+    String newQ = questions[Random().nextInt(questions.length)];
+
+    var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+    var doc = await docRef.get();
+    List<dynamic> players = List.from(doc.data()?['players'] ?? []);
+
+    for (var p in players) {
+      p['hasVoted'] = false;
+      p['lastVote'] = null; 
+    }
+
+    await docRef.update({
+      'currentQuestion': newQ,
+      'players': players,
+    });
+  }
+
+  // --- LOGIQUE COMMUNE / LOCAL ---
   void _selectCategory(String cat) {
     if (widget.isOnline) {
       if (!isHost) return;
@@ -117,27 +164,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     }
   }
 
-  void _updateScore(Player player, int delta) async {
-    if (widget.isOnline) {
-      if (player.name != widget.currentPlayerName) return;
-      
-      var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-      var doc = await docRef.get();
-      List<dynamic> players = List.from(doc.data()?['players'] ?? []);
-      
-      for (var p in players) {
-        if (p['name'] == widget.currentPlayerName) {
-          p['score'] = (p['score'] ?? 0) + delta;
-          if (p['score'] < 0) p['score'] = 0;
-        }
-      }
-      await docRef.update({'players': players});
-    } else {
-      setState(() {
-        player.score += delta;
-        if (player.score < 0) player.score = 0;
-      });
-    }
+  void _updateScoreLocal(Player player, int delta) {
+    setState(() {
+      player.score += delta;
+      if (player.score < 0) player.score = 0;
+    });
   }
 
   void _quit() async {
@@ -169,7 +200,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         width: double.infinity, height: double.infinity,
         decoration: const BoxDecoration(
           color: Color(0xFF101012),
-          image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover),
+          image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover, opacity: 0.3),
         ),
         child: isLoading 
           ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
@@ -193,6 +224,34 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         Text(canSelect ? "CHOISIS L'AMBIANCE" : "LE CHEF CHOISIT...", 
           style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
         const SizedBox(height: 40),
+
+        // ✅ LE BOUTON SECRET EN MODE LOCAL EST ICI !
+        if (!widget.isOnline) ...[
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                Switch(
+                  value: _localSecretMode,
+                  activeColor: Colors.purpleAccent,
+                  inactiveThumbColor: Colors.grey,
+                  inactiveTrackColor: Colors.white12,
+                  onChanged: (val) => setState(() => _localSecretMode = val),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+
         if (canSelect) ...[
           _catButton("Soft", "😇", Colors.greenAccent),
           _catButton("Interdit", "🚫", Colors.orangeAccent),
@@ -211,9 +270,9 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.05)]),
+            gradient: LinearGradient(colors: [color.withOpacity(0.3), color.withOpacity(0.05)]),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withValues(alpha: 0.5)),
+            border: Border.all(color: color.withOpacity(0.5)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -229,66 +288,283 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   }
 
   Widget _buildGameBoard() {
-    bool canChange = !widget.isOnline || isHost;
-    return Column(
+    return StreamBuilder<DocumentSnapshot>(
+      stream: widget.isOnline ? FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots() : null,
+      builder: (context, snapshot) {
+        List<dynamic> currentPlayersFB = [];
+        bool allVoted = false;
+        String visibilityMode = 'visible';
+        bool gameEnded = false;
+
+        if (widget.isOnline && snapshot.hasData && snapshot.data!.exists) {
+          var data = snapshot.data!.data() as Map<String, dynamic>;
+          currentPlayersFB = data['players'] ?? [];
+          allVoted = currentPlayersFB.isNotEmpty && currentPlayersFB.every((p) => p['hasVoted'] == true);
+          visibilityMode = data['jnjVisibility'] ?? 'visible'; // Contrôlé via le lobby
+          gameEnded = data['jnjGameEnded'] ?? false;
+        } else if (!widget.isOnline) {
+          // Utilisation des variables locales
+          visibilityMode = _localSecretMode ? 'invisible' : 'visible';
+          gameEnded = _localGameEnded;
+        }
+
+        return Column(
+          children: [
+            Text(gameEnded ? "🏆 CLASSEMENT FINAL 🏆" : "JE N'AI JAMAIS • ${selectedCategory.toUpperCase()}", style: TextStyle(color: gameEnded ? Colors.amber : Colors.white54, fontWeight: FontWeight.bold, fontSize: gameEnded ? 20 : 14)),
+            const SizedBox(height: 20),
+            
+            if (!gameEnded) _buildQuestionCard(),
+            const SizedBox(height: 15),
+
+            // Révélation du Total en mode Secret Online
+            if (widget.isOnline && visibilityMode == 'invisible' && allVoted && !gameEnded)
+              _buildInvisibleTotalReveal(currentPlayersFB),
+            
+            // Boutons de vote (ONLINE uniquement et si pas encore voté)
+            if (widget.isOnline && !hasVotedThisTurn && !gameEnded) 
+              _buildOnlineVoteActions(),
+            
+            const SizedBox(height: 20),
+            const Text("SCORES", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900)),
+            
+            // Liste des joueurs (S'adapte au mode Local/Online/Secret/Visible)
+            Expanded(child: _buildPlayerList(currentPlayersFB, visibilityMode, gameEnded)),
+
+            // Boutons de fin de page
+            if (widget.isOnline) ...[
+              if (gameEnded)
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                    onPressed: _quit,
+                    child: const Text("QUITTER LA PARTIE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ).animate().fadeIn()
+              else if (isHost && allVoted) 
+                _buildNextAndEndButtonsOnline()
+            ] else ...[
+              _buildNextButtonLocal()
+            ],
+          ],
+        );
+      }
+    );
+  }
+
+  Widget _buildInvisibleTotalReveal(List<dynamic> players) {
+    int totalDejaFait = players.where((p) => p['lastVote'] == 'deja_fait').length;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15, left: 25, right: 25),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.purpleAccent.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.purpleAccent.withOpacity(0.5))
+      ),
+      child: Text(
+        "Révélation : $totalDejaFait personne(s) l'a déjà fait !",
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
+      )
+    ).animate().fadeIn().scale();
+  }
+
+  Widget _buildQuestionCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Container(
+        width: double.infinity, padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.02)]),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Text(currentQuestion, textAlign: TextAlign.center, 
+          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+      ),
+    ).animate(key: ValueKey(currentQuestion)).fadeIn().scale();
+  }
+
+  Widget _buildOnlineVoteActions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("JE N'AI JAMAIS • $selectedCategory", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: InkWell(
-            onTap: canChange ? nextQuestion : null,
-            child: Container(
-              width: double.infinity, padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.02)]),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.white10),
-              ),
-              child: Column(
-                children: [
-                  Text(currentQuestion, textAlign: TextAlign.center, 
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
-                  if (canChange) const Padding(padding: EdgeInsets.only(top: 20), child: Text("Tapote pour changer 🔄", style: TextStyle(color: Colors.white38, fontSize: 12))),
-                ],
+        _voteBtn("JAMAIS", Colors.redAccent, () => _voteOnline(false)),
+        const SizedBox(width: 20),
+        _voteBtn("DÉJÀ FAIT", Colors.greenAccent, () => _voteOnline(true)),
+      ],
+    ).animate().fadeIn();
+  }
+
+  Widget _voteBtn(String text, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: color.withOpacity(0.5)),
+        ),
+        child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildVoteText(String? vote) {
+    if (vote == 'deja_fait') return const Text("Déjà fait", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold));
+    if (vote == 'jamais') return const Text("Jamais", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold));
+    return const SizedBox();
+  }
+
+  Widget _buildPlayerList(List<dynamic> fbPlayers, String visibilityMode, bool gameEnded) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: widget.isOnline ? fbPlayers.length : widget.players.length,
+      itemBuilder: (context, index) {
+        String name;
+        int score;
+        String gender;
+        bool hasVoted = false;
+        String? lastVote;
+
+        if (widget.isOnline) {
+          name = fbPlayers[index]['name'];
+          score = fbPlayers[index]['score'] ?? 0;
+          gender = fbPlayers[index]['gender'] ?? 'H';
+          hasVoted = fbPlayers[index]['hasVoted'] ?? false;
+          lastVote = fbPlayers[index]['lastVote'];
+        } else {
+          name = widget.players[index].name;
+          score = widget.players[index].score;
+          gender = widget.players[index].gender;
+        }
+
+        bool isMe = widget.isOnline && name == widget.currentPlayerName;
+        
+        // --- LOGIQUE D'AFFICHAGE DU TRAILING ---
+        Widget trailingWidget;
+
+        if (widget.isOnline) {
+          String displayScore = score.toString();
+          Widget actionWidget = const SizedBox();
+
+          if (gameEnded) {
+            displayScore = score.toString();
+            actionWidget = _buildVoteText(lastVote);
+          } else if (visibilityMode == 'visible') {
+            displayScore = score.toString();
+            actionWidget = hasVoted ? _buildVoteText(lastVote) : const Icon(Icons.hourglass_empty, color: Colors.white24, size: 20);
+          } else {
+            displayScore = isMe ? score.toString() : "?";
+            actionWidget = hasVoted ? const Icon(Icons.check_circle, color: Colors.greenAccent) : const Icon(Icons.radio_button_unchecked, color: Colors.white24);
+          }
+
+          trailingWidget = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(displayScore, style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 15),
+              actionWidget,
+            ],
+          );
+
+        } else {
+          // --- MODE LOCAL STRICTEMENT INTACT ---
+          bool showScore = visibilityMode == 'visible' || gameEnded;
+          trailingWidget = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!gameEnded) IconButton(icon: const Icon(Icons.remove, color: Colors.redAccent), onPressed: () => _updateScoreLocal(widget.players[index], -1)),
+              Text(showScore ? "$score" : "?", style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
+              if (!gameEnded) IconButton(icon: const Icon(Icons.add, color: Colors.greenAccent), onPressed: () => _updateScoreLocal(widget.players[index], 1)),
+            ],
+          );
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15)),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
+              child: Text(name[0], style: const TextStyle(color: Colors.white)),
+            ),
+            title: Text(name + (isMe ? " (Moi)" : ""), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            trailing: trailingWidget,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNextAndEndButtonsOnline() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+              onPressed: nextQuestionOnline,
+              child: const Text("SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 1,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+              onPressed: () {
+                FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'jnjGameEnded': true});
+              },
+              child: const Text("FIN", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn().shimmer();
+  }
+
+  Widget _buildNextButtonLocal() {
+    if (_localSecretMode && !_localGameEnded) {
+      // Bouton fin pour révéler les scores en local
+      return Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                onPressed: nextQuestion,
+                child: const Text("SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
-          ).animate(key: ValueKey(currentQuestion)).fadeIn().scale(),
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 1,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                onPressed: () => setState(() => _localGameEnded = true),
+                child: const Text("FIN", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 30),
-        const Text("SCORES", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900)),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: widget.players.length,
-            itemBuilder: (context, index) {
-              final player = widget.players[index];
-              bool isMe = widget.isOnline && player.name == widget.currentPlayerName;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: player.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
-                    child: Text(player.name[0], style: const TextStyle(color: Colors.white)),
-                  ),
-                  title: Text(player.name + (isMe ? " (Moi)" : ""), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!widget.isOnline || isMe) 
-                        IconButton(icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent), onPressed: () => _updateScore(player, -1)),
-                      Text("${player.score}", style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-                      if (!widget.isOnline || isMe) 
-                        IconButton(icon: const Icon(Icons.add_circle_outline, color: Colors.greenAccent), onPressed: () => _updateScore(player, 1)),
-                    ],
-                  ),
-                ),
-              ).animate().fadeIn(delay: Duration(milliseconds: index * 50));
-            },
-          ),
+      ).animate().fadeIn().shimmer();
+    } else {
+      // Classique
+      return Padding(
+        padding: const EdgeInsets.all(20),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: _localGameEnded ? Colors.redAccent : Colors.purpleAccent, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+          onPressed: _localGameEnded ? _quit : nextQuestion, 
+          child: Text(_localGameEnded ? "QUITTER LA PARTIE" : "QUESTION SUIVANTE ➔", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
-      ],
-    );
+      ).animate().fadeIn().shimmer();
+    }
   }
 }

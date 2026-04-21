@@ -407,7 +407,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   context: context,
                                   backgroundColor: const Color(0xFF1A1A1D),
                                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                  builder: (context) => _buildParamsSheet(data['gameMode'] ?? 'Action ou Vérité'),
+                                  // ✅ On envoie toutes les data pour gérer le toggle
+                                  builder: (context) => _buildParamsSheet(data),
                                 );
                               },
                               child: const Row(
@@ -455,8 +456,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       )
     );
   }
-  
-Widget _buildParamsSheet(String mode) {
+
+  // ✅ CETTE FONCTION PREND MAINTENANT LES DATA ENTIÈRES POUR GÉRER LE SWITCH EN DIRECT
+  Widget _buildParamsSheet(Map<String, dynamic> data) {
+    String mode = data['gameMode'] ?? 'Action ou Vérité';
+    String initialVisibility = data['jnjVisibility'] ?? 'visible';
+
     final List<Map<String, dynamic>> actionCats = [
       {'n': 'Soft', 'e': '🍭'}, {'n': 'Famille', 'e': '🏠'}, {'n': 'Dehors', 'e': '🌳'},
       {'n': 'Bar', 'e': '🍻'}, {'n': 'Sans Filtre', 'e': '🙊'}, {'n': 'Séduction', 'e': '🫦'},
@@ -466,25 +471,63 @@ Widget _buildParamsSheet(String mode) {
       {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '🌶️ +18', 'e': '🌶️'},
     ];
     final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
-    return Container(
-      padding: const EdgeInsets.all(25),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("INTENSITÉ : $mode", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 20),
-            ...cats.map((c) => ListTile(
-              leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
-              title: Text(c['n'], style: const TextStyle(color: Colors.white)),
-              onTap: () {
-                FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
-                Navigator.pop(context);
-              },
-            )),
-          ],
-        ),
-      ),
+
+    // StatefulBuilder permet au Switch de s'animer sans fermer le menu
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setModalState) {
+        bool isSecret = initialVisibility == 'invisible';
+        
+        return Container(
+          padding: const EdgeInsets.all(25),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("PARAMÈTRES : ${mode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                const SizedBox(height: 20),
+
+                // ✅ LE BOUTON SECRET EST MAINTENANT ICI (Uniquement pour Je n'ai jamais)
+                if (mode == "Je n'ai jamais") ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: SwitchListTile(
+                      title: const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: const Text("Cache les scores jusqu'à la fin", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      value: isSecret,
+                      activeColor: Colors.purpleAccent,
+                      inactiveThumbColor: Colors.grey,
+                      inactiveTrackColor: Colors.white12,
+                      onChanged: (val) {
+                        setModalState(() => isSecret = val);
+                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+                          'jnjVisibility': val ? 'invisible' : 'visible'
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                const SizedBox(height: 10),
+                
+                ...cats.map((c) => ListTile(
+                  leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
+                  title: Text(c['n'], style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
+                    Navigator.pop(context);
+                  },
+                )),
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 }
