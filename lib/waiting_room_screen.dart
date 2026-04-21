@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
+import 'je_nai_jamais_screen.dart';
+import 'main.dart';
 
 // 1. C'EST MAINTENANT UN STATEFUL WIDGET
 class WaitingRoomScreen extends StatefulWidget {
@@ -240,23 +242,31 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         if (!_isNavigatingToGame) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             if (context.mounted) {
-                              setState(() { _isNavigatingToGame = true; }); // On verrouille
-                              Navigator.push( // PUSH NORMAL (On ne détruit plus le lobby !)
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ActionVeriteScreen(
-                                    lobbyId: widget.lobbyId,
-                                    category: data['category'] ?? 'Soft', 
-                                    isOnline: true,
-                                    currentPlayerName: widget.currentPlayerName,
-                                    currentPlayerGender: widget.currentPlayerGender,
-                                  ),
-                                ),
-                              ).then((_) {
-                                // Quand le joueur quitte le jeu et revient au lobby, on déverrouille
-                                if (context.mounted) {
-                                  setState(() { _isNavigatingToGame = false; });
-                                }
+                              setState(() { _isNavigatingToGame = true; });
+
+                              // ON DÉTERMINE L'ÉCRAN SELON LE MODE DE JEU
+                              Widget targetScreen;
+                              String gameMode = data['gameMode'] ?? 'Action ou Vérité';
+
+                              if (gameMode == "Je n'ai jamais") {
+                                targetScreen = JeNaiJamaisScreen(
+                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                  isOnline: true,
+                                  lobbyId: widget.lobbyId,
+                                  currentPlayerName: widget.currentPlayerName,
+                                );
+                              } else {
+                                targetScreen = ActionVeriteScreen(
+                                  lobbyId: widget.lobbyId,
+                                  category: data['category'] ?? 'Soft',
+                                  isOnline: true,
+                                  currentPlayerName: widget.currentPlayerName,
+                                  currentPlayerGender: widget.currentPlayerGender,
+                                );
+                              }
+
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)).then((_) {
+                                if (context.mounted) setState(() { _isNavigatingToGame = false; });
                               });
                             }
                           });
@@ -335,9 +345,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
-                    
                     var data = snapshot.data!.data() as Map<String, dynamic>;
-
                     bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
 
                     if (amITheHost) {
@@ -346,40 +354,22 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         child: Column(
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.greenAccent,
-                                minimumSize: const Size(double.infinity, 60),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              ),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                               onPressed: () async {
-                                // On récupère la liste actuelle des joueurs pour l'injecter dans le jeu
                                 final doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
                                 List allPlayers = doc.data()?['players'] ?? [];
-
-                                await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-                                  'status': 'playing',
-                                  'activePlayers': allPlayers, // On crée la session de jeu ici avec tous les joueurs du salon !
-                                  'lastAction': '${widget.currentPlayerName} a lancé la partie !' 
-                                });
+                                await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'playing', 'activePlayers': allPlayers});
                               },
                               child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
                             ),
-                            
                             const SizedBox(height: 15),
-                            
                             OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.white24),
-                                minimumSize: const Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              ),
+                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
                                   backgroundColor: const Color(0xFF1A1A1D),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                  ),
+                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
                                   builder: (BuildContext context) {
                                     List<String> gameModes = ['Action ou Vérité', 'Je n\'ai jamais'];
                                     return Padding(
@@ -401,7 +391,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                               },
                                             );
                                           }),
-                                          const SizedBox(height: 10),
                                         ],
                                       ),
                                     );
@@ -410,95 +399,15 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                               },
                               child: Text("MODE : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
                             ),
-
                             const SizedBox(height: 15),
-
                             OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.white24),
-                                minimumSize: const Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              ),
+                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
                                   backgroundColor: const Color(0xFF1A1A1D),
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                  ),
-                                  builder: (BuildContext context) {
-                                    return StreamBuilder<DocumentSnapshot>(
-                                      stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
-                                        var sheetData = snapshot.data!.data() as Map<String, dynamic>;
-                                        
-                                        String currentMode = sheetData['gameMode'] ?? 'Action ou Vérité';
-                                        String currentCategory = sheetData['category'] ?? 'Soft';
-
-                                        final List<Map<String, dynamic>> fullCategories = [
-                                          {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
-                                          {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
-                                          {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
-                                          {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
-                                          {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
-                                          {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},
-                                          {'name': 'Couple', 'color': const Color(0xFFEC4899), 'emoji': '💞'},
-                                          {'name': 'Hot', 'color': const Color(0xFFE11D48), 'emoji': '🔥'},
-                                        ];
-
-                                        return Padding(
-                                          padding: const EdgeInsets.all(25.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text("PARAMÈTRES : ${currentMode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1), textAlign: TextAlign.center),
-                                              const SizedBox(height: 25),
-                                              
-                                              if (currentMode == 'Action ou Vérité') ...[
-                                                const Text("Choisis l'intensité :", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                                                const SizedBox(height: 15),
-                                                Wrap(
-                                                  spacing: 8,
-                                                  runSpacing: 8,
-                                                  alignment: WrapAlignment.center,
-                                                  children: fullCategories.map((cat) {
-                                                    bool isSelected = currentCategory == cat['name'];
-                                                    return ChoiceChip(
-                                                      label: Text("${cat['emoji']} ${cat['name']}", style: TextStyle(color: isSelected ? Colors.white : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-                                                      selected: isSelected,
-                                                      selectedColor: cat['color'], 
-                                                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                                                      side: BorderSide.none,
-                                                      onSelected: (bool selected) {
-                                                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': cat['name']});
-                                                      },
-                                                    );
-                                                  }).toList(),
-                                                ),
-                                              ] else ...[
-                                                const Icon(Icons.construction, color: Colors.pinkAccent, size: 40),
-                                                const SizedBox(height: 15),
-                                                const Text("Paramètres à venir pour ce mode.", style: TextStyle(color: Colors.white70)),
-                                              ],
-                                              
-                                              const SizedBox(height: 30),
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.pinkAccent,
-                                                  minimumSize: const Size(double.infinity, 50),
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                                ),
-                                                onPressed: () => Navigator.pop(context),
-                                                child: const Text("VALIDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    );
-                                  },
+                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+                                  builder: (context) => _buildParamsSheet(data['gameMode'] ?? 'Action ou Vérité'),
                                 );
                               },
                               child: const Row(
@@ -521,19 +430,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Icon(Icons.gamepad, color: Colors.pinkAccent, size: 20),
                                   const SizedBox(width: 10),
-                                  Text(
-                                    "MODE PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}",
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-                                  ),
+                                  Text("MODE PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                                 ],
                               ),
                             ),
@@ -550,6 +453,38 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
           ),
         ),
       )
+    );
+  }
+  
+Widget _buildParamsSheet(String mode) {
+    final List<Map<String, dynamic>> actionCats = [
+      {'n': 'Soft', 'e': '🍭'}, {'n': 'Famille', 'e': '🏠'}, {'n': 'Dehors', 'e': '🌳'},
+      {'n': 'Bar', 'e': '🍻'}, {'n': 'Sans Filtre', 'e': '🙊'}, {'n': 'Séduction', 'e': '🫦'},
+      {'n': 'Couple', 'e': '💞'}, {'n': 'Hot', 'e': '🔥'},
+    ];
+    final List<Map<String, dynamic>> jnjCats = [
+      {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '🌶️ +18', 'e': '🌶️'},
+    ];
+    final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
+    return Container(
+      padding: const EdgeInsets.all(25),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("INTENSITÉ : $mode", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+            const SizedBox(height: 20),
+            ...cats.map((c) => ListTile(
+              leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
+              title: Text(c['n'], style: const TextStyle(color: Colors.white)),
+              onTap: () {
+                FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
+                Navigator.pop(context);
+              },
+            )),
+          ],
+        ),
+      ),
     );
   }
 }
