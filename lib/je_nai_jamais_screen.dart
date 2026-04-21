@@ -32,7 +32,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   bool isHost = false;
   bool hasVotedThisTurn = false;
 
-  // Variables pour le mode LOCAL
   bool _localSecretMode = false;
   bool _localGameEnded = false;
 
@@ -65,8 +64,9 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         var data = snapshot.data()!;
         if (mounted) {
           setState(() {
-            currentQuestion = data['currentQuestion'] ?? "En attente du chef...";
-            selectedCategory = data['selectedCategory'] ?? ""; 
+            // ✅ Permet de lancer le jeu immédiatement si le lobby a une catégorie
+            selectedCategory = data['category'] ?? data['selectedCategory'] ?? ""; 
+            currentQuestion = data['currentQuestion'] ?? "Le chef choisit...";
             
             List<dynamic> fbPlayers = data['players'] ?? [];
             widget.players.clear();
@@ -83,6 +83,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
             hasVotedThisTurn = amIVoted;
             isLoading = false;
           });
+
+          // ✅ LE CHEF PIOCHE LA PREMIÈRE QUESTION AUTOMATIQUEMENT
+          if (isHost && selectedCategory.isNotEmpty && (data['currentQuestion'] == null || data['currentQuestion'] == "Le chef choisit...")) {
+            nextQuestionOnline();
+          }
         }
       }
     });
@@ -97,7 +102,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     }
   }
 
-  // --- LOGIQUE ONLINE ---
   void _voteOnline(bool hasDoneIt) async {
     if (hasVotedThisTurn || widget.lobbyId == null) return;
 
@@ -116,6 +120,8 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   }
 
   void nextQuestionOnline() async {
+    if (selectedCategory.isEmpty || !allQuestions.containsKey(selectedCategory)) return;
+    
     final questions = allQuestions[selectedCategory] as List;
     String newQ = questions[Random().nextInt(questions.length)];
 
@@ -134,12 +140,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     });
   }
 
-  // --- LOGIQUE COMMUNE / LOCAL ---
   void _selectCategory(String cat) {
     if (widget.isOnline) {
       if (!isHost) return;
       FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-        'selectedCategory': cat,
+        'category': cat,
       });
       nextQuestion(categoryOverride: cat);
     } else {
@@ -171,47 +176,57 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     });
   }
 
+  // ✅ CORRECTION DU BOUTON RETOUR QUI ÉJECTAIT LE JOUEUR
   void _quit() async {
     if (widget.isOnline && widget.lobbyId != null) {
-      var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-      var doc = await docRef.get();
-      if (doc.exists) {
-        List<dynamic> players = List.from(doc.data()?['players'] ?? []);
-        players.removeWhere((p) => p['name'] == widget.currentPlayerName);
-        await docRef.update({'players': players});
-      }
+      String myGender = 'H';
+      var me = widget.players.where((p) => p.name == widget.currentPlayerName);
+      if (me.isNotEmpty) myGender = me.first.gender;
+
+      // On le retire JUSTE de la partie (activePlayers) pas du lobby !
+      await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
+        'activePlayers': FieldValue.arrayRemove([{'name': widget.currentPlayerName, 'gender': myGender}])
+      });
     }
     if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white, size: 30),
-          onPressed: _quit,
+    // Englobe tout le Scaffold pour protéger le bouton retour matériel (Android)
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        _quit();
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: Colors.white, size: 30),
+            onPressed: _quit,
+          ),
         ),
-      ),
-      body: Container(
-        width: double.infinity, height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Color(0xFF101012),
-          image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover, opacity: 0.3),
-        ),
-        child: isLoading 
-          ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
-          : SafeArea(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: selectedCategory.isEmpty 
-                  ? _buildCategorySelection() 
-                  : _buildGameBoard(),
+        body: Container(
+          width: double.infinity, height: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFF101012),
+            image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover, opacity: 0.3),
+          ),
+          child: isLoading 
+            ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
+            : SafeArea(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: selectedCategory.isEmpty 
+                    ? _buildCategorySelection() 
+                    : _buildGameBoard(),
+                ),
               ),
-            ),
+        ),
       ),
     );
   }
@@ -225,7 +240,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
           style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
         const SizedBox(height: 40),
 
-        // ✅ LE BOUTON SECRET EN MODE LOCAL EST ICI !
         if (!widget.isOnline) ...[
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -300,10 +314,9 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
           var data = snapshot.data!.data() as Map<String, dynamic>;
           currentPlayersFB = data['players'] ?? [];
           allVoted = currentPlayersFB.isNotEmpty && currentPlayersFB.every((p) => p['hasVoted'] == true);
-          visibilityMode = data['jnjVisibility'] ?? 'visible'; // Contrôlé via le lobby
+          visibilityMode = data['jnjVisibility'] ?? 'visible';
           gameEnded = data['jnjGameEnded'] ?? false;
         } else if (!widget.isOnline) {
-          // Utilisation des variables locales
           visibilityMode = _localSecretMode ? 'invisible' : 'visible';
           gameEnded = _localGameEnded;
         }
@@ -316,21 +329,17 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
             if (!gameEnded) _buildQuestionCard(),
             const SizedBox(height: 15),
 
-            // Révélation du Total en mode Secret Online
             if (widget.isOnline && visibilityMode == 'invisible' && allVoted && !gameEnded)
               _buildInvisibleTotalReveal(currentPlayersFB),
             
-            // Boutons de vote (ONLINE uniquement et si pas encore voté)
             if (widget.isOnline && !hasVotedThisTurn && !gameEnded) 
               _buildOnlineVoteActions(),
             
             const SizedBox(height: 20),
             const Text("SCORES", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900)),
             
-            // Liste des joueurs (S'adapte au mode Local/Online/Secret/Visible)
             Expanded(child: _buildPlayerList(currentPlayersFB, visibilityMode, gameEnded)),
 
-            // Boutons de fin de page
             if (widget.isOnline) ...[
               if (gameEnded)
                 Padding(
@@ -338,7 +347,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
                     onPressed: _quit,
-                    child: const Text("QUITTER LA PARTIE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text("RETOURNER AU LOBBY", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ).animate().fadeIn()
               else if (isHost && allVoted) 
@@ -442,8 +451,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         }
 
         bool isMe = widget.isOnline && name == widget.currentPlayerName;
-        
-        // --- LOGIQUE D'AFFICHAGE DU TRAILING ---
         Widget trailingWidget;
 
         if (widget.isOnline) {
@@ -452,7 +459,8 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
           if (gameEnded) {
             displayScore = score.toString();
-            actionWidget = _buildVoteText(lastVote);
+            // ✅ CORRECTION CLASSEMENT FINAL (N'affiche QUE le score, plus le vote du dernier tour)
+            actionWidget = const SizedBox(); 
           } else if (visibilityMode == 'visible') {
             displayScore = score.toString();
             actionWidget = hasVoted ? _buildVoteText(lastVote) : const Icon(Icons.hourglass_empty, color: Colors.white24, size: 20);
@@ -471,7 +479,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
           );
 
         } else {
-          // --- MODE LOCAL STRICTEMENT INTACT ---
           bool showScore = visibilityMode == 'visible' || gameEnded;
           trailingWidget = Row(
             mainAxisSize: MainAxisSize.min,
@@ -530,7 +537,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
   Widget _buildNextButtonLocal() {
     if (_localSecretMode && !_localGameEnded) {
-      // Bouton fin pour révéler les scores en local
       return Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
@@ -556,7 +562,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         ),
       ).animate().fadeIn().shimmer();
     } else {
-      // Classique
       return Padding(
         padding: const EdgeInsets.all(20),
         child: ElevatedButton(

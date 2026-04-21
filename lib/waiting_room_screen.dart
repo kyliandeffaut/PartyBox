@@ -5,7 +5,6 @@ import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
 import 'main.dart';
 
-// 1. C'EST MAINTENANT UN STATEFUL WIDGET
 class WaitingRoomScreen extends StatefulWidget {
   final String lobbyId;
   final String lobbyName;
@@ -29,7 +28,6 @@ class WaitingRoomScreen extends StatefulWidget {
 }
 
 class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
-  // 2. LE BOUCLIER ANTI-BUG EST ICI
   bool _isLeavingManually = false; 
   bool _isNavigatingToGame = false;
 
@@ -48,26 +46,19 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       List players = List.from(data['players'] ?? []);
       String currentHost = data['host'] ?? '';
 
-      // 1. On retire le joueur de la liste
       players.removeWhere((p) => p['name'] == widget.currentPlayerName);
 
-      // 2. LE CHECK DE SUPPRESSION
       if (players.isEmpty) {
-        // PLUS PERSONNE : On supprime le lobby définitivement
         await docRef.delete();
       } else {
-        // IL RESTE DU MONDE : On met à jour la liste et on gère le nouveau chef
         Map<String, dynamic> updates = {'players': players};
-        
-        // Si celui qui part est le chef, on donne la couronne au premier de la liste restante
         if (widget.currentPlayerName == currentHost) {
           updates['host'] = players[0]['name']; 
         }
-        
         await docRef.update(updates);
       }
     } catch (e) {
-      debugPrint("Erreur lors de la sortie du lobby : $e");
+      debugPrint("Erreur sortie lobby : $e");
     }
   }
 
@@ -126,10 +117,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
             image: DecorationImage(
               image: const AssetImage('assets/images/background.jpg'),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withValues(alpha: 0.8), 
-                BlendMode.darken
-              ),
+              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.8), BlendMode.darken),
             ),
           ),
           child: SafeArea(
@@ -140,60 +128,42 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   widget.lobbyName,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 4,
-                    shadows: [Shadow(color: Colors.blueAccent, blurRadius: 20)],
+                    fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white,
+                    letterSpacing: 4, shadows: [Shadow(color: Colors.blueAccent, blurRadius: 20)],
                   ),
                 ),
-                // Le mot de passe écoute Firebase en direct pour s'afficher si on DEVIENT chef !
                 StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
                     
                     var data = snapshot.data!.data() as Map<String, dynamic>;
-
                     List activePlayers = data['activePlayers'] ?? [];
                     String status = data['status'] ?? 'waiting';
 
                     if (status == 'playing' && activePlayers.isEmpty) {
-                      // Si le salon dit qu'on joue mais que tout le monde est revenu au lobby
-                      FirebaseFirestore.instance
-                          .collection('lobbies')
-                          .doc(widget.lobbyId)
-                          .update({'status': 'waiting'});
+                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'waiting'});
                     }
 
                     bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
 
-                    // Si je suis le chef actuellement dans la base de données, j'affiche le MDP
                     if (amITheHost) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 15),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1), 
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
                               const SizedBox(width: 8),
-                              Text(
-                                "MDP : ${widget.password}",
-                                style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1),
-                              ),
+                              Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
                             ],
                           ),
                         ),
                       );
                     }
-                    
-                    // Si je ne suis pas le chef, je n'affiche rien (une boite vide invisible)
                     return const SizedBox(); 
                   },
                 ),
@@ -206,36 +176,27 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   child: StreamBuilder<DocumentSnapshot>(
                     stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasError) return const Center(child: Text("Erreur de connexion", style: TextStyle(color: Colors.white)));
+                      if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
                       if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
 
                       var data = snapshot.data!.data() as Map<String, dynamic>?;
-                      if (data == null) return const Center(child: Text("Lobby introuvable", style: TextStyle(color: Colors.white)));
+                      if (data == null) return const Center(child: Text("Introuvable", style: TextStyle(color: Colors.white)));
 
                       List players = data['players'] ?? [];
                       String hostName = data['host'] ?? '';
 
                       bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
 
-                      // 3. ON UTILISE LE BOUCLIER ICI !
-                      // Si je n'y suis plus ET que ce n'est pas moi qui suis parti...
                       if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (context.mounted) {
                             Navigator.of(context).pop(); 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Le chef du lobby t'a expulsé ❌", style: TextStyle(color: Colors.white)),
-                                backgroundColor: Colors.redAccent,
-                              ),
-                            );
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chef t'a expulsé ❌"), backgroundColor: Colors.redAccent));
                           }
                         });
-                        return const Center(child: Text("Expulsion en cours...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
+                        return const Center(child: Text("Expulsion...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
                       }
 
-                      // LE TÉLÉPORTEUR INTELLIGENT (Modèle Hub)
-                      // On vérifie si je suis dans la liste des joueurs en train de jouer
                       bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
 
                       if (data['status'] == 'playing' && amIActive) {
@@ -244,7 +205,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             if (context.mounted) {
                               setState(() { _isNavigatingToGame = true; });
 
-                              // ON DÉTERMINE L'ÉCRAN SELON LE MODE DE JEU
                               Widget targetScreen;
                               String gameMode = data['gameMode'] ?? 'Action ou Vérité';
 
@@ -274,11 +234,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
                       }
 
-                      if (players.isEmpty) {
-                        return const Center(
-                          child: Text("En attente de joueurs...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic))
-                        );
-                      }
+                      if (players.isEmpty) return const Center(child: Text("Attente...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
 
                       return ListView.builder(
                         itemCount: players.length,
@@ -293,25 +249,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
                             child: ListTile(
-                              leading: Icon(
-                                Icons.person, 
-                                color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent 
-                              ),
+                              leading: Icon(Icons.person, color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent),
                               title: Row(
                                 children: [
-                                  Text(
-                                    name, 
-                                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)
-                                  ),
-                                  if (isHost) ...[
-                                    const SizedBox(width: 8),
-                                    const Icon(Icons.star, color: Colors.amber, size: 20), 
-                                  ]
+                                  Text(name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
+                                  if (isHost) ...[const SizedBox(width: 8), const Icon(Icons.star, color: Colors.amber, size: 20)]
                                 ],
                               ),
                               trailing: Row(
@@ -324,9 +268,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                       icon: const Icon(Icons.close, color: Colors.redAccent),
                                       onPressed: () {
                                         FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-                                          'players': FieldValue.arrayRemove([
-                                            {'name': name, 'gender': gender}
-                                          ])
+                                          'players': FieldValue.arrayRemove([{'name': name, 'gender': gender}])
                                         });
                                       },
                                     ),
@@ -407,7 +349,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   context: context,
                                   backgroundColor: const Color(0xFF1A1A1D),
                                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                  // ✅ On envoie toutes les data pour gérer le toggle
                                   builder: (context) => _buildParamsSheet(data),
                                 );
                               },
@@ -457,10 +398,11 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
-  // ✅ CETTE FONCTION PREND MAINTENANT LES DATA ENTIÈRES POUR GÉRER LE SWITCH EN DIRECT
   Widget _buildParamsSheet(Map<String, dynamic> data) {
     String mode = data['gameMode'] ?? 'Action ou Vérité';
-    String initialVisibility = data['jnjVisibility'] ?? 'visible';
+    
+    // ✅ LA CORRECTION DU BOUTON CLICQUABLE EST ICI (variable en dehors du builder)
+    bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
 
     final List<Map<String, dynamic>> actionCats = [
       {'n': 'Soft', 'e': '🍭'}, {'n': 'Famille', 'e': '🏠'}, {'n': 'Dehors', 'e': '🌳'},
@@ -468,15 +410,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       {'n': 'Couple', 'e': '💞'}, {'n': 'Hot', 'e': '🔥'},
     ];
     final List<Map<String, dynamic>> jnjCats = [
-      {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '🌶️ +18', 'e': '🌶️'},
+      // ✅ CORRECTION DU DOUBLE EMOJI 🌶️ ICI
+      {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '+18', 'e': '🌶️'}, 
     ];
     final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
 
-    // StatefulBuilder permet au Switch de s'animer sans fermer le menu
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setModalState) {
-        bool isSecret = initialVisibility == 'invisible';
-        
         return Container(
           padding: const EdgeInsets.all(25),
           child: SingleChildScrollView(
@@ -486,7 +426,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 Text("PARAMÈTRES : ${mode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(height: 20),
 
-                // ✅ LE BOUTON SECRET EST MAINTENANT ICI (Uniquement pour Je n'ai jamais)
                 if (mode == "Je n'ai jamais") ...[
                   Container(
                     decoration: BoxDecoration(
