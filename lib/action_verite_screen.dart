@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class GamePlayer {
   final String name;
@@ -381,16 +382,15 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       )
                     : Row(
                         children: [
-                          // 🟢 MUR VÉRITÉ (GAUCHE)
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 600),
-                            curve: Curves.easeOutExpo, // Un bel effet élastique
+                            curve: Curves.easeOutExpo,
                             width: showNext
                                 ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
                                 : MediaQuery.of(context).size.width / 2,
-                            child: ClipRRect( // Empêche le texte de dépasser pendant l'animation
+                            child: ClipRRect(
                               child: Material(
-                                color: const Color(0xFF22C55E).withValues(alpha: 0.85), // Un peu transparent pour voir ton fond
+                                color: const Color.fromARGB(255, 26, 138, 63).withValues(alpha: 0.95), // Vert Forêt profond
                                 child: InkWell(
                                   onTap: showNext ? null : () => pickQuestion('verite', cIndex),
                                   child: SizedBox(
@@ -400,7 +400,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                                       child: showNext && _lastChoice == 'verite'
                                           ? _buildExpandedContent("VÉRITÉ", cIndex)
                                           : const Center(
-                                              child: RotatedBox( // On tourne le texte à la verticale pour le style
+                                              child: RotatedBox(
                                                 quarterTurns: 3,
                                                 child: Text("VÉRITÉ", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
                                               ),
@@ -409,10 +409,13 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                                   ),
                                 ),
                               ),
-                            ),
+                            )
+                            // LE MIROITEMENT ANIMÉ
+                            .animate(onPlay: (controller) => controller.repeat())
+                            .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.15), angle: 1.5),
                           ),
 
-                          // 🔴 MUR ACTION (DROITE)
+                          // MUR ACTION
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 600),
                             curve: Curves.easeOutExpo,
@@ -421,7 +424,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                                 : MediaQuery.of(context).size.width / 2,
                             child: ClipRRect(
                               child: Material(
-                                color: const Color(0xFFEC4899).withValues(alpha: 0.85),
+                                color: const Color(0xFF6B1124).withValues(alpha: 0.95), // Bordeaux luxueux
                                 child: InkWell(
                                   onTap: showNext ? null : () => pickQuestion('action', cIndex),
                                   child: SizedBox(
@@ -432,7 +435,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                                           ? _buildExpandedContent("ACTION", cIndex)
                                           : const Center(
                                               child: RotatedBox(
-                                                quarterTurns: 1, // Tourné dans l'autre sens
+                                                quarterTurns: 1, 
                                                 child: Text("ACTION", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
                                               ),
                                             ),
@@ -440,109 +443,12 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                                   ),
                                 ),
                               ),
-                            ),
+                            )
+                            // LE MIROITEMENT ANIMÉ (Avec un petit décalage pour faire naturel)
+                            .animate(onPlay: (controller) => controller.repeat())
+                            .shimmer(duration: 3.seconds, color: Colors.white.withValues(alpha: 0.15), angle: 1.5, delay: 1.5.seconds),
                           ),
                         ],
-                      ),
-              ),
-              
-              // 2. LA NOUVELLE ZONE DES BOUTONS ANIMÉE ✨
-              Padding(
-                padding: const EdgeInsets.all(40),
-                child: !isMyTurn 
-                    ? // SI CE N'EST PAS MON TOUR
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          "Attends que ${currentPlayer.name} joue...",
-                          style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                    : // SI C'EST MON TOUR
-                      SizedBox(
-                        height: 65, // Hauteur fixe pour une belle animation
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // 🟢 BOUTON VÉRITÉ
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.fastOutSlowIn,
-                              width: showNext
-                                  ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width - 80 : 0)
-                                  : (MediaQuery.of(context).size.width - 100) / 2,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF22C55E),
-                                    padding: EdgeInsets.zero,
-                                    elevation: 10,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                  ),
-                                  onPressed: showNext 
-                                      ? () { 
-                                          setState(() => _lastChoice = ''); 
-                                          _updateTurn(cIndex); 
-                                        } 
-                                      : () => pickQuestion('verite', cIndex),
-                                  child: Text(
-                                    showNext ? "TOUR SUIVANT ➔" : "VÉRITÉ",
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    overflow: TextOverflow.fade, // Empêche les erreurs quand le bouton rétrécit
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // ⬛ ESPACEMENT (Disparaît si un choix est fait)
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 500),
-                              width: showNext ? 0 : 20,
-                            ),
-
-                            // 🔴 BOUTON ACTION
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.fastOutSlowIn,
-                              width: showNext
-                                  ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width - 80 : 0)
-                                  : (MediaQuery.of(context).size.width - 100) / 2,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFEC4899),
-                                    padding: EdgeInsets.zero,
-                                    elevation: 10,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                  ),
-                                  onPressed: showNext 
-                                      ? () { 
-                                          setState(() => _lastChoice = ''); 
-                                          _updateTurn(cIndex); 
-                                        } 
-                                      : () => pickQuestion('action', cIndex),
-                                  child: Text(
-                                    showNext ? "TOUR SUIVANT ➔" : "ACTION",
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
               ),
             ],
