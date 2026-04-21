@@ -501,13 +501,10 @@ class CategoryScreen extends StatelessWidget {
         height: double.infinity,
         // LE NOUVEAU FOND STYLER
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topRight,
-            radius: 1.5,
-            colors: [
-              Color(0xFF2E1065), // Violet profond (ambiance soirée)
-              Color(0xFF101012), // Noir
-            ],
+          color: Color(0xFF101012), // Couleur de fond par sécurité si l'image charge lentement
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.jpg'), // Ton image d'accueil
+            fit: BoxFit.cover, // Permet à l'image de bien prendre tout l'écran
           ),
         ),
         child: SafeArea(

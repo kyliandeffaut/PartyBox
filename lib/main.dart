@@ -235,62 +235,118 @@ class GameSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context), // Retourne à l'ajout des joueurs
-        ),
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Container(
         width: double.infinity,
+        height: double.infinity,
+        // 🌟 TON IMAGE DE FOND NÉON
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF1A1A2E), Color(0xFF101012)],
-            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          color: Color(0xFF101012),
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.jpg'),
+            fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("CHOISIS TON JEU", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 2)),
-            const SizedBox(height: 50),
-            
-            _menuCard(context, "Action ou Vérité", "🎭", const Color.fromARGB(255, 251, 64, 64), () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(players: players)));
-            }),
-            
-            const SizedBox(height: 20),
-            
-            _menuCard(context, "Je n'ai jamais", "🤫", Colors.deepPurpleAccent, () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => JeNaiJamaisScreen(players: players)));
-            }),
-          ],
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "CHOISIS TON JEU", 
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 26, 
+                  fontWeight: FontWeight.w900, 
+                  letterSpacing: 4
+                )
+              ).animate().fade().scale(),
+              
+              const SizedBox(height: 50),
+              
+              // --- JEU 1 : ACTION OU VÉRITÉ ---
+              _menuCard(
+                context, 
+                "Action ou Vérité", 
+                "🎭", 
+                const Color(0xFFFB4040), 
+                () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => CategoryScreen(players: players)
+                  ));
+                }
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // --- JEU 2 : JE N'AI JAMAIS ---
+              _menuCard(
+                context, 
+                "Je n'ai jamais", 
+                "🤫", 
+                Colors.deepPurpleAccent, 
+                () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => JeNaiJamaisScreen(players: players)
+                  ));
+                }
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _menuCard(BuildContext context, String title, String emoji, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
+  // ✨ LA FONCTION DE CARTE STYLÉE (Anciennement _menuCard)
+  Widget _menuCard(BuildContext context, String title, String emoji, Color color, VoidCallback onPress) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: InkWell(
+        onTap: onPress,
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            // EFFET GLASSMORPHISM
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withValues(alpha: 0.3),
+                color.withValues(alpha: 0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              )
+            ],
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 40)),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  title.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white, 
+                    fontSize: 18, 
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1
+                  ),
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+            ],
+          ),
         ),
-        child: Row(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 30)),
-            const SizedBox(width: 20),
-            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
+      ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, curve: Curves.easeOutBack),
     );
   }
 }
