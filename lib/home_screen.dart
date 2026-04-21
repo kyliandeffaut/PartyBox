@@ -253,13 +253,13 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
       DocumentReference lobbyRef = await FirebaseFirestore.instance.collection('lobbies').add({
         'lobbyName': name,
         'password': password,
-        'createdAt': FieldValue.serverTimestamp(),
         'status': 'waiting',
         'host': pseudo,
         'gameMode': 'Action ou Vérité',
         'players': [
           {'name': pseudo, 'gender': _selectedGender}
-        ], 
+        ],
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;

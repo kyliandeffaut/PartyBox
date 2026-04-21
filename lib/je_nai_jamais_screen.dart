@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'main.dart';
 
 class JeNaiJamaisScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class JeNaiJamaisScreen extends StatefulWidget {
 
 class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   Map<String, dynamic> allQuestions = {};
-  String currentQuestion = "Appuie sur la carte !";
+  String currentQuestion = "Choisis une ambiance !";
   String selectedCategory = "";
   bool isLoading = true;
 
@@ -46,7 +47,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F2027),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -63,30 +63,38 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         ),
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        // 🌟 LE FOND NÉON IDENTIQUE AUX AUTRES
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
+          color: Color(0xFF101012),
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.jpg'),
+            fit: BoxFit.cover,
           ),
         ),
         child: isLoading 
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
           : SafeArea(
-              child: selectedCategory.isEmpty 
-                  ? _buildCategorySelection() 
-                  : _buildGameBoard(),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: selectedCategory.isEmpty 
+                    ? _buildCategorySelection() 
+                    : _buildGameBoard(),
+              ),
             ),
       ),
     );
   }
 
+  // --- 😇 SÉLECTION DES AMBIANCES ---
   Widget _buildCategorySelection() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("CHOISIS TON AMBIANCE", 
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 2)),
+          const Text("QUELLE AMBIANCE ?", 
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 4)),
           const SizedBox(height: 40),
           _catButton("Soft", "😇", Colors.greenAccent),
           _catButton("Interdit", "🚫", Colors.orangeAccent),
@@ -98,105 +106,108 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
   Widget _catButton(String name, String emoji, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color.withValues(alpha: 0.2),
-          foregroundColor: Colors.white,
-          side: BorderSide(color: color, width: 2),
-          minimumSize: const Size(double.infinity, 60),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+      child: InkWell(
+        onTap: () => setState(() { selectedCategory = name; nextQuestion(); }),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.05)]),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 26)),
+              const SizedBox(width: 15),
+              Text(name.toUpperCase(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 2)),
+            ],
+          ),
         ),
-        onPressed: () => setState(() { selectedCategory = name; nextQuestion(); }),
-        child: Text("$emoji $name", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      ),
+      ).animate().fadeIn(delay: 100.ms).slideX(begin: 0.2),
     );
   }
 
+  // --- 🎮 PLATEAU DE JEU ---
   Widget _buildGameBoard() {
     return Column(
       children: [
+        const SizedBox(height: 10),
+        Text("JE N'AI JAMAIS • $selectedCategory", 
+          style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 2)),
         const SizedBox(height: 20),
-        Text("JE N'AI JAMAIS ($selectedCategory)", style: const TextStyle(color: Colors.white70)),
-        const SizedBox(height: 30),
         
-        // LA CARTE
-        GestureDetector(
-          onTap: nextQuestion,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.85,
-            height: 250,
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 15)],
+        // LA CARTE DE QUESTION GLASSMORPHISM
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: InkWell(
+            onTap: nextQuestion,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.05)]),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.white24),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20)],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(currentQuestion, textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3)),
+                  const SizedBox(height: 20),
+                  const Text("Tapote pour changer 🔄", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                ],
+              ),
             ),
-            child: Center(
-              child: Text(currentQuestion, textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 22, color: Colors.black87, fontWeight: FontWeight.bold)),
-            ),
-          ),
+          ).animate(key: ValueKey(currentQuestion)).fadeIn().scale(curve: Curves.easeOutBack),
         ),
 
         const SizedBox(height: 30),
-        const Text("QUI L'A DÉJÀ FAIT ?", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
+        const Text("QUI L'A DÉJÀ FAIT ?", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 1)),
+        const SizedBox(height: 15),
 
-        // LISTE DES COMPTEURS
+        // LISTE DES SCORES STYLISÉE
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: widget.players.length,
             itemBuilder: (context, index) {
               final player = widget.players[index];
-              return Card(
-                color: Colors.white.withValues(alpha: 0.1),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.white10),
+                ),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: player.gender == 'H' ? Colors.blue : Colors.pinkAccent,
-                    child: Text(player.name[0].toUpperCase(), style: const TextStyle(color: Colors.white)),
+                    backgroundColor: player.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
+                    child: Text(player.name[0].toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                  title: Text(player.name, style: const TextStyle(color: Colors.white)),
+                  title: Text(player.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // BOUTON MOINS
-                      IconButton(
-                        icon: Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 24),
-                        onPressed: () {
-                          setState(() {
-                            if (player.score > 0) player.score--; // Sécurité : pas de score négatif
-                          });
-                        },
-                      ),
-                      
-                      // AFFICHAGE DU SCORE
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          "${player.score}", 
-                          style: const TextStyle(
-                            color: Colors.amber, 
-                            fontSize: 22, 
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ),
-
-                      // BOUTON PLUS
-                      IconButton(
-                        icon: const Icon(Icons.add_circle, color: Colors.greenAccent, size: 28),
-                        onPressed: () => setState(() => player.score++),
-                      ),
+                      _scoreBtn(Icons.remove_circle_outline, Colors.redAccent, () => setState(() { if (player.score > 0) player.score--; })),
+                      Text("${player.score}", style: const TextStyle(color: Colors.amber, fontSize: 20, fontWeight: FontWeight.w900)),
+                      _scoreBtn(Icons.add_circle_outline, Colors.greenAccent, () => setState(() => player.score++)),
                     ],
                   ),
                 ),
-              );
+              ).animate().fadeIn(delay: Duration(milliseconds: index * 100)).slideX(begin: 0.1);
             },
           ),
         ),
       ],
     );
+  }
+
+  Widget _scoreBtn(IconData icon, Color color, VoidCallback fn) {
+    return IconButton(icon: Icon(icon, color: color, size: 26), onPressed: fn);
   }
 }
