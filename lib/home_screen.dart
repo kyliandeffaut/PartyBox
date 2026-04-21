@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() => _isPremiumUnlocked = false); // On met à false pour l'affichage
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("🔒 Premium désactivé (Mode test)"), backgroundColor: Colors.orange),
+                    const SnackBar(content: Text("🔒 Premium désactivé"), backgroundColor: Colors.orange),
                   );
                 }
               }
