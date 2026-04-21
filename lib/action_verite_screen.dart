@@ -482,54 +482,120 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF101012),
+      extendBodyBehindAppBar: true, // LE fond passe SOUS l'AppBar
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("CHOISIS UNE CATÉGORIE", style: TextStyle(color: Colors.white, fontSize: 16)),
+        centerTitle: true,
+        title: const Text(
+          "CHOISIS UNE CATÉGORIE", 
+          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(20),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, childAspectRatio: 1.5, crossAxisSpacing: 15, mainAxisSpacing: 15
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        // LE NOUVEAU FOND STYLER
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topRight,
+            radius: 1.5,
+            colors: [
+              Color(0xFF2E1065), // Violet profond (ambiance soirée)
+              Color(0xFF101012), // Noir
+            ],
+          ),
         ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: cat['color'].withValues(alpha: 0.2),
-              side: BorderSide(color: cat['color'], width: 2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: SafeArea(
+          child: GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, 
+              childAspectRatio: 1.2, // Cartes un peu plus carrées
+              crossAxisSpacing: 20, 
+              mainAxisSpacing: 20
             ),
-            onPressed: () {
-              List<GamePlayer> formattedPlayers = players.map((p) => GamePlayer(
-                name: p.name, 
-                gender: p.gender
-              )).toList();
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final cat = categories[index];
+              return InkWell(
+                borderRadius: BorderRadius.circular(25),
+                onTap: () {
+                  List<GamePlayer> formattedPlayers = players.map((p) => GamePlayer(
+                    name: p.name, 
+                    gender: p.gender
+                  )).toList();
 
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => ActionVeriteScreen(
-                  category: cat['name'], 
-                  isOnline: false,       
-                  localPlayers: formattedPlayers, 
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => ActionVeriteScreen(
+                      category: cat['name'], 
+                      isOnline: false,       
+                      localPlayers: formattedPlayers, 
+                    ),
+                  ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    // EFFET GLASSMORPHISM ET LUMIÈRE
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        cat['color'].withValues(alpha: 0.3),
+                        cat['color'].withValues(alpha: 0.05),
+                      ],
+                    ),
+                    border: Border.all(color: cat['color'].withValues(alpha: 0.5), width: 1.5),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: cat['color'].withValues(alpha: 0.15),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 5)
+                      )
+                    ]
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Emoji plus grand avec une petite ombre
+                      Text(
+                        cat['emoji'], 
+                        style: const TextStyle(
+                          fontSize: 40,
+                          shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(2, 2))]
+                        )
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        cat['name'], 
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontWeight: FontWeight.w800, 
+                          fontSize: 16,
+                          letterSpacing: 1
+                        )
+                      ),
+                    ],
+                  ),
                 ),
-              ));
+              )
+              // L'ANIMATION EN CASCADE
+              .animate()
+              .fade(duration: const Duration(milliseconds: 400))
+              .scale(
+                begin: const Offset(0.8, 0.8), 
+                curve: Curves.easeOutBack, 
+                delay: Duration(milliseconds: index * 50) // Chaque carte arrive 50ms après la précédente !
+              );
             },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(cat['emoji'], style: const TextStyle(fontSize: 30)),
-                const SizedBox(height: 10),
-                Text(cat['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
