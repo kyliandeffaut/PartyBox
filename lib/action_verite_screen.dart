@@ -169,6 +169,40 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     _updateGameState(text, true); 
   }
 
+  Widget _buildExpandedContent(String typeTitle, int cIndex) {
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(typeTitle, style: const TextStyle(fontSize: 20, color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 4)),
+          const SizedBox(height: 40),
+          Text(
+            localCurrentQuestion,
+            style: const TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3),
+            textAlign: TextAlign.center,
+          ),
+          const Spacer(),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              minimumSize: const Size(double.infinity, 70),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 10,
+            ),
+            onPressed: () {
+              setState(() => _lastChoice = ''); // On referme l'écran
+              _updateTurn(cIndex);
+            },
+            child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (players.isEmpty) {
@@ -332,39 +366,84 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
               Text(
                 currentPlayer.name.toUpperCase(), 
                 style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)
-              ),              
+              ),
+
+              const SizedBox(height: 30),
               
+              // LA ZONE SPLIT-SCREEN QUI PREND TOUT LE RESTE DE L'ÉCRAN
               Expanded(
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
-                    transitionBuilder: (Widget child, Animation<double> animation) {
-                      return SlideTransition(
-                        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
-                        child: FadeTransition(opacity: animation, child: child),
-                      );
-                    },
-                    child: Padding(
-                      key: ValueKey(cQuestion),
-                      padding: const EdgeInsets.all(30),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9), 
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(color: themeColor.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: 5)
-                          ]
-                        ),
+                child: !isMyTurn
+                    ? Center(
                         child: Text(
-                          cQuestion,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black87),
+                          "Attends que ${currentPlayer.name} joue...",
+                          style: const TextStyle(color: Colors.white54, fontSize: 18, fontStyle: FontStyle.italic),
                         ),
+                      )
+                    : Row(
+                        children: [
+                          // 🟢 MUR VÉRITÉ (GAUCHE)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.easeOutExpo, // Un bel effet élastique
+                            width: showNext
+                                ? (_lastChoice == 'verite' ? MediaQuery.of(context).size.width : 0)
+                                : MediaQuery.of(context).size.width / 2,
+                            child: ClipRRect( // Empêche le texte de dépasser pendant l'animation
+                              child: Material(
+                                color: const Color(0xFF22C55E).withValues(alpha: 0.85), // Un peu transparent pour voir ton fond
+                                child: InkWell(
+                                  onTap: showNext ? null : () => pickQuestion('verite', cIndex),
+                                  child: SizedBox(
+                                    height: double.infinity,
+                                    child: AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 400),
+                                      child: showNext && _lastChoice == 'verite'
+                                          ? _buildExpandedContent("VÉRITÉ", cIndex)
+                                          : const Center(
+                                              child: RotatedBox( // On tourne le texte à la verticale pour le style
+                                                quarterTurns: 3,
+                                                child: Text("VÉRITÉ", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // 🔴 MUR ACTION (DROITE)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.easeOutExpo,
+                            width: showNext
+                                ? (_lastChoice == 'action' ? MediaQuery.of(context).size.width : 0)
+                                : MediaQuery.of(context).size.width / 2,
+                            child: ClipRRect(
+                              child: Material(
+                                color: const Color(0xFFEC4899).withValues(alpha: 0.85),
+                                child: InkWell(
+                                  onTap: showNext ? null : () => pickQuestion('action', cIndex),
+                                  child: SizedBox(
+                                    height: double.infinity,
+                                    child: AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 400),
+                                      child: showNext && _lastChoice == 'action'
+                                          ? _buildExpandedContent("ACTION", cIndex)
+                                          : const Center(
+                                              child: RotatedBox(
+                                                quarterTurns: 1, // Tourné dans l'autre sens
+                                                child: Text("ACTION", style: TextStyle(fontSize: 45, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 5)),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ),
               ),
               
               // 2. LA NOUVELLE ZONE DES BOUTONS ANIMÉE ✨
