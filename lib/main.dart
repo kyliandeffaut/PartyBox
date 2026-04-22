@@ -36,7 +36,7 @@ class ActionVeriteApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF101012),
       ),
-      home: const SplashScreen(), // 👈 DÉMARRAGE SUR LE SPLASH SCREEN
+      home: const SplashScreen(), // DÉMARRAGE SUR LE SPLASH SCREEN
     );
   }
 }
@@ -81,15 +81,26 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.black, // Fond bien sombre pour le néon
       body: Stack(
         children: [
-          // 1. Le Logo au centre avec effet de pulsation
+          // 1. Le Logo au centre avec bords arrondis et animation unique
           Center(
-            child: Image.asset(
-              'assets/images/logo.png', // Ton nouveau logo
-              width: 220,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20), // 👈 1. BORDS ARRONDIS
+              child: Image.asset(
+                'assets/images/logo.png', // Ton logo
+                width: 220,
+              ),
             )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .fadeIn(duration: const Duration(milliseconds: 800))
-            .scaleXY(begin: 0.95, end: 1.05, duration: const Duration(milliseconds: 1500)), // Effet de respiration
+            // 2. ANIMATION PLUS LENTE ET UNIQUE
+            // .forward() joue l'animation une seule fois (pas de boucle)
+            .animate(onPlay: (controller) => controller.forward()) 
+            // Fade-in plus lent (1.2 secondes)
+            .fadeIn(duration: const Duration(milliseconds: 1200))
+            // Pulse plus lent (2.5 secondes) et non-répétitif
+            .scaleXY(
+              begin: 0.95, 
+              end: 1.05, 
+              duration: const Duration(milliseconds: 2500)
+            ), 
           ),
           
           // 2. La Signature DEFFAUT STUDIO en bas

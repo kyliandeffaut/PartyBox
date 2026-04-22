@@ -1,4 +1,4 @@
-package com.example.action_verite
+package com.deffautstudio.partybox
 
 import io.flutter.embedding.android.FlutterActivity
 

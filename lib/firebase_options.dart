@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '779421460538',
     projectId: 'partybox-98bce',
     storageBucket: 'partybox-98bce.firebasestorage.app',
-    iosBundleId: 'com.example.actionVerite',
+    iosBundleId: 'com.deffautstudio.partybox',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '779421460538',
     projectId: 'partybox-98bce',
     storageBucket: 'partybox-98bce.firebasestorage.app',
-    iosBundleId: 'com.example.actionVerite',
+    iosBundleId: 'com.deffautstudio.partybox',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
