@@ -36,7 +36,111 @@ class ActionVeriteApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF101012),
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(), // 👈 DÉMARRAGE SUR LE SPLASH SCREEN
+    );
+  }
+}
+
+// --- ÉCRAN 0 : LE SPLASH SCREEN ANIMÉ (DEFFAUT STUDIO) ---
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateToHome();
+  }
+
+  _navigateToHome() async {
+    // Le splash screen dure exactement 3.5 secondes
+    await Future.delayed(const Duration(milliseconds: 3500));
+    
+    if (mounted) {
+      // Redirection fluide en fondu vers l'accueil
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 800),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black, // Fond bien sombre pour le néon
+      body: Stack(
+        children: [
+          // 1. Le Logo au centre avec effet de pulsation
+          Center(
+            child: Image.asset(
+              'assets/images/logo.png', // Ton nouveau logo
+              width: 220,
+            )
+            .animate(onPlay: (controller) => controller.repeat(reverse: true))
+            .fadeIn(duration: const Duration(milliseconds: 800))
+            .scaleXY(begin: 0.95, end: 1.05, duration: const Duration(milliseconds: 1500)), // Effet de respiration
+          ),
+          
+          // 2. La Signature DEFFAUT STUDIO en bas
+          Positioned(
+            bottom: 60,
+            left: 0,
+            right: 0,
+            child: Column(
+              children: [
+                const Divider(
+                  color: Colors.white24,
+                  indent: 100,
+                  endIndent: 100,
+                  thickness: 1,
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "DEFFAUT",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900, // Gras
+                        fontSize: 18,
+                        color: Colors.white,
+                        letterSpacing: 5.0,
+                        shadows: [Shadow(color: Colors.blueAccent, blurRadius: 10)], // Lueur néon bleue
+                      ),
+                    ),
+                    const SizedBox(width: 5), // Espace
+                    const Text(
+                      "STUDIO",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300, // Très fin pour le contraste
+                        fontSize: 18,
+                        color: Colors.white,
+                        letterSpacing: 5.0,
+                        shadows: [Shadow(color: Colors.blueAccent, blurRadius: 10)], // Lueur néon bleue
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+            .animate()
+            // Arrive légèrement après le logo (effet de fondu et de glissement vers le haut)
+            .fadeIn(delay: const Duration(milliseconds: 500), duration: const Duration(milliseconds: 1000))
+            .slideY(begin: 0.5, end: 0, curve: Curves.easeOut),
+          ),
+        ],
+      ),
     );
   }
 }
