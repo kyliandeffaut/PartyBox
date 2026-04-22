@@ -304,13 +304,28 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
 
                     if (amITheHost) {
+                      final List activePlayers = (data['activePlayers'] as List?) ?? [];
+                      final bool someoneStillInGame = activePlayers.isNotEmpty;
                       return Padding(
                         padding: const EdgeInsets.all(30.0),
                         child: Column(
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                              onPressed: () async {
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: someoneStillInGame ? Colors.grey : Colors.greenAccent,
+                                minimumSize: const Size(double.infinity, 60),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              ),
+                              onPressed: someoneStillInGame
+                                  ? () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Attends que tout le monde revienne au lobby avant de relancer ✅"),
+                                          backgroundColor: Colors.orangeAccent,
+                                        ),
+                                      );
+                                    }
+                                  : () async {
                                 final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
                                 final doc = await docRef.get();
                                 var currentData = doc.data() as Map<String, dynamic>;
@@ -321,6 +336,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   var newP = Map<String, dynamic>.from(p);
                                   newP['hasVoted'] = false;
                                   newP['lastVote'] = null;
+                                  newP['score'] = 0;
                                   return newP;
                                 }).toList();
 
@@ -335,7 +351,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   'currentPlayerIndex': 0,
                                 });
                               },
-                              child: const Text("LANCER LA PARTIE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+                              child: Text(
+                                someoneStillInGame ? "JOUEURS ENCORE EN JEU..." : "LANCER LA PARTIE",
+                                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
                             ),
                             const SizedBox(height: 15),
                             OutlinedButton(

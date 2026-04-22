@@ -49,6 +49,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
       await _checkIfHost();
       _listenToLobby();
     } else {
+      // Offline: la liste de joueurs peut être réutilisée entre parties,
+      // donc on repart toujours avec des scores propres.
+      for (final p in widget.players) {
+        p.score = 0;
+      }
       setState(() => isLoading = false);
     }
   }
