@@ -34,7 +34,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
   bool _isHost = false;
   bool _hasVotedThisTurn = false;
   String? _myChoice; // 'A'|'B'
-  String? _questionsLoadError;
 
   bool _canPop = false;
 
@@ -72,11 +71,9 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
       } else {
         _questions = [];
       }
-      _questionsLoadError = null;
     } catch (e) {
       debugPrint("Erreur chargement tu_prefere.json: $e");
       _questions = [];
-      _questionsLoadError = e.toString();
     }
   }
 
@@ -200,9 +197,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _questionsLoadError == null
-                    ? "Aucune question dans assets/tu_prefere.json ❌"
-                    : "Erreur chargement assets/tu_prefere.json ❌ ($_questionsLoadError)\nRedémarre l'app si tu viens d'ajouter l'asset.",
+                "Impossible de charger les questions (Tu préfères ?). Vérifie l'asset puis redémarre l'app.",
               ),
               backgroundColor: Colors.redAccent,
             ),
@@ -244,7 +239,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Impossible de mettre à jour la question ❌ ($e)"),
+            content: const Text("Impossible de mettre à jour la question. Réessaie."),
             backgroundColor: Colors.redAccent,
           ),
         );

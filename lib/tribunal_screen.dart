@@ -33,7 +33,6 @@ class _TribunalScreenState extends State<TribunalScreen> {
   bool _isHost = false;
   bool _hasVotedThisTurn = false;
   String? _myVoteTarget;
-  String? _questionsLoadError;
 
   bool _canPop = false;
 
@@ -64,11 +63,9 @@ class _TribunalScreenState extends State<TribunalScreen> {
       } else {
         _questions = [];
       }
-      _questionsLoadError = null;
     } catch (e) {
       debugPrint("Erreur chargement tribunal.json: $e");
       _questions = [];
-      _questionsLoadError = e.toString();
     }
   }
 
@@ -185,9 +182,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _questionsLoadError == null
-                    ? "Aucune question dans assets/tribunal.json ❌"
-                    : "Erreur chargement assets/tribunal.json ❌ ($_questionsLoadError)\nRedémarre l'app si tu viens d'ajouter l'asset.",
+                "Impossible de charger les questions (Tribunal). Vérifie l'asset puis redémarre l'app.",
               ),
               backgroundColor: Colors.redAccent,
             ),
@@ -230,7 +225,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Impossible de mettre à jour la question ❌ ($e)"),
+            content: const Text("Impossible de mettre à jour la question. Réessaie."),
             backgroundColor: Colors.redAccent,
           ),
         );
