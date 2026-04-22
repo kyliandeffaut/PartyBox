@@ -33,10 +33,11 @@ class _TribunalScreenState extends State<TribunalScreen> {
   bool _isHost = false;
   bool _hasVotedThisTurn = false;
   String? _myVoteTarget;
+  String? _questionsLoadError;
 
   bool _canPop = false;
 
-  static const String _fieldQuestion = 'tribunalQuestion';
+  static const String _fieldQuestion = 'currentQuestion';
 
   @override
   void initState() {
@@ -47,7 +48,6 @@ class _TribunalScreenState extends State<TribunalScreen> {
   Future<void> _init() async {
     await _loadQuestions();
     if (widget.isOnline && widget.lobbyId != null) {
-      await _checkIfHost();
       _listenLobby();
     } else {
       setState(() => _isLoading = false);
@@ -61,17 +61,14 @@ class _TribunalScreenState extends State<TribunalScreen> {
       final decoded = json.decode(response);
       if (decoded is List) {
         _questions = decoded.map((e) => e.toString()).where((s) => s.trim().isNotEmpty).toList();
+      } else {
+        _questions = [];
       }
+      _questionsLoadError = null;
     } catch (e) {
       debugPrint("Erreur chargement tribunal.json: $e");
       _questions = [];
-    }
-  }
-
-  Future<void> _checkIfHost() async {
-    final doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
-    if (doc.exists && doc.data()?['host'] == widget.currentPlayerName) {
-      setState(() => _isHost = true);
+      _questionsLoadError = e.toString();
     }
   }
 
@@ -79,6 +76,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
     FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snap) {
       if (!snap.exists || snap.data() == null) return;
       final data = snap.data()!;
+      final bool amIHost = (data['host'] ?? '').toString() == (widget.currentPlayerName ?? '');
 
       final List<dynamic> fbPlayers = data['activePlayers'] ?? [];
       bool amIVoted = false;
@@ -104,6 +102,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
 
       if (!mounted) return;
       setState(() {
+        _isHost = amIHost;
         _currentQuestion = (data[_fieldQuestion] ?? "Le chef choisit...").toString();
         widget.players
           ..clear()
@@ -114,7 +113,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
       });
 
       // Auto pick au lancement si vide
-      if (_isHost && (_currentQuestion == "Le chef choisit..." || data[_fieldQuestion] == null)) {
+      if (amIHost && (_currentQuestion == "Le chef choisit..." || data[_fieldQuestion] == null)) {
         _nextQuestionOnline();
       }
     });
@@ -178,34 +177,65 @@ class _TribunalScreenState extends State<TribunalScreen> {
   }
 
   Future<void> _nextQuestionOnline() async {
-    if (widget.lobbyId == null || _questions.isEmpty) return;
-    final newQ = _questions[Random().nextInt(_questions.length)];
-
-    final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-    final doc = await docRef.get();
-    if (!doc.exists) return;
-
-    final List activeP = List.from(doc.data()?['activePlayers'] ?? []);
-    final List allP = List.from(doc.data()?['players'] ?? []);
-
-    for (final p in activeP) {
-      if (p is Map) {
-        p['hasVoted'] = false;
-        p['voteTarget'] = null;
-      }
-    }
-    for (final p in allP) {
-      if (p is Map) {
-        p['hasVoted'] = false;
-        p['voteTarget'] = null;
+    if (widget.lobbyId == null) return;
+    if (_questions.isEmpty) {
+      await _loadQuestions();
+      if (_questions.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                _questionsLoadError == null
+                    ? "Aucune question dans assets/tribunal.json ❌"
+                    : "Erreur chargement assets/tribunal.json ❌ ($_questionsLoadError)\nRedémarre l'app si tu viens d'ajouter l'asset.",
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+        return;
       }
     }
 
-    await docRef.update({
-      _fieldQuestion: newQ,
-      'activePlayers': activeP,
-      'players': allP,
-    });
+    final String newQ = _questions[Random().nextInt(_questions.length)];
+
+    try {
+      final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+      final doc = await docRef.get();
+      if (!doc.exists) return;
+
+      final List activeP = List.from(doc.data()?['activePlayers'] ?? []);
+      final List allP = List.from(doc.data()?['players'] ?? []);
+
+      for (final p in activeP) {
+        if (p is Map) {
+          p['hasVoted'] = false;
+          p['voteTarget'] = null;
+        }
+      }
+      for (final p in allP) {
+        if (p is Map) {
+          p['hasVoted'] = false;
+          p['voteTarget'] = null;
+        }
+      }
+
+      await docRef.update({
+        _fieldQuestion: newQ,
+        'activePlayers': activeP,
+        'players': allP,
+      });
+    } catch (e) {
+      debugPrint("Erreur update Firestore (Tribunal): $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Impossible de mettre à jour la question ❌ ($e)"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
   }
 
   void _pickNextLocal() {

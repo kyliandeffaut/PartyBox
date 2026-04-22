@@ -364,9 +364,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   'players': updatedPlayers,
                                   'jnjGameEnded': false,
                                   'currentQuestion': null, // Force une nouvelle pioche
-                                  'tribunalQuestion': null,
-                                  'tpOptionA': null,
-                                  'tpOptionB': null,
                                   'lastChoice': null,
                                   'showNextButton': false,
                                   'currentPlayerIndex': 0,

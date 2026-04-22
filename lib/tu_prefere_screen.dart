@@ -34,11 +34,11 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
   bool _isHost = false;
   bool _hasVotedThisTurn = false;
   String? _myChoice; // 'A'|'B'
+  String? _questionsLoadError;
 
   bool _canPop = false;
 
-  static const String _fieldA = 'tpOptionA';
-  static const String _fieldB = 'tpOptionB';
+  static const String _fieldQuestion = 'currentQuestion';
 
   @override
   void initState() {
@@ -49,7 +49,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
   Future<void> _init() async {
     await _loadQuestions();
     if (widget.isOnline && widget.lobbyId != null) {
-      await _checkIfHost();
       _listenLobby();
     } else {
       setState(() => _isLoading = false);
@@ -65,22 +64,19 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
         _questions = decoded
             .whereType<Map>()
             .map((m) => {
-                  'a': (m['a'] ?? '').toString(),
-                  'b': (m['b'] ?? '').toString(),
+                  'a': (m['a'] ?? '').toString().trim(),
+                  'b': (m['b'] ?? '').toString().trim(),
                 })
-            .where((m) => m['a']!.trim().isNotEmpty && m['b']!.trim().isNotEmpty)
+            .where((m) => m['a']!.isNotEmpty && m['b']!.isNotEmpty)
             .toList();
+      } else {
+        _questions = [];
       }
+      _questionsLoadError = null;
     } catch (e) {
       debugPrint("Erreur chargement tu_prefere.json: $e");
       _questions = [];
-    }
-  }
-
-  Future<void> _checkIfHost() async {
-    final doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
-    if (doc.exists && doc.data()?['host'] == widget.currentPlayerName) {
-      setState(() => _isHost = true);
+      _questionsLoadError = e.toString();
     }
   }
 
@@ -88,6 +84,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
     FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snap) {
       if (!snap.exists || snap.data() == null) return;
       final data = snap.data()!;
+      final bool amIHost = (data['host'] ?? '').toString() == (widget.currentPlayerName ?? '');
 
       final List<dynamic> fbPlayers = data['activePlayers'] ?? [];
       bool amIVoted = false;
@@ -113,8 +110,15 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
 
       if (!mounted) return;
       setState(() {
-        _optionA = (data[_fieldA] ?? "Le chef choisit...").toString();
-        _optionB = (data[_fieldB] ?? "Le chef choisit...").toString();
+        _isHost = amIHost;
+        final cq = data[_fieldQuestion];
+        if (cq is Map) {
+          _optionA = (cq['a'] ?? "Le chef choisit...").toString();
+          _optionB = (cq['b'] ?? "Le chef choisit...").toString();
+        } else {
+          _optionA = "Le chef choisit...";
+          _optionB = "Le chef choisit...";
+        }
         widget.players
           ..clear()
           ..addAll(rebuilt);
@@ -123,7 +127,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
         _isLoading = false;
       });
 
-      if (_isHost && (data[_fieldA] == null || data[_fieldB] == null || _optionA == "Le chef choisit..." || _optionB == "Le chef choisit...")) {
+      if (amIHost && (_optionA == "Le chef choisit..." || _optionB == "Le chef choisit...")) {
         _nextQuestionOnline();
       }
     });
@@ -188,35 +192,64 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
   }
 
   Future<void> _nextQuestionOnline() async {
-    if (widget.lobbyId == null || _questions.isEmpty) return;
+    if (widget.lobbyId == null) return;
+    if (_questions.isEmpty) {
+      await _loadQuestions();
+      if (_questions.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                _questionsLoadError == null
+                    ? "Aucune question dans assets/tu_prefere.json ❌"
+                    : "Erreur chargement assets/tu_prefere.json ❌ ($_questionsLoadError)\nRedémarre l'app si tu viens d'ajouter l'asset.",
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+        return;
+      }
+    }
     final q = _questions[Random().nextInt(_questions.length)];
 
-    final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-    final doc = await docRef.get();
-    if (!doc.exists) return;
+    try {
+      final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+      final doc = await docRef.get();
+      if (!doc.exists) return;
 
-    final List activeP = List.from(doc.data()?['activePlayers'] ?? []);
-    final List allP = List.from(doc.data()?['players'] ?? []);
+      final List activeP = List.from(doc.data()?['activePlayers'] ?? []);
+      final List allP = List.from(doc.data()?['players'] ?? []);
 
-    for (final p in activeP) {
-      if (p is Map) {
-        p['hasVoted'] = false;
-        p['tpChoice'] = null;
+      for (final p in activeP) {
+        if (p is Map) {
+          p['hasVoted'] = false;
+          p['tpChoice'] = null;
+        }
+      }
+      for (final p in allP) {
+        if (p is Map) {
+          p['hasVoted'] = false;
+          p['tpChoice'] = null;
+        }
+      }
+
+      await docRef.update({
+        _fieldQuestion: {'a': q['a'], 'b': q['b']},
+        'activePlayers': activeP,
+        'players': allP,
+      });
+    } catch (e) {
+      debugPrint("Erreur update Firestore (Tu préfères): $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Impossible de mettre à jour la question ❌ ($e)"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
       }
     }
-    for (final p in allP) {
-      if (p is Map) {
-        p['hasVoted'] = false;
-        p['tpChoice'] = null;
-      }
-    }
-
-    await docRef.update({
-      _fieldA: q['a'],
-      _fieldB: q['b'],
-      'activePlayers': activeP,
-      'players': allP,
-    });
   }
 
   void _pickNextLocal() {
