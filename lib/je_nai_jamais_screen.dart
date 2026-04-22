@@ -37,6 +37,114 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   bool _localSecretMode = false;
   bool _localGameEnded = false;
 
+  List<Map<String, dynamic>> _awardDataFromOnlinePlayers(List<dynamic> fbPlayers) {
+    return fbPlayers
+        .whereType<Map>()
+        .map((p) => {
+              'name': (p['name'] ?? '').toString(),
+              'score': (p['score'] ?? 0) as int,
+            })
+        .where((p) => (p['name'] as String).isNotEmpty)
+        .toList();
+  }
+
+  List<Map<String, dynamic>> _awardDataFromLocalPlayers() {
+    return widget.players
+        .map((p) => {'name': p.name, 'score': p.score})
+        .where((p) => (p['name'] as String).isNotEmpty)
+        .toList();
+  }
+
+  String _joinWinners(List<Map<String, dynamic>> winners) {
+    final names = winners.map((p) => p['name'] as String).toList();
+    return names.join(', ');
+  }
+
+  Widget _awardTile({
+    required String emoji,
+    required String title,
+    required String subtitle,
+    required Color color,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.35)),
+        boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 12, offset: const Offset(0, 8))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: color.withOpacity(0.35)),
+            ),
+            child: Center(child: Text(emoji, style: const TextStyle(fontSize: 22))),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn().slideY(begin: 0.15, end: 0);
+  }
+
+  Widget _buildAwards(List<Map<String, dynamic>> players) {
+    if (players.isEmpty) return const SizedBox();
+
+    final sortedDesc = [...players]..sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+    final sortedAsc = [...players]..sort((a, b) => (a['score'] as int).compareTo(b['score'] as int));
+
+    final topScore = sortedDesc.first['score'] as int;
+    final lowScore = sortedAsc.first['score'] as int;
+
+    final topWinners = sortedDesc.where((p) => p['score'] == topScore).toList();
+    final lowWinners = sortedAsc.where((p) => p['score'] == lowScore).toList();
+
+    final int range = (topScore - lowScore).abs();
+
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        const Text("AWARDS", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        const SizedBox(height: 8),
+        _awardTile(
+          emoji: "😈",
+          title: "Le plus diabolique",
+          subtitle: "${_joinWinners(topWinners)} • $topScore point(s)",
+          color: Colors.redAccent,
+        ),
+        _awardTile(
+          emoji: "😇",
+          title: "L'ange de la soirée",
+          subtitle: "${_joinWinners(lowWinners)} • $lowScore point(s)",
+          color: Colors.greenAccent,
+        ),
+        _awardTile(
+          emoji: "🎢",
+          title: "Écart",
+          subtitle: "Différence max • $range point(s)",
+          color: Colors.purpleAccent,
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -355,8 +463,14 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
             Text(gameEnded ? "🏆 CLASSEMENT FINAL 🏆" : "JE N'AI JAMAIS • ${selectedCategory.toUpperCase()}", style: TextStyle(color: gameEnded ? Colors.amber : Colors.white54, fontWeight: FontWeight.bold, fontSize: gameEnded ? 20 : 14)),
             const SizedBox(height: 20),
             
-            if (!gameEnded) _buildQuestionCard(),
-            const SizedBox(height: 15),
+            if (!gameEnded) ...[
+              _buildQuestionCard(),
+              const SizedBox(height: 15),
+            ] else ...[
+              _buildAwards(
+                widget.isOnline ? _awardDataFromOnlinePlayers(currentPlayersFB) : _awardDataFromLocalPlayers(),
+              ),
+            ],
 
             if (widget.isOnline && visibilityMode == 'invisible' && allVoted && !gameEnded)
               _buildInvisibleTotalReveal(currentPlayersFB),
