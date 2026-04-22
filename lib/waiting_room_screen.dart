@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
+import 'tribunal_screen.dart';
+import 'tu_prefere_screen.dart';
 import 'main.dart';
 
 class WaitingRoomScreen extends StatefulWidget {
@@ -215,6 +217,20 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   lobbyId: widget.lobbyId,
                                   currentPlayerName: widget.currentPlayerName,
                                 );
+                              } else if (gameMode == "Le Tribunal") {
+                                targetScreen = TribunalScreen(
+                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                  isOnline: true,
+                                  lobbyId: widget.lobbyId,
+                                  currentPlayerName: widget.currentPlayerName,
+                                );
+                              } else if (gameMode == "Tu préfères ?") {
+                                targetScreen = TuPrefereScreen(
+                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                  isOnline: true,
+                                  lobbyId: widget.lobbyId,
+                                  currentPlayerName: widget.currentPlayerName,
+                                );
                               } else {
                                 targetScreen = ActionVeriteScreen(
                                   lobbyId: widget.lobbyId,
@@ -337,6 +353,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   newP['hasVoted'] = false;
                                   newP['lastVote'] = null;
                                   newP['score'] = 0;
+                                  newP['voteTarget'] = null;
+                                  newP['tpChoice'] = null;
                                   return newP;
                                 }).toList();
 
@@ -346,6 +364,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   'players': updatedPlayers,
                                   'jnjGameEnded': false,
                                   'currentQuestion': null, // Force une nouvelle pioche
+                                  'tribunalQuestion': null,
+                                  'tpOptionA': null,
+                                  'tpOptionB': null,
                                   'lastChoice': null,
                                   'showNextButton': false,
                                   'currentPlayerIndex': 0,
@@ -365,7 +386,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   backgroundColor: const Color(0xFF1A1A1D),
                                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
                                   builder: (BuildContext context) {
-                                    List<String> gameModes = ['Action ou Vérité', 'Je n\'ai jamais'];
+                                    List<String> gameModes = [
+                                      'Action ou Vérité',
+                                      'Je n\'ai jamais',
+                                      'Le Tribunal',
+                                      'Tu préfères ?',
+                                    ];
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 20),
                                       child: Column(
@@ -464,6 +490,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     final List<Map<String, dynamic>> jnjCats = [
       {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '+18', 'e': '🌶️'}, 
     ];
+    final bool hasCategories = mode == 'Action ou Vérité' || mode == "Je n'ai jamais";
     final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
 
     return StatefulBuilder(
@@ -502,21 +529,43 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   const SizedBox(height: 20),
                 ],
 
-                const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                const SizedBox(height: 10),
-                
-                ...cats.map((c) {
-                  bool isSelected = c['n'] == currentCategory;
-                  return ListTile(
-                    leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
-                    title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-                    trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
-                    onTap: () {
-                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
-                      Navigator.pop(context);
-                    },
-                  );
-                }),
+                if (hasCategories) ...[
+                  const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 10),
+                  ...cats.map((c) {
+                    bool isSelected = c['n'] == currentCategory;
+                    return ListTile(
+                      leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
+                      title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                      trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
+                      onTap: () {
+                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
+                        Navigator.pop(context);
+                      },
+                    );
+                  }),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.white54),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "Aucun paramètre pour ce mode.",
+                            style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
