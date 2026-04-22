@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
+import 'tribunal_screen.dart';
+import 'tu_prefere_screen.dart';
 import 'home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -84,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> {
           // 1. Le Logo au centre avec bords arrondis et animation unique
           Center(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20), // 👈 1. BORDS ARRONDIS
+              borderRadius: BorderRadius.circular(20), // 1. BORDS ARRONDIS
               child: Image.asset(
                 'assets/images/logo.png', // Ton logo
                 width: 220,
@@ -354,7 +356,6 @@ class GameSelectionScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // 🌟 TON IMAGE DE FOND NÉON
         decoration: const BoxDecoration(
           color: Color(0xFF101012),
           image: DecorationImage(
@@ -363,56 +364,92 @@ class GameSelectionScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "CHOISIS TON JEU", 
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 26, 
-                  fontWeight: FontWeight.w900, 
-                  letterSpacing: 4
-                )
-              ).animate().fade().scale(),
-              
-              const SizedBox(height: 50),
-              
-              // --- JEU 1 : ACTION OU VÉRITÉ ---
-              _menuCard(
-                context, 
-                "Action ou Vérité", 
-                "🎭", 
-                const Color(0xFFFB4040), 
-                () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => CategoryScreen(players: players)
-                  ));
-                }
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // --- JEU 2 : JE N'AI JAMAIS ---
-              _menuCard(
-                context, 
-                "Je n'ai jamais", 
-                "🤫", 
-                Colors.deepPurpleAccent, 
-                () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => JeNaiJamaisScreen(players: players)
-                  ));
-                }
-              ),
-            ],
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  "CHOISIS TON JEU", 
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontSize: 26, 
+                    fontWeight: FontWeight.w900, 
+                    letterSpacing: 4
+                  )
+                ).animate().fade().scale(),
+                
+                const SizedBox(height: 40),
+                
+                // --- JEU 1 : ACTION OU VÉRITÉ ---
+                _menuCard(
+                  context, 
+                  "Action ou Vérité", 
+                  "🎭", 
+                  const Color(0xFFFB4040), 
+                  () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => CategoryScreen(players: players)
+                    ));
+                  }
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // --- JEU 2 : JE N'AI JAMAIS ---
+                _menuCard(
+                  context, 
+                  "Je n'ai jamais", 
+                  "🤫", 
+                  Colors.deepPurpleAccent, 
+                  () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => JeNaiJamaisScreen(players: players)
+                    ));
+                  }
+                ),
+
+                const SizedBox(height: 20),
+
+                // --- JEU 3 : LE TRIBUNAL  ---
+                _menuCard(
+                  context, 
+                  "Le Tribunal", 
+                  "⚖️", 
+                  Colors.amber.shade600, 
+                  () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => TribunalScreen(players: players)
+                    ));
+                  }
+                ),
+
+                const SizedBox(height: 20),
+
+                // --- JEU 4 : TU PRÉFÈRES ? 👈 NOUVEAU ---
+                _menuCard(
+                  context, 
+                  "Tu préfères ?", 
+                  "🤔", 
+                  Colors.tealAccent.shade400, 
+                  () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => TuPrefereScreen(players: players)
+                    ));
+                  }
+                ),
+                
+                const SizedBox(height: 40), // Petit espace en bas
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ✨ LA FONCTION DE CARTE STYLÉE (Anciennement _menuCard)
+  // ✨ LA FONCTION DE CARTE STYLÉE
   Widget _menuCard(BuildContext context, String title, String emoji, Color color, VoidCallback onPress) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
