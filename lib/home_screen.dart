@@ -578,7 +578,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                     );
 
                     // 2. Si le scan a marché
-                    if (result != null && result is Map<String, String>) {
+                    if (result != null && result is Map) {
                       setState(() => _isLoading = true);
                       
                       String scannedLobbyId = result['lobbyId']!;
