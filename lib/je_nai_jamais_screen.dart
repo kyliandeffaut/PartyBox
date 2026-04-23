@@ -26,6 +26,7 @@ class JeNaiJamaisScreen extends StatefulWidget {
 
 class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   Map<String, dynamic> allQuestions = {};
+  Map<String, List<dynamic>> _remainingQuestions = {};
   String currentQuestion = "Chargement...";
   String selectedCategory = "";
   bool isLoading = true;
@@ -212,6 +213,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     try {
       final String response = await rootBundle.loadString('assets/je_nai_jamais.json');
       allQuestions = json.decode(response);
+
+      _remainingQuestions.clear();
+      allQuestions.forEach((key, value) {
+        _remainingQuestions[key] = List.from(value)..shuffle();
+      });
     } catch (e) {
       debugPrint("Erreur chargement JSON: $e");
     }
@@ -246,9 +252,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
   void nextQuestionOnline() async {
     if (selectedCategory.isEmpty || !allQuestions.containsKey(selectedCategory)) return;
-    
-    final questions = allQuestions[selectedCategory] as List;
-    String newQ = questions[Random().nextInt(questions.length)];
+
+    if (_remainingQuestions[selectedCategory] == null || _remainingQuestions[selectedCategory]!.isEmpty) {
+      _remainingQuestions[selectedCategory] = List.from(allQuestions[selectedCategory])..shuffle();
+    }
+    String newQ = _remainingQuestions[selectedCategory]!.removeLast(); // On pioche et on retire !
 
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
@@ -289,8 +297,12 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
   void nextQuestion({String? categoryOverride}) {
     String cat = categoryOverride ?? selectedCategory;
-    final questions = allQuestions[cat] as List;
-    String newQ = questions[Random().nextInt(questions.length)];
+    
+    // NOUVEAU SYSTÈME ALÉATOIRE SANS DOUBLON
+    if (_remainingQuestions[cat] == null || _remainingQuestions[cat]!.isEmpty) {
+      _remainingQuestions[cat] = List.from(allQuestions[cat])..shuffle();
+    }
+    String newQ = _remainingQuestions[cat]!.removeLast(); // On pioche et on retire !
 
     if (widget.isOnline) {
       FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
@@ -308,7 +320,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     });
   }
 
-  // ✅ CORRECTION DU BOUTON RETOUR QUI ÉJECTAIT LE JOUEUR
+  // CORRECTION DU BOUTON RETOUR QUI ÉJECTAIT LE JOUEUR
   void _quit() async {
     if (widget.isOnline && widget.lobbyId != null) {
       var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);

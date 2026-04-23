@@ -28,6 +28,7 @@ class TuPrefereScreen extends StatefulWidget {
 
 class _TuPrefereScreenState extends State<TuPrefereScreen> {
   List<Map<String, String>> _questions = [];
+  List<Map<String, String>> _remainingQuestions = [];
   String _optionA = "Chargement...";
   String _optionB = "Chargement...";
   bool _isLoading = true;
@@ -73,6 +74,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                 })
             .where((m) => m['a']!.isNotEmpty && m['b']!.isNotEmpty)
             .toList();
+        _remainingQuestions = List.from(_questions)..shuffle();
       } else {
         _questions = [];
       }
@@ -197,7 +199,11 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
     if (widget.lobbyId == null) return;
     if (_questions.isEmpty) return;
     
-    final q = _questions[Random().nextInt(_questions.length)];
+    // NOUVEAU SYSTÈME ALÉATOIRE SANS DOUBLON
+    if (_remainingQuestions.isEmpty) {
+      _remainingQuestions = List.from(_questions)..shuffle();
+    }
+    final q = _remainingQuestions.removeLast(); // On pioche
 
     try {
       final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
@@ -230,10 +236,16 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
     }
   }
 
-  // --- 🔄 FONCTIONS POUR LE MODE LOCAL ---
+  // --- FONCTIONS POUR LE MODE LOCAL ---
   void _pickNextLocal() {
     if (_questions.isEmpty) return;
-    final q = _questions[Random().nextInt(_questions.length)];
+    
+    // NOUVEAU SYSTÈME ALÉATOIRE SANS DOUBLON
+    if (_remainingQuestions.isEmpty) {
+      _remainingQuestions = List.from(_questions)..shuffle();
+    }
+    final q = _remainingQuestions.removeLast(); // On pioche
+    
     setState(() {
       _optionA = q['a'] ?? '';
       _optionB = q['b'] ?? '';
@@ -386,7 +398,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                               ],
                             ),
                           ),
-                          
+
                           const SizedBox(height: 14),
 
                           if (!allVoted) ...[

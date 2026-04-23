@@ -38,6 +38,10 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
   List<dynamic> allQuestions = [];
   List<GamePlayer> players = [];
   
+  // NOUVEAU : LES DEUX SACS DE PIOCHE SANS DOUBLON
+  List<dynamic> _remainingActions = [];
+  List<dynamic> _remainingVerites = [];
+  
   // Variables locales (utilisées UNIQUEMENT si on joue hors-ligne sur 1 seul téléphone)
   int localCurrentPlayerIndex = 0;
   String localCurrentQuestion = "Appuie sur un bouton !";
@@ -49,7 +53,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     super.initState();
     loadQuestions();
     
-    // Au lancement, on récupère les joueurs
     if (widget.isOnline && widget.lobbyId != null) {
       fetchPlayersFromFirebase(); 
     } else {
@@ -62,7 +65,24 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
   Future<void> loadQuestions() async {
     final String response = await rootBundle.loadString('assets/action_verite.json');
     final data = await json.decode(response);
-    setState(() { allQuestions = data; });
+    setState(() { 
+      allQuestions = data; 
+      _refillBag('action'); // On remplit le sac d'actions
+      _refillBag('verite'); // On remplit le sac de vérités
+    });
+  }
+
+  // NOUVEAU : FONCTION POUR REMPLIR ET MÉLANGER UN SAC
+  void _refillBag(String type) {
+    var filtered = allQuestions.where((q) => q['type'] == type && q['category'] == widget.category).toList();
+    if (filtered.isEmpty) { // Sécurité si la catégorie est vide
+      filtered = allQuestions.where((q) => q['type'] == type).toList();
+    }
+    if (type == 'action') {
+      _remainingActions = List.from(filtered)..shuffle();
+    } else {
+      _remainingVerites = List.from(filtered)..shuffle();
+    }
   }
 
   Future<void> fetchPlayersFromFirebase() async {
@@ -81,13 +101,12 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // 🔄 LA MAGIE : On envoie la question ET le choix dans Firebase pour que tout le monde voie le bon écran !
   void _updateGameState(String question, bool showNext, String choice) {
     if (widget.isOnline && widget.lobbyId != null) {
       FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
         'currentQuestion': question,
         'showNextButton': showNext,
-        'lastChoice': choice, // ✨ On synchronise le mur qui s'ouvre !
+        'lastChoice': choice, 
       });
     } else {
       setState(() {
@@ -98,7 +117,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // 🔄 LA MAGIE : On change de tour dans Firebase et on referme les murs
   void _updateTurn(int currentIndex) {
     int nextIndex = (currentIndex + 1) % players.length;
     
@@ -107,7 +125,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
         'currentPlayerIndex': nextIndex,
         'currentQuestion': "Appuie sur un bouton !",
         'showNextButton': false,
-        'lastChoice': '', // ✨ On referme les murs pour tout le monde
+        'lastChoice': '', 
       });
     } else {
       setState(() {
@@ -119,7 +137,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
   }
 
-  // Tirage de la question
   void pickQuestion(String type, int cIndex) {
     setState(() {
       _lastChoice = type;
@@ -127,14 +144,18 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
 
     if (allQuestions.isEmpty || players.isEmpty) return;
 
-    var filtered = allQuestions.where((q) => q['type'] == type && q['category'] == widget.category).toList();
-    if (filtered.isEmpty) {
-      filtered = allQuestions.where((q) => q['type'] == type).toList();
+    // NOUVEAU SYSTÈME ALÉATOIRE : On utilise le bon sac
+    List<dynamic> currentBag = type == 'action' ? _remainingActions : _remainingVerites;
+    
+    // Si le sac est vide, on le remplit et on le remélange
+    if (currentBag.isEmpty) {
+      _refillBag(type);
+      currentBag = type == 'action' ? _remainingActions : _remainingVerites;
     }
-    if (filtered.isEmpty) return;
+    
+    if (currentBag.isEmpty) return; // Sécurité extrême
 
-    final random = Random();
-    var questionData = filtered[random.nextInt(filtered.length)];
+    var questionData = currentBag.removeLast(); // ON PIOCHE SANS REMISE !
     String text = questionData['text'];
 
     GamePlayer currentPlayer = players[cIndex];
@@ -169,7 +190,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
     }
     text = text.replaceAll("{player}", currentPlayer.name); 
 
-    // On met à jour pour TOUT LE MONDE (avec le type Action/Vérité)
     _updateGameState(text, true, type); 
   }
 
@@ -181,13 +201,13 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           Text(typeTitle, style: const TextStyle(fontSize: 20, color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 4)),
           const SizedBox(height: 30),
           Text(
-            actualQuestion, // On utilise la vraie question synchronisée !
+            actualQuestion, 
             style: const TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.w800, height: 1.3),
             textAlign: TextAlign.center,
           ),
           const Spacer(),
           isMyTurn
-            ? ElevatedButton( // Le bouton actif pour celui qui joue
+            ? ElevatedButton( 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
@@ -201,7 +221,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 },
                 child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
               )
-            : Text( // Le texte pour ceux qui regardent
+            : Text( 
                 "Attends que ${currentPlayer.name} passe au tour suivant...",
                 style: const TextStyle(color: Colors.white70, fontSize: 16, fontStyle: FontStyle.italic),
                 textAlign: TextAlign.center,
@@ -249,7 +269,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           int cIndex = data['currentPlayerIndex'] ?? 0;
           String cQuestion = data['currentQuestion'] ?? "Appuie sur un bouton !";
           bool showNext = data['showNextButton'] ?? false;
-          String cChoice = data['lastChoice'] ?? ''; // ✨ ON RÉCUPÈRE LE CHOIX DE FIREBASE
+          String cChoice = data['lastChoice'] ?? ''; 
           
           if (cIndex >= players.length) {
             cIndex = 0; 
@@ -325,8 +345,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       ),
       body: Stack(
         children: [
-          // COUCHE 1 : LE FOND
-          (!isMyTurn && !showNext) // ON MONTRE L'ÉCRAN BLEU SEULEMENT SI LE JOUEUR N'A PAS ENCORE CLIQUÉ
+          (!isMyTurn && !showNext) 
               ? Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -346,7 +365,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                 )
               : Row(
                   children: [
-                    // MUR VÉRITÉ
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutExpo,
@@ -379,7 +397,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                       .shimmer(duration: 4.seconds, color: Colors.white.withValues(alpha: 0.30), angle: 30, delay: 1.seconds),
                     ),
 
-                    // MUR ACTION
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeOutExpo,
@@ -414,7 +431,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                   ],
                 ),
 
-          // COUCHE 2 : LES TEXTES DU HAUT
           SafeArea(
             child: IgnorePointer(
                 child: Column(
@@ -456,7 +472,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
   }
 }
 
-// --- ÉCRAN 2 : SÉLECTION DES CATÉGORIES (SPÉCIAL MODE LOCAL) ---
+// --- ÉCRAN 2 : SÉLECTION DES CATÉGORIES ---
 class CategoryScreen extends StatelessWidget {
   final List<dynamic> players; 
 
@@ -476,7 +492,7 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // LE fond passe SOUS l'AppBar
+      extendBodyBehindAppBar: true, 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -493,12 +509,11 @@ class CategoryScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // LE NOUVEAU FOND STYLER
         decoration: const BoxDecoration(
-          color: Color(0xFF101012), // Couleur de fond par sécurité si l'image charge lentement
+          color: Color(0xFF101012), 
           image: DecorationImage(
-            image: AssetImage('assets/images/background.jpg'), // Ton image d'accueil
-            fit: BoxFit.cover, // Permet à l'image de bien prendre tout l'écran
+            image: AssetImage('assets/images/background.jpg'), 
+            fit: BoxFit.cover, 
           ),
         ),
         child: SafeArea(
@@ -506,7 +521,7 @@ class CategoryScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, 
-              childAspectRatio: 1.2, // Cartes un peu plus carrées
+              childAspectRatio: 1.2, 
               crossAxisSpacing: 20, 
               mainAxisSpacing: 20
             ),
@@ -531,7 +546,6 @@ class CategoryScreen extends StatelessWidget {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    // EFFET GLASSMORPHISM ET LUMIÈRE
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -554,7 +568,6 @@ class CategoryScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Emoji plus grand avec une petite ombre
                       Text(
                         cat['emoji'], 
                         style: const TextStyle(
@@ -576,13 +589,12 @@ class CategoryScreen extends StatelessWidget {
                   ),
                 ),
               )
-              // L'ANIMATION EN CASCADE
               .animate()
               .fade(duration: const Duration(milliseconds: 400))
               .scale(
                 begin: const Offset(0.8, 0.8), 
                 curve: Curves.easeOutBack, 
-                delay: Duration(milliseconds: index * 50) // Chaque carte arrive 50ms après la précédente !
+                delay: Duration(milliseconds: index * 50)
               );
             },
           ),

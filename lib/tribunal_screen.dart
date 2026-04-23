@@ -28,6 +28,7 @@ class TribunalScreen extends StatefulWidget {
 
 class _TribunalScreenState extends State<TribunalScreen> {
   List<String> _questions = [];
+  List<String> _remainingQuestions = [];
   String _currentQuestion = "Chargement...";
   bool _isLoading = true;
   bool _isHost = false;
@@ -64,6 +65,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
       final decoded = json.decode(response);
       if (decoded is List) {
         _questions = decoded.map((e) => e.toString()).where((s) => s.trim().isNotEmpty).toList();
+        _remainingQuestions = List.from(_questions)..shuffle();
       } else {
         _questions = [];
       }
@@ -178,12 +180,13 @@ class _TribunalScreenState extends State<TribunalScreen> {
 
   Future<void> _nextQuestionOnline() async {
     if (widget.lobbyId == null) return;
-    if (_questions.isEmpty) {
-      await _loadQuestions();
-      if (_questions.isEmpty) return;
-    }
+    if (_questions.isEmpty) return;
 
-    final String newQ = _questions[Random().nextInt(_questions.length)];
+    // 👈 NOUVEAU SYSTÈME ALÉATOIRE SANS DOUBLON
+    if (_remainingQuestions.isEmpty) {
+      _remainingQuestions = List.from(_questions)..shuffle(); // On recharge le sac s'il est vide
+    }
+    final String newQ = _remainingQuestions.removeLast(); // On pioche et on retire
 
     try {
       final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
@@ -216,11 +219,16 @@ class _TribunalScreenState extends State<TribunalScreen> {
     }
   }
 
-  // --- 🔄 FONCTIONS POUR LE MODE LOCAL ---
+  // --- FONCTIONS POUR LE MODE LOCAL ---
   void _pickNextLocal() {
     if (_questions.isEmpty) return;
+    
+    if (_remainingQuestions.isEmpty) {
+      _remainingQuestions = List.from(_questions)..shuffle();
+    }
+    
     setState(() {
-      _currentQuestion = _questions[Random().nextInt(_questions.length)];
+      _currentQuestion = _remainingQuestions.removeLast(); // On pioche
       _hasVotedThisTurn = false;
       _myVoteTarget = null;
       _localVotes.clear(); 
