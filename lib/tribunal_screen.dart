@@ -223,8 +223,8 @@ class _TribunalScreenState extends State<TribunalScreen> {
       _currentQuestion = _questions[Random().nextInt(_questions.length)];
       _hasVotedThisTurn = false;
       _myVoteTarget = null;
-      _localVotes.clear(); // On réinitialise les votes locaux
-      _localVoteCount = 0; // On remet le compteur à zéro
+      _localVotes.clear(); 
+      _localVoteCount = 0; 
     });
   }
 
@@ -233,18 +233,8 @@ class _TribunalScreenState extends State<TribunalScreen> {
       _localVotes[targetName] = (_localVotes[targetName] ?? 0) + 1;
       _localVoteCount++;
 
-      // Si tout le monde a voté, on affiche les résultats
       if (_localVoteCount >= widget.players.length) {
         _hasVotedThisTurn = true; 
-      } else {
-        // Affiche un petit message pour dire de passer le téléphone
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Vote enregistré ! Passe le téléphone à ${widget.players[_localVoteCount].name}"),
-            duration: const Duration(seconds: 1, milliseconds: 500),
-            backgroundColor: Colors.purpleAccent,
-          ),
-        );
       }
     });
   }
@@ -304,7 +294,6 @@ class _TribunalScreenState extends State<TribunalScreen> {
                         fbPlayers = data['activePlayers'] ?? [];
                       }
                       
-                      // 🔄 CHOIX DYNAMIQUE (LIGNE OU LOCAL) POUR LES STATS
                       final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
                       final counts = widget.isOnline ? _countVotes(fbPlayers) : _localVotes;
                       final totalVotes = widget.isOnline ? fbPlayers.length : _localVoteCount;
@@ -333,8 +322,22 @@ class _TribunalScreenState extends State<TribunalScreen> {
                           const SizedBox(height: 16),
 
                           if (!allVoted) ...[
-                            const Text("VOTE EN SECRET", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                            const SizedBox(height: 10),
+                            // TEXTE D'INDICATION PLUS GRAND ET JUSTE SOUS LA QUESTION
+                            Text(
+                              _hasVotedThisTurn 
+                                ? "Vote envoyé ✅" 
+                                : (widget.isOnline 
+                                    ? "CHOISIS UN JOUEUR" 
+                                    : "Au tour de ${widget.players[_localVoteCount].name} de voter !"),
+                              style: TextStyle(
+                                color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, 
+                                fontWeight: FontWeight.w900, 
+                                fontSize: 20, 
+                                letterSpacing: 1
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+
                             Expanded(
                               child: ListView.builder(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -343,10 +346,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                   final p = widget.players[i];
                                   final isMe = widget.isOnline && p.name == widget.currentPlayerName;
                                   
-                                  // En local, on ne s'affiche pas soi-même dans la liste pour ne pas voter pour soi
-                                  if (!widget.isOnline && p.name == widget.players[_localVoteCount].name) {
-                                    return const SizedBox(); 
-                                  }
+                                  // PLUS AUCUNE CONDITION ICI : TU PEUX VOTER POUR TOI-MÊME !
 
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 10),
@@ -373,22 +373,13 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                               if (widget.isOnline) {
                                                 _voteOnline(p.name);
                                               } else {
-                                                _handleLocalVote(p.name); // 👈 Appel local
+                                                _handleLocalVote(p.name); 
                                               }
                                             },
                                     ),
                                   ).animate().fadeIn(delay: (i * 60).ms).slideX(begin: 0.15);
                                 },
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              _hasVotedThisTurn 
-                                ? "Vote envoyé ✅" 
-                                : (widget.isOnline 
-                                    ? "Choisis un joueur…" 
-                                    : "Au tour de ${widget.players[_localVoteCount].name} de voter !"),
-                              style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
                           ] else ...[

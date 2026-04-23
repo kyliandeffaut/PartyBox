@@ -33,12 +33,14 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
   bool _isLoading = true;
   bool _isHost = false;
   bool _hasVotedThisTurn = false;
+  // ignore: unused_field
   String? _myChoice; // 'A'|'B'
 
   bool _canPop = false;
 
   static const String _fieldQuestion = 'currentQuestion';
 
+  // --- VARIABLES POUR LE MODE LOCAL (Hors-ligne) ---
   final Map<String, int> _localChoices = {'A': 0, 'B': 0};
   int _localVoteCount = 0;
 
@@ -250,14 +252,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
 
       if (_localVoteCount >= widget.players.length) {
         _hasVotedThisTurn = true;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Choix enregistré ! Passe le téléphone à ${widget.players[_localVoteCount].name}"),
-            duration: const Duration(seconds: 1, milliseconds: 500),
-            backgroundColor: Colors.purpleAccent,
-          ),
-        );
       }
     });
   }
@@ -337,7 +331,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                         fbPlayers = data['activePlayers'] ?? [];
                       }
 
-                      // 🔄 CHOIX DYNAMIQUE (LIGNE OU LOCAL) POUR LES STATS
                       final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
                       final counts = widget.isOnline ? _countChoices(fbPlayers) : _localChoices;
                       final total = widget.isOnline ? fbPlayers.length : _localVoteCount;
@@ -373,7 +366,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                     if (widget.isOnline) {
                                       _voteOnline('A');
                                     } else {
-                                      _handleLocalChoice('A'); // 👈 Appel local
+                                      _handleLocalChoice('A'); 
                                     }
                                   },
                                 ),
@@ -386,14 +379,14 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                     if (widget.isOnline) {
                                       _voteOnline('B');
                                     } else {
-                                      _handleLocalChoice('B'); // 👈 Appel local
+                                      _handleLocalChoice('B'); 
                                     }
                                   },
                                 ),
                               ],
                             ),
                           ),
-
+                          
                           const SizedBox(height: 14),
 
                           if (!allVoted) ...[
@@ -401,11 +394,19 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                               _hasVotedThisTurn 
                                 ? "Vote envoyé ✅" 
                                 : (widget.isOnline 
-                                    ? "Choisis… (vote secret)" 
+                                    ? "VOTE EN SECRET" 
                                     : "Au tour de ${widget.players[_localVoteCount].name} de choisir !"),
-                              style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, 
+                                fontWeight: FontWeight.w900, 
+                                fontSize: 20, 
+                                letterSpacing: 1
+                              ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 16),
+                          ],
+
+                          if (!allVoted) ...[
                             Expanded(
                               child: ListView.builder(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
