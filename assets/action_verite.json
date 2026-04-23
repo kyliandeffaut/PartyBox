@@ -1,624 +1,520 @@
 [
   {
-    "id": 498,
     "type": "action",
     "category": "Hot",
     "text": "Fais semblant d'être attaché(e) et essaie de te libérer."
   },
   {
-    "id": 998,
     "type": "action",
     "category": "Hot",
     "text": "Bande-toi les yeux et laisse quelqu'un te faire goûter quelque chose."
   },
   {
-    "id": 996,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te donner un ordre autoritaire."
   },
   {
-    "id": 871,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un t'attacher les mains avec une ceinture pour 2 tours."
   },
   {
-    "id": 121,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un t'attacher les poignets avec une ceinture."
   },
   {
-    "id": 123,
     "type": "action",
     "category": "Hot",
     "text": "Bande-toi les yeux et laisse les autres te faire deviner des objets."
   },
   {
-    "id": 125,
     "type": "action",
     "category": "Hot",
     "text": "Obéis aveuglément au joueur de gauche pendant 2 tours."
   },
   {
-    "id": 1000,
     "type": "action",
     "category": "Hot",
     "text": "Obéis à ton 'maître' pour les 3 prochains tours."
   },
   {
-    "id": 500,
     "type": "action",
     "category": "Hot",
     "text": "Donne un ordre autoritaire à tout le monde dans la pièce."
   },
   {
-    "id": 500,
     "type": "action",
     "category": "Hot",
     "text": "Donne un ordre autoritaire à tout le monde dans la pièce."
   },
   {
-    "id": 498,
     "type": "action",
     "category": "Hot",
     "text": "Fais semblant d'être attaché(e) et essaie de te libérer."
   },
   {
-    "id": 496,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te donner un petit gage de 'soumission' (ex: apporter un verre d'eau)."
   },
   {
-    "id": 746,
     "type": "action",
     "category": "Hot",
     "text": "Bande-toi les yeux et laisse les autres te faire deviner 3 objets au toucher."
   },
   {
-    "id": 246,
     "type": "action",
     "category": "Hot",
     "text": "Demande la permission avant de parler pendant le prochain tour."
   },
   {
-    "id": 248,
     "type": "action",
     "category": "Hot",
     "text": "Donne une petite fessée au joueur de ton choix (avec son accord)."
   },
   {
-    "id": 250,
     "type": "action",
     "category": "Hot",
     "text": "Mets-toi à genoux devant un joueur et appelle-le 'Maître' ou 'Maîtresse'."
   },
   {
-    "id": 873,
     "type": "action",
     "category": "Hot",
     "text": "Bande-toi les yeux et laisse les autres te toucher avec un objet mystère."
   },
   {
-    "id": 875,
     "type": "action",
     "category": "Hot",
     "text": "Donne une fessée légère à la personne qui a choisi cette catégorie."
   },
   {
-    "id": 748,
     "type": "action",
     "category": "Hot",
     "text": "Demande la permission avant de parler pendant le prochain tour."
   },
   {
-    "id": 750,
     "type": "action",
     "category": "Hot",
     "text": "Obéis à un ordre simple donné par le joueur en face de toi."
   },
   {
-    "id": 371,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te donner un ordre pour ton prochain tour."
   },
   {
-    "id": 373,
     "type": "action",
     "category": "Hot",
     "text": "Fais semblant d'être un serviteur et sers à boire à tout le monde."
   },
   {
-    "id": 375,
     "type": "action",
     "category": "Hot",
     "text": "Demande une 'punition' légère au joueur de ton choix."
   },
   {
-    "id": 496,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te donner un petit gage de 'soumission' (ex: apporter un verre d'eau)."
   },
   {
-    "id": 997,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu l'idée d'être dominé ?"
   },
   {
-    "id": 999,
     "type": "verite",
     "category": "Hot",
     "text": "Quel accessoire aimerais-tu tester ?"
   },
   {
-    "id": 122,
     "type": "verite",
     "category": "Hot",
     "text": "Es-tu plutôt dominant ou dominé ?"
   },
   {
-    "id": 747,
     "type": "verite",
     "category": "Hot",
     "text": "Es-tu plutôt du genre dominant ou dominé au lit ?"
   },
   {
-    "id": 247,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà utilisé des menottes ou des liens ?"
   },
   {
-    "id": 124,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton accessoire préféré au lit ?"
   },
   {
-    "id": 249,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu donner ou recevoir des ordres ?"
   },
   {
-    "id": 499,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu les jeux de rôles coquins ?"
   },
   {
-    "id": 499,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu les jeux de rôles coquins ?"
   },
   {
-    "id": 372,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu qu'on te bande les yeux ?"
   },
   {
-    "id": 374,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est ta limite absolue que tu ne franchiras jamais ?"
   },
   {
-    "id": 749,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu l'idée d'être attaché ou d'attacher quelqu'un ?"
   },
   {
-    "id": 872,
     "type": "verite",
     "category": "Hot",
     "text": "Aimes-tu donner ou recevoir des ordres ?"
   },
   {
-    "id": 874,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton accessoire Hot préféré ou celui que tu aimerais tester ?"
   },
   {
-    "id": 497,
     "type": "verite",
     "category": "Hot",
     "text": "Es-tu plutôt du genre dominant ou dominé au lit ?"
   },
   {
-    "id": 497,
     "type": "verite",
     "category": "Hot",
     "text": "Es-tu plutôt du genre dominant ou dominé au lit ?"
   },
   {
-    "id": 63,
     "type": "action",
     "category": "Bar",
     "text": "Propose un toast très sérieux à une cacahuète."
   },
   {
-    "id": 437,
     "type": "action",
     "category": "Bar",
     "text": "Propose une règle de jeu de boisson totalement loufoque."
   },
   {
-    "id": 61,
     "type": "action",
     "category": "Bar",
     "text": "Commande ton prochain verre avec une voix de robot."
   },
   {
-    "id": 687,
     "type": "action",
     "category": "Bar",
     "text": "Commande ton prochain verre (imaginaire) en chantant au serveur."
   },
   {
-    "id": 65,
     "type": "action",
     "category": "Bar",
     "text": "Offre un shot d'eau à ton voisin de droite."
   },
   {
-    "id": 312,
     "type": "action",
     "category": "Bar",
     "text": "Va commander un verre imaginaire avec ton plus beau sourire."
   },
   {
-    "id": 814,
     "type": "action",
     "category": "Bar",
     "text": "Défie quelqu'un au bras de fer sur la table."
   },
   {
-    "id": 314,
     "type": "action",
     "category": "Bar",
     "text": "Mime un barman qui jongle avec des bouteilles (et qui rate)."
   },
   {
-    "id": 187,
     "type": "action",
     "category": "Bar",
     "text": "Défie quelqu'un au bras de fer sur le comptoir ou la table."
   },
   {
-    "id": 437,
     "type": "action",
     "category": "Bar",
     "text": "Propose une règle de jeu de boisson totalement loufoque."
   },
   {
-    "id": 439,
     "type": "action",
     "category": "Bar",
     "text": "Fais semblant de préparer un cocktail complexe avec des ingrédients invisibles."
   },
   {
-    "id": 189,
     "type": "action",
     "category": "Bar",
     "text": "Fais une pub pour la boisson que tu es en train de boire."
   },
   {
-    "id": 439,
     "type": "action",
     "category": "Bar",
     "text": "Fais semblant de préparer un cocktail complexe avec des ingrédients invisibles."
   },
   {
-    "id": 689,
     "type": "action",
     "category": "Bar",
     "text": "Fais semblant de préparer un cocktail complexe avec beaucoup de gestes."
   },
   {
-    "id": 939,
     "type": "action",
     "category": "Bar",
     "text": "Propose une nouvelle règle de jeu de comptoir."
   },
   {
-    "id": 937,
     "type": "action",
     "category": "Bar",
     "text": "Essaie d'ouvrir une bouteille imaginaire de façon acrobatique."
   },
   {
-    "id": 812,
     "type": "action",
     "category": "Bar",
     "text": "Commande un verre (même vide) en utilisant ta voix de robot."
   },
   {
-    "id": 936,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le verre le plus cher que tu aies jamais payé ?"
   },
   {
-    "id": 436,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le cocktail le plus bizarre que tu aies goûté ?"
   },
   {
-    "id": 940,
     "type": "verite",
     "category": "Bar",
     "text": "Quel bar recommanderais-tu à ton pire ennemi pour qu'il passe une mauvaise soirée ?"
   },
   {
-    "id": 62,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est la pire chose que tu aies faite en étant ivre ?"
   },
   {
-    "id": 690,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le bar le plus stylé que tu aies jamais visité ?"
   },
   {
-    "id": 440,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est ta chanson de karaoké préférée ?"
   },
   {
-    "id": 440,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est ta chanson de karaoké préférée ?"
   },
   {
-    "id": 436,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le cocktail le plus bizarre que tu aies goûté ?"
   },
   {
-    "id": 688,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà payé un verre à un inconnu juste pour discuter ?"
   },
   {
-    "id": 315,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est la chanson qui te fait instantanément danser dans un bar ?"
   },
   {
-    "id": 311,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le serveur le plus sympa (ou le pire) que tu aies croisé ?"
   },
   {
-    "id": 811,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est le cocktail le plus bizarre que tu aies jamais bu ?"
   },
   {
-    "id": 938,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà dragué un serveur ou une serveuse ?"
   },
   {
-    "id": 190,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est la règle de jeu à boire la plus inventive que tu connaisses ?"
   },
   {
-    "id": 188,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà payé un verre à un inconnu juste pour discuter ?"
   },
   {
-    "id": 186,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est ton cocktail ou boisson préférée ?"
   },
   {
-    "id": 815,
     "type": "verite",
     "category": "Bar",
     "text": "Quelle est ta chanson de karaoké préférée ?"
   },
   {
-    "id": 438,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà quitté un bar sans payer (volontairement ou non) ?"
   },
   {
-    "id": 686,
     "type": "verite",
     "category": "Bar",
     "text": "Quel est ton cocktail ou ta boisson préférée ?"
   },
   {
-    "id": 64,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà menti sur ton âge pour entrer dans un bar ?"
   },
   {
-    "id": 313,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà laissé un faux numéro à quelqu'un dans un bar ?"
   },
   {
-    "id": 438,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà quitté un bar sans payer (volontairement ou non) ?"
   },
   {
-    "id": 813,
     "type": "verite",
     "category": "Bar",
     "text": "As-tu déjà été banni d'un établissement ?"
   },
   {
-    "id": 478,
     "type": "action",
     "category": "Couple",
     "text": "Fais une liste de 3 choses que tu changerais chez ton/ta partenaire idéal(e)."
   },
   {
-    "id": 480,
     "type": "action",
     "category": "Couple",
     "text": "Fais un massage des mains sensuel à un autre joueur."
   },
   {
-    "id": 730,
     "type": "action",
     "category": "Couple",
     "text": "Fais un massage des mains de 2 minutes au joueur de ton choix."
   },
   {
-    "id": 728,
     "type": "action",
     "category": "Couple",
     "text": "Écris un court poème d'amour en 1 minute pour ton amoureux imaginaire."
   },
   {
-    "id": 726,
     "type": "action",
     "category": "Couple",
     "text": "Mime une scène de ménage pour une broutille (ex: qui a fini le lait)."
   },
   {
-    "id": 351,
     "type": "action",
     "category": "Couple",
     "text": "Écris un poème de 4 lignes sur l'amour."
   },
   {
-    "id": 353,
     "type": "action",
     "category": "Couple",
     "text": "Mime une demande en mariage avec un objet random de la pièce."
   },
   {
-    "id": 355,
     "type": "action",
     "category": "Couple",
     "text": "Fais une simulation d'une soirée Netflix & Chill."
   },
   {
-    "id": 851,
     "type": "action",
     "category": "Couple",
     "text": "Mime une scène de ménage pour une broutille (ex: le sel)."
   },
   {
-    "id": 855,
     "type": "action",
     "category": "Couple",
     "text": "Masse les pieds du joueur de ton choix pendant 2 minutes."
   },
   {
-    "id": 853,
     "type": "action",
     "category": "Couple",
     "text": "Raconte comment tu imagines ta lune de miel idéale."
   },
   {
-    "id": 105,
     "type": "action",
     "category": "Couple",
     "text": "Mime une scène de ménage pour une broutille (ex: le sel)."
   },
   {
-    "id": 103,
     "type": "action",
     "category": "Couple",
     "text": "Appelle ton amoureux/amoureuse et dis-lui 'Je sais ce que tu as fait'."
   },
   {
-    "id": 230,
     "type": "action",
     "category": "Couple",
     "text": "Raconte comment tu imagines ta lune de miel idéale."
   },
   {
-    "id": 226,
     "type": "action",
     "category": "Couple",
     "text": "Mime un mariage express avec le joueur de ton choix."
   },
   {
-    "id": 476,
     "type": "action",
     "category": "Couple",
     "text": "Mime une demande en mariage ratée."
   },
   {
-    "id": 980,
     "type": "action",
     "category": "Couple",
     "text": "Masse le dos d'un joueur pendant 1 minute."
   },
   {
-    "id": 478,
     "type": "action",
     "category": "Couple",
     "text": "Fais une liste de 3 choses que tu changerais chez ton/ta partenaire idéal(e)."
   },
   {
-    "id": 480,
     "type": "action",
     "category": "Couple",
     "text": "Fais un massage des mains sensuel à un autre joueur."
   },
   {
-    "id": 978,
     "type": "action",
     "category": "Couple",
     "text": "Mime une scène de film romantique culte."
   },
   {
-    "id": 101,
     "type": "action",
     "category": "Couple",
     "text": "Fais une déclaration d'amour d'une minute à ton partenaire imaginaire."
   },
   {
-    "id": 476,
     "type": "action",
     "category": "Couple",
     "text": "Mime une demande en mariage ratée."
   },
   {
-    "id": 228,
     "type": "action",
     "category": "Couple",
     "text": "Regarde ton partenaire (ou un joueur) amoureusement pendant 1 minute."
   },
   {
-    "id": 976,
     "type": "action",
     "category": "Couple",
     "text": "Fais une déclaration d'amour d'une minute à un objet."
@@ -634,85 +530,71 @@
     "category": "Couple"
   },
   {
-    "id": 102,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus folle que tu ferais par amour ?"
   },
   {
-    "id": 854,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la première chose qui t'a attiré chez ton partenaire actuel ?"
   },
   {
-    "id": 477,
     "type": "verite",
     "category": "Couple",
     "text": "As-tu déjà menti à ton/ta partenaire pour sortir avec tes amis ?"
   },
   {
-    "id": 104,
     "type": "verite",
     "category": "Couple",
     "text": "Es-tu jaloux(se) ? Donne un exemple récent."
   },
   {
-    "id": 479,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus romantique que tu aies faite pour quelqu'un ?"
   },
   {
-    "id": 477,
     "type": "verite",
     "category": "Couple",
     "text": "As-tu déjà menti à ton/ta partenaire pour sortir avec tes amis ?"
   },
   {
-    "id": 354,
     "type": "verite",
     "category": "Couple",
     "text": "Crois-tu en l'âme sœur ?"
   },
   {
-    "id": 977,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus romantique que tu aies faite ?"
   },
   {
-    "id": 352,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus mignonne qu'on t'ait dite en couple ?"
   },
   {
-    "id": 979,
     "type": "verite",
     "category": "Couple",
     "text": "Quel est ton secret pour faire durer un couple ?"
   },
   {
-    "id": 229,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la qualité que tu apprécies le plus chez ton partenaire ?"
   },
   {
-    "id": 727,
     "type": "verite",
     "category": "Couple",
     "text": "As-tu déjà menti à ton partenaire pour sortir avec tes potes ?"
   },
   {
-    "id": 729,
     "type": "verite",
     "category": "Couple",
     "text": "Crois-tu au coup de foudre ?"
   },
   {
-    "id": 852,
     "type": "verite",
     "category": "Couple",
     "text": "As-tu déjà envisagé de tromper ton partenaire ?"
@@ -723,1225 +605,1021 @@
     "category": "Couple"
   },
   {
-    "id": 227,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la dispute la plus bête que tu aies eue avec un partenaire ?"
   },
   {
-    "id": 479,
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus romantique que tu aies faite pour quelqu'un ?"
   },
   {
-    "id": 165,
     "type": "action",
     "category": "Dehors",
     "text": "Fais un check de loin à une personne qui passe dans la rue."
   },
   {
-    "id": 683,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le bruit d'une voiture de sport qui passe les vitesses."
   },
   {
-    "id": 38,
     "type": "action",
     "category": "Dehors",
     "text": "Va toquer chez le voisin et demande-lui une cuillère de sucre."
   },
   {
-    "id": 288,
     "type": "action",
     "category": "Dehors",
     "text": "Fais un compliment à voix haute à un passant (depuis la fenêtre)."
   },
   {
-    "id": 786,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et crie 'J'aime le fromage !'"
   },
   {
-    "id": 411,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et fais une révérence à la première voiture qui passe."
   },
   {
-    "id": 36,
     "type": "action",
     "category": "Dehors",
     "text": "Va ouvrir la fenêtre et crie 'J'aime le fromage !'"
   },
   {
-    "id": 413,
     "type": "action",
     "category": "Dehors",
     "text": "Demande ton chemin à un inconnu pour aller à une destination imaginaire."
   },
   {
-    "id": 911,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et demande à un arbre pourquoi il ne parle pas."
   },
   {
-    "id": 915,
     "type": "action",
     "category": "Dehors",
     "text": "Salue un parfait inconnu dans la rue de façon très polie."
   },
   {
-    "id": 415,
     "type": "action",
     "category": "Dehors",
     "text": "Sors et fais 5 jumping jacks devant ta porte."
   },
   {
-    "id": 163,
     "type": "action",
     "category": "Dehors",
     "text": "Demande l'heure à quelqu'un dans la rue alors que tu as ton tel en main."
   },
   {
-    "id": 40,
     "type": "action",
     "category": "Dehors",
     "text": "Marche comme un mannequin sur le trottoir pendant 1 minute."
   },
   {
-    "id": 913,
     "type": "action",
     "category": "Dehors",
     "text": "Sors et fais une danse de la pluie devant chez toi."
   },
   {
-    "id": 292,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 10 pompes claquées (ou essaie)."
   },
   {
-    "id": 286,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et propose un duel de Pierre-Feuille-Ciseaux à un inconnu."
   },
   {
-    "id": 788,
     "type": "action",
     "category": "Dehors",
     "text": "Fais un jogging sur place devant ta porte pendant 1 minute."
   },
   {
-    "id": 415,
     "type": "action",
     "category": "Dehors",
     "text": "Sors et fais 5 jumping jacks devant ta porte."
   },
   {
-    "id": 411,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et fais une révérence à la première voiture qui passe."
   },
   {
-    "id": 413,
     "type": "action",
     "category": "Dehors",
     "text": "Demande ton chemin à un inconnu pour aller à une destination imaginaire."
   },
   {
-    "id": 663,
     "type": "action",
     "category": "Dehors",
     "text": "Fais un compliment à voix haute à un inconnu depuis ta fenêtre."
   },
   {
-    "id": 665,
     "type": "action",
     "category": "Dehors",
     "text": "Sors et fais un tour sur toi-même devant ta porte d'entrée."
   },
   {
-    "id": 790,
     "type": "action",
     "category": "Dehors",
     "text": "Va toquer chez ton voisin et demande-lui une allumette."
   },
   {
-    "id": 308,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le bruit d'une voiture de sport qui passe les vitesses."
   },
   {
-    "id": 43,
     "type": "action",
     "category": "Dehors",
     "text": "Fais la planche (gainage) pendant 1 minute."
   },
   {
-    "id": 661,
     "type": "action",
     "category": "Dehors",
     "text": "Va dehors et propose un duel de Pierre-Feuille-Ciseaux à un passant."
   },
   {
-    "id": 419,
     "type": "action",
     "category": "Dehors",
     "text": "Mime une épreuve de saut à la perche sans matériel."
   },
   {
-    "id": 792,
     "type": "action",
     "category": "Dehors",
     "text": "Fais la planche (gainage) pendant 45 secondes."
   },
   {
-    "id": 669,
     "type": "action",
     "category": "Dehors",
     "text": "Fais la planche (gainage) pendant que tout le monde compte jusqu'à 30."
   },
   {
-    "id": 419,
     "type": "action",
     "category": "Dehors",
     "text": "Mime une épreuve de saut à la perche sans matériel."
   },
   {
-    "id": 294,
     "type": "action",
     "category": "Dehors",
     "text": "Fais la chaise contre un mur pendant 1 minute."
   },
   {
-    "id": 417,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 10 pompes sur une seule main (ou essaie sur les genoux)."
   },
   {
-    "id": 41,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 20 pompes immédiatement."
   },
   {
-    "id": 169,
     "type": "action",
     "category": "Dehors",
     "text": "Mime un sport et le groupe doit deviner lequel c'est en moins de 10s."
   },
   {
-    "id": 45,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 30 jumping jacks très rapidement."
   },
   {
-    "id": 167,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 15 burpees le plus vite possible."
   },
   {
-    "id": 794,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 15 pompes claquées (ou essaie)."
   },
   {
-    "id": 919,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 1 minute de jumping jacks."
   },
   {
-    "id": 667,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 15 pompes (ou 15 squats si tu es fatigué)."
   },
   {
-    "id": 417,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 10 pompes sur une seule main (ou essaie sur les genoux)."
   },
   {
-    "id": 917,
     "type": "action",
     "category": "Dehors",
     "text": "Fais 10 fentes avant alternées."
   },
   {
-    "id": 290,
     "type": "action",
     "category": "Dehors",
     "text": "Sorts et fais un tour de pâté de maison en courant comme Naruto."
   },
   {
-    "id": 161,
     "type": "action",
     "category": "Dehors",
     "text": "Tiens la porte à un inconnu en faisant une révérence exagérée."
   },
   {
-    "id": 433,
     "type": "action",
     "category": "Dehors",
     "text": "Imite le bruit d'une voiture qui refuse de démarrer par -10°C."
   },
   {
-    "id": 183,
     "type": "action",
     "category": "Dehors",
     "text": "Mime un changement de roue en accéléré."
   },
   {
-    "id": 810,
     "type": "action",
     "category": "Dehors",
     "text": "Fais comme si tu conduisais et que tu étais très énervé dans les bouchons."
   },
   {
-    "id": 60,
     "type": "action",
     "category": "Dehors",
     "text": "Nettoie le pare-brise de la voiture la plus proche (si possible)."
   },
   {
-    "id": 433,
     "type": "action",
     "category": "Dehors",
     "text": "Imite le bruit d'une voiture qui refuse de démarrer par -10°C."
   },
   {
-    "id": 931,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un enfant qui donne des coups dans le siège conducteur."
   },
   {
-    "id": 306,
     "type": "action",
     "category": "Dehors",
     "text": "Fais comme si tu étais un passager terrifié par la vitesse imaginaire."
   },
   {
-    "id": 935,
     "type": "action",
     "category": "Dehors",
     "text": "Mime un chauffeur de limousine très distingué."
   },
   {
-    "id": 808,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le changement d'une roue crevée en moins d'une minute."
   },
   {
-    "id": 933,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le bruit d'une voiture électrique."
   },
   {
-    "id": 806,
     "type": "action",
     "category": "Dehors",
     "text": "Imite le bruit d'une voiture de sport qui dérape."
   },
   {
-    "id": 685,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un enfant qui demande 'C'est quand qu'on arrive ?' 5 fois."
   },
   {
-    "id": 435,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le nettoyage d'une voiture très sale avec beaucoup d'enthousiasme."
   },
   {
-    "id": 681,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un chauffeur de taxi qui raconte sa vie à ses passagers."
   },
   {
-    "id": 431,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un copilote de rallye très stressé."
   },
   {
-    "id": 56,
     "type": "action",
     "category": "Dehors",
     "text": "Imite le bruit d'un moteur de Formule 1 qui démarre."
   },
   {
-    "id": 435,
     "type": "action",
     "category": "Dehors",
     "text": "Mime le nettoyage d'une voiture très sale avec beaucoup d'enthousiasme."
   },
   {
-    "id": 58,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant de conduire et de t'énerver dans les bouchons."
   },
   {
-    "id": 431,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un copilote de rallye très stressé."
   },
   {
-    "id": 310,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un enfant qui demande 'C'est quand qu'on arrive ?' en boucle."
   },
   {
-    "id": 185,
     "type": "action",
     "category": "Dehors",
     "text": "Fais semblant d'être un passager qui a très peur de la conduite du chauffeur."
   },
   {
-    "id": 181,
     "type": "action",
     "category": "Dehors",
     "text": "Commente le trajet comme si tu étais un GPS avec une voix bizarre."
   },
   {
-    "id": 916,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà simulé une maladie pour ne pas faire de sport ?"
   },
   {
-    "id": 162,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà couru après un bus en vain devant tout le monde ?"
   },
   {
-    "id": 414,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la chose la plus folle que tu aies vue dans la rue récemment ?"
   },
   {
-    "id": 164,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la chose la plus étrange que tu aies vue dans le métro/bus ?"
   },
   {
-    "id": 412,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public où tu te sens le plus à l'aise ?"
   },
   {
-    "id": 418,
     "type": "verite",
     "category": "Dehors",
     "text": "Préfères-tu les sports extrêmes ou les sports de détente ?"
   },
   {
-    "id": 914,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà dormi à la belle étoile ?"
   },
   {
-    "id": 37,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà fait quelque chose d'illégal dans un lieu public ?"
   },
   {
-    "id": 416,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport que tu détestais le plus à l'école ?"
   },
   {
-    "id": 168,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'athlète qui t'inspire le plus ?"
   },
   {
-    "id": 293,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton plus grand exploit sportif personnel ?"
   },
   {
-    "id": 44,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà simulé une blessure pour éviter le cours d'EPS ?"
   },
   {
-    "id": 416,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport que tu détestais le plus à l'école ?"
   },
   {
-    "id": 787,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà été arrêté par la police ? Si oui, pourquoi ?"
   },
   {
-    "id": 912,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la chose la plus étrange que tu aies vue dans les transports ?"
   },
   {
-    "id": 793,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton plus grand exploit sportif personnel ?"
   },
   {
-    "id": 166,
     "type": "verite",
     "category": "Dehors",
     "text": "Es-tu plutôt sport d'équipe ou sport individuel ?"
   },
   {
-    "id": 795,
     "type": "verite",
     "category": "Dehors",
     "text": "Es-tu plutôt sport d'équipe ou sport individuel ?"
   },
   {
-    "id": 412,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public où tu te sens le plus à l'aise ?"
   },
   {
-    "id": 420,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton record personnel dont tu es le plus fier ?"
   },
   {
-    "id": 42,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport que tu détestes le plus pratiquer ?"
   },
   {
-    "id": 414,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la chose la plus folle que tu aies vue dans la rue récemment ?"
   },
   {
-    "id": 668,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sportif qui t'inspire le plus par sa persévérance ?"
   },
   {
-    "id": 670,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport le plus ennuyeux à regarder selon toi ?"
   },
   {
-    "id": 920,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton record de course à pied ?"
   },
   {
-    "id": 918,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport le plus dangereux que tu aies pratiqué ?"
   },
   {
-    "id": 39,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public le plus bizarre où tu te sois endormi ?"
   },
   {
-    "id": 295,
     "type": "verite",
     "category": "Dehors",
     "text": "Pour quel club de sport ton cœur bat-il ?"
   },
   {
-    "id": 418,
     "type": "verite",
     "category": "Dehors",
     "text": "Préfères-tu les sports extrêmes ou les sports de détente ?"
   },
   {
-    "id": 666,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel sport aimerais-tu essayer si tu avais un budget illimité ?"
   },
   {
-    "id": 791,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le sport que tu détestes le plus regarder ?"
   },
   {
-    "id": 170,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel sport aimerais-tu tester mais tu as trop peur d'essayer ?"
   },
   {
-    "id": 420,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton record personnel dont tu es le plus fier ?"
   },
   {
-    "id": 287,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà été témoin d'une scène de film en pleine rue ?"
   },
   {
-    "id": 291,
     "type": "verite",
     "category": "Dehors",
     "text": "Préfères-tu regarder du sport ou en faire ?"
   },
   {
-    "id": 289,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public le plus étrange où tu aies dû passer un appel privé ?"
   },
   {
-    "id": 662,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà été témoin d'une scène de film ou d'un accident dans la rue ?"
   },
   {
-    "id": 789,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public le plus bizarre où tu te sois endormi ?"
   },
   {
-    "id": 664,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est l'endroit public le plus bizarre où tu te sois endormi ?"
   },
   {
-    "id": 682,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la pire voiture dans laquelle tu sois jamais monté ?"
   },
   {
-    "id": 309,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le trajet le plus court que tu aies fait en prenant la voiture ?"
   },
   {
-    "id": 307,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà dormi dans une voiture ? Si oui, où ?"
   },
   {
-    "id": 57,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà vomi en voiture ?"
   },
   {
-    "id": 432,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la pire galère mécanique qui t'est arrivée ?"
   },
   {
-    "id": 49,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la pire chanson que tu aies chantée à fond en voiture ?"
   },
   {
-    "id": 434,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton meilleur souvenir de voyage en voiture (Road trip) ?"
   },
   {
-    "id": 809,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà vomi dans une voiture ?"
   },
   {
-    "id": 934,
     "type": "verite",
     "category": "Dehors",
     "text": "As-tu déjà oublié où tu avais garé ta voiture ?"
   },
   {
-    "id": 807,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la pire galère que tu aies eue en voiture ?"
   },
   {
-    "id": 684,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est ta chanson préférée pour conduire de nuit ?"
   },
   {
-    "id": 434,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est ton meilleur souvenir de voyage en voiture (Road trip) ?"
   },
   {
-    "id": 184,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la voiture de tes rêves ?"
   },
   {
-    "id": 932,
     "type": "verite",
     "category": "Dehors",
     "text": "Quel est le trajet en voiture le plus long que tu aies fait sans t'arrêter ?"
   },
   {
-    "id": 432,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est la pire galère mécanique qui t'est arrivée ?"
   },
   {
-    "id": 182,
     "type": "verite",
     "category": "Dehors",
     "text": "Quelle est ta chanson préférée pour rouler de nuit ?"
   },
   {
-    "id": 905,
     "type": "action",
     "category": "Famille",
     "text": "Imite le rire de ton cousin ou ta cousine."
   },
   {
-    "id": 401,
     "type": "action",
     "category": "Famille",
     "text": "Imite un tic de langage d'un de tes parents."
   },
   {
-    "id": 155,
     "type": "action",
     "category": "Famille",
     "text": "Mime une dispute typique pour la télécommande chez toi."
   },
   {
-    "id": 151,
     "type": "action",
     "category": "Famille",
     "text": "Imite le rire de ton grand-père ou de ta grand-mère."
   },
   {
-    "id": 405,
     "type": "action",
     "category": "Famille",
     "text": "Raconte l'histoire de ta naissance si tu la connais."
   },
   {
-    "id": 778,
     "type": "action",
     "category": "Famille",
     "text": "Imite un tic nerveux d'un de tes parents."
   },
   {
-    "id": 276,
     "type": "action",
     "category": "Famille",
     "text": "Envoie 'Je t'aime' au membre de ta famille avec qui tu as le moins parlé récemment."
   },
   {
-    "id": 153,
     "type": "action",
     "category": "Famille",
     "text": "Envoie un message de groupe à ta famille disant 'On mange quoi ?'"
   },
   {
-    "id": 280,
     "type": "action",
     "category": "Famille",
     "text": "Explique ton métier/tes études comme si tu parlais à ton arrière-grand-mère."
   },
   {
-    "id": 655,
     "type": "action",
     "category": "Famille",
     "text": "Mime une dispute typique pour savoir qui va débarrasser la table."
   },
   {
-    "id": 278,
     "type": "action",
     "category": "Famille",
     "text": "Imite un membre de ta famille qui essaie d'utiliser une nouvelle technologie."
   },
   {
-    "id": 653,
     "type": "action",
     "category": "Famille",
     "text": "Fais un compliment sincère au membre de ta famille avec qui tu as le plus de mal."
   },
   {
-    "id": 28,
     "type": "action",
     "category": "Famille",
     "text": "Imite ton père ou ta mère quand ils sont en colère."
   },
   {
-    "id": 26,
     "type": "action",
     "category": "Famille",
     "text": "Envoie un SMS à ta mère pour lui dire 'Je t'aime' sans raison."
   },
   {
-    "id": 651,
     "type": "action",
     "category": "Famille",
     "text": "Imite ton père ou ta mère quand ils sont au téléphone avec un service client."
   },
   {
-    "id": 405,
     "type": "action",
     "category": "Famille",
     "text": "Raconte l'histoire de ta naissance si tu la connais."
   },
   {
-    "id": 776,
     "type": "action",
     "category": "Famille",
     "text": "Appelle un membre de ta famille et dis-lui juste 'merci' avant de raccrocher."
   },
   {
-    "id": 403,
     "type": "action",
     "category": "Famille",
     "text": "Envoie un message 'Merci pour tout' à un proche sans expliquer pourquoi."
   },
   {
-    "id": 780,
     "type": "action",
     "category": "Famille",
     "text": "Montre ta dernière photo de famille dans ton téléphone."
   },
   {
-    "id": 901,
     "type": "action",
     "category": "Famille",
     "text": "Montre ta dernière conversation SMS avec l'un de tes parents."
   },
   {
-    "id": 30,
     "type": "action",
     "category": "Famille",
     "text": "Montre la photo la plus gênante de toi enfant que tu as sur ton tel."
   },
   {
-    "id": 401,
     "type": "action",
     "category": "Famille",
     "text": "Imite un tic de langage d'un de tes parents."
   },
   {
-    "id": 903,
     "type": "action",
     "category": "Famille",
     "text": "Raconte une anecdote de réunion de famille qui a mal fini."
   },
   {
-    "id": 403,
     "type": "action",
     "category": "Famille",
     "text": "Envoie un message 'Merci pour tout' à un proche sans expliquer pourquoi."
   },
   {
-    "id": 277,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la plus grosse gaffe que tu aies faite lors d'un repas de famille ?"
   },
   {
-    "id": 152,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la tradition familiale la plus bizarre chez toi ?"
   },
   {
-    "id": 404,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le meilleur souvenir de vacances que tu as avec ta famille ?"
   },
   {
-    "id": 402,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la règle la plus stricte que tu avais chez toi ?"
   },
   {
-    "id": 902,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la qualité que tu admires le plus chez ta mère ou ton père ?"
   },
   {
-    "id": 402,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la règle la plus stricte que tu avais chez toi ?"
   },
   {
-    "id": 654,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le surnom le plus mignon (ou gênant) qu'on te donne en famille ?"
   },
   {
-    "id": 27,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le membre de ta famille qui te fait le plus rire ?"
   },
   {
-    "id": 779,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la règle la plus injuste que tu avais chez toi enfant ?"
   },
   {
-    "id": 29,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le secret de famille le plus drôle que tu puisses partager ?"
   },
   {
-    "id": 404,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le meilleur souvenir de vacances que tu as avec ta famille ?"
   },
   {
-    "id": 904,
     "type": "verite",
     "category": "Famille",
     "text": "As-tu déjà fait le mur pour sortir sans l'accord de tes parents ?"
   },
   {
-    "id": 154,
     "type": "verite",
     "category": "Famille",
     "text": "Quel est le meilleur conseil qu'un proche t'ait donné ?"
   },
   {
-    "id": 652,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la tradition familiale la plus étrange chez toi ?"
   },
   {
-    "id": 777,
     "type": "verite",
     "category": "Famille",
     "text": "Qui est le membre de ta famille dont tu es le plus proche ?"
   },
   {
-    "id": 279,
     "type": "verite",
     "category": "Famille",
     "text": "Quelle est la chose la plus drôle que tes parents aient racontée sur toi ?"
   },
   {
-    "id": 240,
     "type": "action",
     "category": "Hot",
     "text": "Embrasse langoureusement le cou de ton voisin."
   },
   {
-    "id": 113,
     "type": "action",
     "category": "Hot",
     "text": "Lèche le lobe de l'oreille du joueur à ta droite."
   },
   {
-    "id": 986,
     "type": "action",
     "category": "Hot",
     "text": "Simule un plaisir intense pendant 10 secondes."
   },
   {
-    "id": 238,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te dessiner un cœur sur une partie intime (cachée)."
   },
   {
-    "id": 236,
     "type": "action",
     "category": "Hot",
     "text": "Simule une scène de film érotique (juste le son)."
   },
   {
-    "id": 990,
     "type": "action",
     "category": "Hot",
     "text": "Lèche le cou de ton voisin de droite."
   },
   {
-    "id": 361,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te bander les yeux et te faire goûter un aliment."
   },
   {
-    "id": 115,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te faire un suçon là où il veut."
   },
   {
-    "id": 740,
     "type": "action",
     "category": "Hot",
     "text": "Laisse quelqu'un te faire un suçon là où il veut sur ton bras."
   },
   {
-    "id": 365,
     "type": "action",
     "category": "Hot",
     "text": "Masse le bas du dos d'un joueur pendant 1 minute."
   },
   {
-    "id": 738,
     "type": "action",
     "category": "Hot",
     "text": "Lèche le lobe d'oreille du joueur de ton choix (avec son accord)."
   },
   {
-    "id": 111,
     "type": "action",
     "category": "Hot",
     "text": "Simule un plaisir intense pendant 20 secondes."
   },
   {
-    "id": 488,
     "type": "action",
     "category": "Hot",
     "text": "Lèche ton propre poignet comme si c'était de la glace."
   },
   {
-    "id": 988,
     "type": "action",
     "category": "Hot",
     "text": "Mime ta position préférée avec un oreiller."
   },
   {
-    "id": 486,
     "type": "action",
     "category": "Hot",
     "text": "Fais un strip-tease de 30 secondes (sans rien enlever de plus que les chaussures)."
   },
   {
-    "id": 490,
     "type": "action",
     "category": "Hot",
     "text": "Mime ta position préférée avec un coussin."
   },
   {
-    "id": 736,
     "type": "action",
     "category": "Hot",
     "text": "Simule un plaisir intense pendant 20 secondes sans rigoler."
   },
   {
-    "id": 863,
     "type": "action",
     "category": "Hot",
     "text": "Lèche le lobe d'oreille de ton voisin de droite."
   },
   {
-    "id": 488,
     "type": "action",
     "category": "Hot",
     "text": "Lèche ton propre poignet comme si c'était de la glace."
   },
   {
-    "id": 865,
     "type": "action",
     "category": "Hot",
     "text": "Mime ta position préférée avec un coussin."
   },
   {
-    "id": 490,
     "type": "action",
     "category": "Hot",
     "text": "Mime ta position préférée avec un coussin."
   },
   {
-    "id": 363,
     "type": "action",
     "category": "Hot",
     "text": "Mime un baiser passionné dans le vide pendant 10 secondes."
   },
   {
-    "id": 486,
     "type": "action",
     "category": "Hot",
     "text": "Fais un strip-tease de 30 secondes (sans rien enlever de plus que les chaussures)."
   },
   {
-    "id": 861,
     "type": "action",
     "category": "Hot",
     "text": "Simule un orgasme intense pendant 20 secondes."
   },
   {
-    "id": 989,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le truc le plus osé que tu aies jamais fait ?"
   },
   {
-    "id": 487,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le truc le plus fou que tu aies fait au lit ?"
   },
   {
-    "id": 487,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le truc le plus fou que tu aies fait au lit ?"
   },
   {
-    "id": 364,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le fantasme que tu n'oseras jamais réaliser ?"
   },
   {
-    "id": 239,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà utilisé des jouets ? Lequel est ton préféré ?"
   },
   {
-    "id": 739,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la chose la plus 'osée' que tu aies faite dans un lit ?"
   },
   {
-    "id": 489,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé un message très explicite à la mauvaise personne ?"
   },
   {
-    "id": 864,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé ou reçu des nudes ?"
   },
   {
-    "id": 862,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la chose la plus hard que tu aies faite dans un lit ?"
   },
   {
-    "id": 987,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà pratiqué dans un lieu public risqué ?"
   },
   {
-    "id": 114,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la chose la plus osée que tu aies faite dans un lit ?"
   },
   {
-    "id": 489,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé un message très explicite à la mauvaise personne ?"
   },
   {
-    "id": 737,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est l'endroit le plus insolite où tu aies fait l'amour ?"
   },
   {
-    "id": 112,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton fantasme le plus inavouable ?"
   },
   {
-    "id": 362,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la chose la plus 'osée' que tu aies faite en public ?"
   },
   {
-    "id": 237,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est l'endroit le plus fou où tu voudrais le faire ?"
   },
   {
-    "id": 234,
     "type": "action",
     "category": "Hot",
     "text": "Enlève tes chaussettes de façon très lente et sensuelle."
   },
   {
-    "id": 482,
     "type": "action",
     "category": "Hot",
     "text": "Chuchote quelque chose de coquin à l'oreille de la personne à ta gauche."
@@ -1958,7 +1636,6 @@
     "category": "Hot"
   },
   {
-    "id": 734,
     "type": "action",
     "category": "Hot",
     "text": "Fais un massage sensuel des épaules à ton voisin de gauche."
@@ -1982,37 +1659,31 @@
     "target": "homme"
   },
   {
-    "id": 857,
     "type": "action",
     "category": "Hot",
     "text": "Fais un massage sensuel des épaules à la personne de ton choix."
   },
   {
-    "id": 110,
     "type": "action",
     "category": "Hot",
     "text": "Masse les mains d'un joueur de façon sensuelle."
   },
   {
-    "id": 484,
     "type": "action",
     "category": "Hot",
     "text": "Enlève tes chaussures et tes chaussettes de manière sensuelle."
   },
   {
-    "id": 359,
     "type": "action",
     "category": "Hot",
     "text": "Embrasse l'intérieur du poignet d'un joueur."
   },
   {
-    "id": 982,
     "type": "action",
     "category": "Hot",
     "text": "Déboutonne un bouton de ta chemise/pantalon."
   },
   {
-    "id": 106,
     "type": "action",
     "category": "Hot",
     "text": "Fais un bisou dans le cou du joueur de ton choix."
@@ -2030,871 +1701,726 @@
     "target": "opposite"
   },
   {
-    "id": 859,
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement (accessoire exclus)."
   },
   {
-    "id": 357,
     "type": "action",
     "category": "Hot",
     "text": "Fais une danse du ventre ou un strip-tease de 15 secondes (avec vêtements)."
   },
   {
-    "id": 984,
     "type": "action",
     "category": "Hot",
     "text": "Fais un massage sensuel à ton voisin."
   },
   {
-    "id": 484,
     "type": "action",
     "category": "Hot",
     "text": "Enlève tes chaussures et tes chaussettes de manière sensuelle."
   },
   {
-    "id": 482,
     "type": "action",
     "category": "Hot",
     "text": "Chuchote quelque chose de coquin à l'oreille de la personne à ta gauche."
   },
   {
-    "id": 108,
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement (accessoires exclus)."
   },
   {
-    "id": 732,
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement (accessoires exclus)."
   },
   {
-    "id": 232,
     "type": "action",
     "category": "Hot",
     "text": "Fais un massage de pieds à quelqu'un pendant 2 minutes."
   },
   {
-    "id": 235,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est ta position préférée pour dormir à deux ?"
   },
   {
-    "id": 485,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton plus grand fantasme inavoué ?"
   },
   {
-    "id": 731,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la zone de ton corps la plus sensible aux caresses ?"
   },
   {
-    "id": 481,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la zone de ton corps la plus érogène ?"
   },
   {
-    "id": 733,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton plus grand fantasme inavoué ?"
   },
   {
-    "id": 858,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton plus grand fantasme inavoué ?"
   },
   {
-    "id": 483,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà eu une aventure avec quelqu'un d'ici ?"
   },
   {
-    "id": 483,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà eu une aventure avec quelqu'un d'ici ?"
   },
   {
-    "id": 360,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est ta tenue préférée pour séduire ?"
   },
   {
-    "id": 985,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle zone de ton corps est la plus sensible ?"
   },
   {
-    "id": 109,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la zone de ton corps la plus sensible ?"
   },
   {
-    "id": 983,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton fantasme secret ?"
   },
   {
-    "id": 981,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le vêtement le plus sexy que tu possèdes ?"
   },
   {
-    "id": 356,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est l'endroit de ton corps où tu aimes le plus être caressé ?"
   },
   {
-    "id": 860,
     "type": "verite",
     "category": "Hot",
     "text": "Es-tu plutôt du genre dominant ou dominé ?"
   },
   {
-    "id": 856,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est l'endroit le plus insolite où tu as fait l'amour ?"
   },
   {
-    "id": 233,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est le film qui t'a le plus excité ?"
   },
   {
-    "id": 735,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà eu un fantasme sur quelqu'un de ce groupe ?"
   },
   {
-    "id": 358,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà eu une aventure d'un soir ?"
   },
   {
-    "id": 231,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton vêtement préféré sur une femme/un homme ?"
   },
   {
-    "id": 485,
     "type": "verite",
     "category": "Hot",
     "text": "Quel est ton plus grand fantasme inavoué ?"
   },
   {
-    "id": 481,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la zone de ton corps la plus érogène ?"
   },
   {
-    "id": 107,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la tenue qui te rend le plus sexy selon toi ?"
   },
   {
-    "id": 118,
     "type": "action",
     "category": "Hot",
     "text": "Fais un body-shot sur le ventre du joueur de ton choix."
   },
   {
-    "id": 242,
     "type": "action",
     "category": "Hot",
     "text": "Baisse ton pantalon/jupe jusqu'aux genoux pendant 10 secondes."
   },
   {
-    "id": 492,
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement au choix du joueur à ta droite."
   },
   {
-    "id": 369,
     "type": "action",
     "category": "Hot",
     "text": "Échange un vêtement avec une personne du sexe opposé."
   },
   {
-    "id": 244,
     "type": "action",
     "category": "Hot",
     "text": "Fais un tour sur toi-même en sous-vêtements."
   },
   {
-    "id": 367,
     "type": "action",
     "category": "Hot",
     "text": "Déboutonne ton pantalon/chemise et reste comme ça 2 tours."
   },
   {
-    "id": 744,
     "type": "action",
     "category": "Hot",
     "text": "Fais un tour sur toi-même en sous-vêtements devant tout le monde."
   },
   {
-    "id": 992,
     "type": "action",
     "category": "Hot",
     "text": "Enlève tes chaussettes de façon sensuelle."
   },
   {
-    "id": 994,
     "type": "action",
     "category": "Hot",
     "text": "Fais un tour de la pièce en sous-vêtements."
   },
   {
-    "id": 120,
     "type": "action",
     "category": "Hot",
     "text": "Reste en sous-vêtements jusqu'à la fin de la partie."
   },
   {
-    "id": 494,
     "type": "action",
     "category": "Hot",
     "text": "Reste en sous-vêtements pour le prochain tour."
   },
   {
-    "id": 116,
     "type": "action",
     "category": "Hot",
     "text": "Enlève le haut pour les 3 prochains tours."
   },
   {
-    "id": 742,
     "type": "action",
     "category": "Hot",
     "text": "Reste torse nu (ou en sous-vêtements) pour les 3 prochains tours."
   },
   {
-    "id": 492,
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement au choix du joueur à ta droite."
   },
   {
-    "id": 869,
     "type": "action",
     "category": "Hot",
     "text": "Fais un body-shot sur le ventre du joueur de ton choix."
   },
   {
-    "id": 867,
     "type": "action",
     "category": "Hot",
     "text": "Finis la partie en sous-vêtements ou bois 3 verres cul-sec."
   },
   {
-    "id": 494,
     "type": "action",
     "category": "Hot",
     "text": "Reste en sous-vêtements pour le prochain tour."
   },
   {
-    "id": 870,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà fait du naturisme ?"
   },
   {
-    "id": 868,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps que tu préfères montrer ?"
   },
   {
-    "id": 991,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà dormi nu chez quelqu'un d'autre ?"
   },
   {
-    "id": 241,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà été surpris nu par quelqu'un ?"
   },
   {
-    "id": 745,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé un nude à la mauvaise personne par erreur ?"
   },
   {
-    "id": 366,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé un nude par erreur à la mauvaise personne ?"
   },
   {
-    "id": 995,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle partie de ton corps n'as-tu jamais montrée à personne ici ?"
   },
   {
-    "id": 243,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps que tu aimes le moins montrer ?"
   },
   {
-    "id": 493,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà fait du naturisme à la plage ?"
   },
   {
-    "id": 245,
     "type": "verite",
     "category": "Hot",
     "text": "Dors-tu nu, en pyjama ou en sous-vêtements ?"
   },
   {
-    "id": 370,
     "type": "verite",
     "category": "Hot",
     "text": "T'es-tu déjà baigné nu dans la mer ou une piscine ?"
   },
   {
-    "id": 866,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà été nu en public ?"
   },
   {
-    "id": 495,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps que tu préfères montrer ?"
   },
   {
-    "id": 741,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà été nu en public (pari, plage nudiste, défi...) ?"
   },
   {
-    "id": 493,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà fait du naturisme à la plage ?"
   },
   {
-    "id": 495,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps que tu préfères montrer ?"
   },
   {
-    "id": 993,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà envoyé un nude que tu regrettes ?"
   },
   {
-    "id": 491,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà été surpris nu par un membre de ta famille ?"
   },
   {
-    "id": 117,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà fait du naturisme ?"
   },
   {
-    "id": 491,
     "type": "verite",
     "category": "Hot",
     "text": "As-tu déjà été surpris nu par un membre de ta famille ?"
   },
   {
-    "id": 743,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps que tu préfères montrer ?"
   },
   {
-    "id": 368,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle est la partie de ton corps dont tu es le plus fier ?"
   },
   {
-    "id": 119,
     "type": "verite",
     "category": "Hot",
     "text": "Quelle partie de ton corps préfères-tu montrer ?"
   },
   {
-    "id": 427,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste un selfie avec une grimace et laisse-le 1 heure."
   },
   {
-    "id": 55,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse le groupe poster le tweet de son choix sur ton compte."
   },
   {
-    "id": 802,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste une photo de ton pied en story sans contexte."
   },
   {
-    "id": 429,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse le groupe écrire une story Instagram à ta place."
   },
   {
-    "id": 429,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse le groupe écrire une story Instagram à ta place."
   },
   {
-    "id": 677,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste une photo de tes chaussures en story sans aucun texte."
   },
   {
-    "id": 53,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Envoie un DM à une célébrité pour lui dire qu'elle cuisine bien."
   },
   {
-    "id": 679,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse le groupe unfollow une personne de ton choix sur ton profil."
   },
   {
-    "id": 927,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste un emoji '🔥' sous la dernière photo de ton ex (ou de ton crush)."
   },
   {
-    "id": 929,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Montre ton temps d'écran hebdomadaire."
   },
   {
-    "id": 179,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse quelqu'un choisir une photo de ta galerie et l'envoyer à un ami."
   },
   {
-    "id": 304,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Prends un selfie très moche et envoie-le à ton 3ème contact Snapchat."
   },
   {
-    "id": 302,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse quelqu'un unfollow un compte de son choix sur ton profil."
   },
   {
-    "id": 51,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste une photo de ton genou en story Instagram sans contexte."
   },
   {
-    "id": 177,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Like les 10 premières photos de ton fil d'actualité Instagram."
   },
   {
-    "id": 804,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Laisse le joueur de droite poster le message de son choix sur ton mur."
   },
   {
-    "id": 427,
     "type": "action",
     "category": "Réseaux Sociaux",
     "text": "Poste un selfie avec une grimace et laisse-le 1 heure."
   },
   {
-    "id": 52,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est le dernier compte que tu as stalké sur Instagram ?"
   },
   {
-    "id": 305,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel influenceur ne supportes-tu absolument pas ?"
   },
   {
-    "id": 180,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est le réseau social que tu détestes le plus ?"
   },
   {
-    "id": 176,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Combien de temps d'écran as-tu sur ton téléphone aujourd'hui ?"
   },
   {
-    "id": 930,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà acheté des followers ou des likes ?"
   },
   {
-    "id": 426,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quelle est la personne que tu as unfollow récemment et pourquoi ?"
   },
   {
-    "id": 676,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est le compte le plus bizarre que tu suives sur Instagram ?"
   },
   {
-    "id": 803,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà créé un faux compte pour espionner ton ex ?"
   },
   {
-    "id": 678,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà supprimé une photo parce qu'elle n'avait pas eu assez de likes ?"
   },
   {
-    "id": 426,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quelle est la personne que tu as unfollow récemment et pourquoi ?"
   },
   {
-    "id": 301,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est ton compte Instagram 'plaisir coupable' ?"
   },
   {
-    "id": 303,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà supprimé une photo parce qu'elle n'avait pas assez de likes ?"
   },
   {
-    "id": 801,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est le dernier compte que tu as stalké ?"
   },
   {
-    "id": 430,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Combien de temps passes-tu sur TikTok par jour en moyenne ?"
   },
   {
-    "id": 680,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quelle est l'application que tu utilises le plus sur ton téléphone ?"
   },
   {
-    "id": 428,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà supprimé une photo parce que ton ex l'avait likée ?"
   },
   {
-    "id": 430,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Combien de temps passes-tu sur TikTok par jour en moyenne ?"
   },
   {
-    "id": 805,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Combien de temps passes-tu sur ton téléphone par jour ?"
   },
   {
-    "id": 928,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quel est ton filtre préféré sur Snapchat ou Instagram ?"
   },
   {
-    "id": 926,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quelle est la dernière story que tu as regardée avec un compte anonyme ?"
   },
   {
-    "id": 428,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà supprimé une photo parce que ton ex l'avait likée ?"
   },
   {
-    "id": 178,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "As-tu déjà créé un faux compte pour espionner quelqu'un ?"
   },
   {
-    "id": 54,
     "type": "verite",
     "category": "Réseaux Sociaux",
     "text": "Quelle est la story la plus gênante que tu aies jamais postée ?"
   },
   {
-    "id": 341,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une pincée de sel pure."
   },
   {
-    "id": 78,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : porter tes vêtements à l'envers ou marcher à reculons 10 min."
   },
   {
-    "id": 835,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Imite la façon de parler de ton ex."
   },
   {
-    "id": 837,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de négocier un objet dans la pièce avec son propriétaire."
   },
   {
-    "id": 839,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Donne 1€ au joueur qui semble le plus pauvre ici."
   },
   {
-    "id": 841,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une chips avec de la mayonnaise et du ketchup mélangés."
   },
   {
-    "id": 843,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens la chaussure de la personne à ta gauche."
   },
   {
-    "id": 845,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un te mettre un glaçon dans le dos."
   },
   {
-    "id": 954,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis un partenaire pour faire un duel de regards."
   },
   {
-    "id": 964,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Donne une pièce à la première personne qui rit."
   },
   {
-    "id": 962,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Vends ton stylo au joueur d'en face pour 100€ imaginaire."
   },
   {
-    "id": 460,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un discours de rupture imaginaire avec une bouteille d'eau."
   },
   {
-    "id": 456,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte le pire défaut de ton premier amour."
   },
   {
-    "id": 462,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de vendre ton téléphone au groupe en listant 5 défauts comme si c'étaient des qualités."
   },
   {
-    "id": 458,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Détruis symboliquement un objet qui te rappelle une ancienne relation (un morceau de papier suffit)."
   },
   {
-    "id": 75,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Écris ton secret sur un papier et brûle-le (ou déchire-le)."
   },
   {
-    "id": 943,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Marche comme si tu avais une jambe de bois jusqu'à la fin du tour."
   },
   {
-    "id": 941,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un clin d'œil à ton propre reflet dans un miroir pendant 30 secondes."
   },
   {
-    "id": 460,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un discours de rupture imaginaire avec une bouteille d'eau."
   },
   {
-    "id": 952,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais 10 squats ou bois un grand verre d'eau cul-sec."
   },
   {
-    "id": 949,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Confie une vérité sur une personne présente."
   },
   {
-    "id": 216,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un te mettre un glaçon dans le dos."
   },
   {
-    "id": 218,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'intérieur d'une chaussure de quelqu'un d'autre."
   },
   {
-    "id": 220,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un mélange de sauces (ketchup, mayo, moutarde) et goûte-le."
   },
   {
-    "id": 316,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mime une personne qui essaie de cacher une tache sur son pantalon."
   },
   {
-    "id": 318,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un clin d'œil appuyé et gênant à chaque personne présente."
   },
   {
-    "id": 320,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de lécher ton nez (encore une fois, pour la science)."
   },
   {
-    "id": 322,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ta dernière note enregistrée dans ton téléphone."
   },
   {
-    "id": 76,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : manger un oignon cru ou boire un shot de vinaigre."
   },
   {
-    "id": 327,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Le groupe te donne 1 minute pour choisir entre 2 gages inventés par eux."
   },
   {
-    "id": 95,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un te maquiller les yeux fermés."
   },
   {
-    "id": 329,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : chanter une chanson à tue-tête ou danser sans musique."
   },
   {
-    "id": 443,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de manger une cuillère de yaourt ou de compote sans utiliser tes mains."
   },
   {
-    "id": 691,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la fois où tu t'es trompé de toilettes (hommes/femmes)."
@@ -2911,37 +2437,31 @@
     "target": "same"
   },
   {
-    "id": 93,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mélange 4 boissons différentes et bois un fond de verre."
   },
   {
-    "id": 331,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la chose la plus gentille qu'un ex ait faite pour toi."
   },
   {
-    "id": 333,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Explique pourquoi ça n'a pas marché avec ton dernier ex en 10 secondes."
   },
   {
-    "id": 462,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de vendre ton téléphone au groupe en listant 5 défauts comme si c'étaient des qualités."
   },
   {
-    "id": 464,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Explique ton plan pour devenir millionnaire avant tes 40 ans."
   },
   {
-    "id": 466,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'haleine du joueur à ta droite (avec son accord)."
@@ -2957,25 +2477,21 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 831,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Appelle ton dernier ex et raccroche dès qu'il/elle répond."
   },
   {
-    "id": 470,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une tranche de citron sans faire de grimace."
   },
   {
-    "id": 335,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Imite la façon de parler ou de marcher d'un de tes ex."
   },
   {
-    "id": 337,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de négocier une gorgée de boisson à quelqu'un comme si c'était de l'or."
@@ -2986,163 +2502,136 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 829,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : faire 20 pompes ou raconter ton pire dossier."
   },
   {
-    "id": 339,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ton ticket de caisse le plus élevé dans ton historique bancaire."
   },
   {
-    "id": 466,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'haleine du joueur à ta droite (avec son accord)."
   },
   {
-    "id": 693,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de manger un aliment sans utiliser tes pouces pendant 1 minute."
   },
   {
-    "id": 695,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un compliment très sérieux à une chaise dans la pièce."
   },
   {
-    "id": 697,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ton historique de recherche Youtube au groupe."
   },
   {
-    "id": 699,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Murmure ton secret le plus inavouable à l'oreille du joueur de droite."
   },
   {
-    "id": 702,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : manger un oignon cru ou faire 50 squats immédiatement."
   },
   {
-    "id": 704,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse le groupe choisir entre deux gages inventés par eux."
   },
   {
-    "id": 706,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Dis un truc que tu détestais chez ton dernier ex."
   },
   {
-    "id": 708,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mime ta réaction si ton ex t'envoyait un message là tout de suite."
   },
   {
-    "id": 710,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Chante une chanson de rupture comme si ta vie en dépendait."
   },
   {
-    "id": 324,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un parcourir tes photos pendant 30 secondes."
   },
   {
-    "id": 712,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de vendre ton téléphone au groupe en listant 5 défauts comme si c'étaient des qualités."
   },
   {
-    "id": 714,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Explique ton plan pour devenir millionnaire avant tes 30 ans."
   },
   {
-    "id": 716,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une chips ou un gâteau sec sans les mains."
   },
   {
-    "id": 718,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mélange deux boissons différentes et bois une gorgée."
   },
   {
-    "id": 720,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Lèche ton propre poignet après y avoir mis du poivre ou du sel."
   },
   {
-    "id": 345,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Lèche ton propre poignet après avoir mis du poivre dessus."
   },
   {
-    "id": 960,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mime une scène de retrouvailles gênante avec un ex."
   },
   {
-    "id": 958,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la dernière fois que tu as croisé un ex par hasard."
   },
   {
-    "id": 80,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis un gage pour le joueur à ta droite."
   },
   {
-    "id": 81,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Appelle ton dernier ex et raccroche dès qu'il décroche."
   },
   {
-    "id": 83,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Déchire une photo (ou supprime-la) de ton ex devant tout le monde."
   },
   {
-    "id": 85,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la pire excuse de rupture que tu as reçue ou donnée."
   },
   {
-    "id": 464,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Explique ton plan pour devenir millionnaire avant tes 40 ans."
   },
   {
-    "id": 86,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Parie 2€ avec le groupe sur le résultat d'un pile ou face."
@@ -3153,55 +2642,46 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 195,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un compliment à un objet inanimé dans la pièce."
   },
   {
-    "id": 468,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mélange du ketchup et du soda et bois une petite gorgée."
   },
   {
-    "id": 441,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la fois où tu as cru que quelqu'un te faisait signe alors qu'il parlait à quelqu'un derrière toi."
   },
   {
-    "id": 468,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mélange du ketchup et du soda et bois une petite gorgée."
   },
   {
-    "id": 470,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une tranche de citron sans faire de grimace."
   },
   {
-    "id": 947,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un choisir un mot de passe à toi (sans le montrer)."
   },
   {
-    "id": 945,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de manger une chips sans faire de bruit."
   },
   {
-    "id": 445,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un compliment très sérieux à une chaise."
   },
   {
-    "id": 447,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ta dernière photo 'cachée' dans ton téléphone."
@@ -3212,391 +2692,326 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 90,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Négocie le prix d'un objet dans la pièce avec son propriétaire."
   },
   {
-    "id": 970,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une bouchée de nourriture proposée par le groupe."
   },
   {
-    "id": 88,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ton solde bancaire au joueur de gauche."
   },
   {
-    "id": 956,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Supprime le numéro d'un ex (si tu l'as encore)."
   },
   {
-    "id": 968,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Bois une gorgée d'eau mélangée avec un peu de poivre."
   },
   {
-    "id": 91,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens les pieds du joueur de ton choix."
   },
   {
-    "id": 833,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Dis 3 qualités de ton ex le/la plus détesté(e)."
   },
   {
-    "id": 452,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : faire 30 squats ou ne plus parler pendant 5 minutes."
   },
   {
-    "id": 454,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis un partenaire pour faire un concours de grimaces immédiat."
   },
   {
-    "id": 456,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte le pire défaut de ton premier amour."
   },
   {
-    "id": 458,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Détruis symboliquement un objet qui te rappelle une ancienne relation (un morceau de papier suffit)."
   },
   {
-    "id": 70,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une chips ou un gâteau sec sans les mains."
   },
   {
-    "id": 66,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte ta blague la moins drôle et ne ris pas."
   },
   {
-    "id": 441,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte la fois où tu as cru que quelqu'un te faisait signe alors qu'il parlait à quelqu'un derrière toi."
   },
   {
-    "id": 443,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de manger une cuillère de yaourt ou de compote sans utiliser tes mains."
   },
   {
-    "id": 445,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Fais un compliment très sérieux à une chaise."
   },
   {
-    "id": 447,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ta dernière photo 'cachée' dans ton téléphone."
   },
   {
-    "id": 966,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'intérieur d'un gant ou d'une chaussure."
   },
   {
-    "id": 68,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Regarde fixement quelqu'un dans les yeux pendant 1 minute sans cligner."
   },
   {
-    "id": 191,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte une anecdote où tu t'es trompé de porte (toilettes, chambre...)."
   },
   {
-    "id": 193,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de manger un aliment sans utiliser tes pouces."
   },
   {
-    "id": 343,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'épaule d'un joueur et devine son parfum de lessive."
   },
   {
-    "id": 197,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ton historique de recherche YouTube au joueur à ta droite."
   },
   {
-    "id": 449,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse le groupe choisir une application sur ton téléphone et regarder pendant 1 minute."
   },
   {
-    "id": 71,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Raconte un secret que personne ici ne connaît sur ton passé."
   },
   {
-    "id": 452,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : faire 30 squats ou ne plus parler pendant 5 minutes."
   },
   {
-    "id": 73,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Murmure ton plus gros secret à l'oreille de ton voisin de gauche."
   },
   {
-    "id": 454,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis un partenaire pour faire un concours de grimaces immédiat."
   },
   {
-    "id": 199,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Écris le nom de ton 'crush' sur un papier et garde-le dans ta poche."
   },
   {
-    "id": 202,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse le groupe décider si tu dois boire un verre d'eau d'un coup ou faire 20 pompes."
   },
   {
-    "id": 204,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Choisis : raconter ton pire dossier ou laisser quelqu'un regarder tes SMS."
   },
   {
-    "id": 206,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mime ta réaction si tu croisais ton ex là tout de suite."
   },
   {
-    "id": 208,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Dis 3 qualités de ton dernier ex (difficile, n'est-ce pas ?)."
   },
   {
-    "id": 210,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Explique la raison de ta dernière rupture en utilisant seulement des mimes."
   },
   {
-    "id": 212,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Vends-moi une chaussure pour 50€ en moins de 30 secondes."
   },
   {
-    "id": 214,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Donne une pièce ou un petit billet à la personne qui a le moins d'argent ici."
   },
   {
-    "id": 816,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Sens l'haleine de ton voisin de droite."
   },
   {
-    "id": 818,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Marche avec les mains par terre jusqu'à l'autre bout de la pièce."
   },
   {
-    "id": 820,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Essaie de lécher ton coude devant tout le monde."
   },
   {
-    "id": 822,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Montre ton historique de recherche Google au groupe."
   },
   {
-    "id": 824,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse quelqu'un regarder tes SMS pendant 30 secondes."
   },
   {
-    "id": 827,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Mange une cuillère de moutarde ou bois un shot de vinaigre."
   },
   {
-    "id": 449,
     "type": "action",
     "category": "Sans Filtre",
     "text": "Laisse le groupe choisir une application sur ton téléphone et regarder pendant 1 minute."
   },
   {
-    "id": 332,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le surnom le plus ridicule que tu aies donné à un ex ?"
   },
   {
-    "id": 457,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Est-ce que tu penses encore à ton ex avant de t'endormir parfois ?"
   },
   {
-    "id": 317,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est ton vêtement le plus ridicule mais que tu gardes quand même ?"
   },
   {
-    "id": 459,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si ton ex se mariait demain, quelle serait ta réaction sincère ?"
   },
   {
-    "id": 330,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu être toujours mouillé ou toujours avoir froid ?"
   },
   {
-    "id": 461,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus chère que tu aies achetée et que tu n'as jamais utilisée ?"
   },
   {
-    "id": 703,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères savoir quand tu vas mourir ou de quoi tu vas mourir ?"
   },
   {
-    "id": 463,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà trouvé de l'argent et ne l'as pas rendu alors que tu savais à qui il était ?"
   },
   {
-    "id": 92,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus dégoûtante que tu aies jamais mangée ?"
   },
   {
-    "id": 465,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la somme minimum pour laquelle tu accepterais de manger un insecte vivant ?"
   },
   {
-    "id": 321,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu as gardé le plus longtemps ?"
   },
   {
-    "id": 467,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le truc le plus dégoûtant que tu aies trouvé dans ton frigo ?"
   },
   {
-    "id": 823,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus illégale que tu aies jamais faite ?"
   },
   {
-    "id": 469,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus sale que tu aies faite dans une cuisine ?"
   },
   {
-    "id": 323,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà écouté aux portes ?"
   },
   {
-    "id": 94,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la dernière fois que tu as pleuré et pourquoi ?"
   },
   {
-    "id": 325,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus étrange que tu caches dans ta chambre ?"
   },
   {
-    "id": 326,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu avoir une tête de bébé ou un corps de bébé ?"
   },
   {
-    "id": 328,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu parler à tous les animaux ou parler toutes les langues humaines ?"
   },
   {
-    "id": 69,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le moment le plus gênant que tu as vécu avec un prof ?"
   },
   {
-    "id": 705,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères être invisible ou pouvoir lire dans les pensées ?"
   },
   {
-    "id": 834,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Regrettes-tu ta dernière rupture ?"
@@ -3607,7 +3022,6 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 707,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà essayé de recontacter un ex juste par ennui ?"
@@ -3625,37 +3039,31 @@
     "target": "femme"
   },
   {
-    "id": 955,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères être riche et malheureux ou pauvre et heureux ?"
   },
   {
-    "id": 709,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la leçon la plus importante que ton ex t'ait apprise ?"
   },
   {
-    "id": 79,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères pouvoir voler ou être invisible ?"
   },
   {
-    "id": 711,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la somme la plus importante que tu aies dépensée en une seule soirée ?"
   },
   {
-    "id": 77,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères ne plus jamais avoir d'Internet ou ne plus jamais te doucher ?"
   },
   {
-    "id": 713,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà trouvé de l'argent et ne l'as pas rendu alors que tu savais à qui il était ?"
@@ -3671,289 +3079,241 @@
     "category": "Sans Filtre"
   },
   {
-    "id": 715,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus chère que tu aies achetée et que tu regrettes ?"
   },
   {
-    "id": 717,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus dégoûtante que tu aies jamais mangée ?"
   },
   {
-    "id": 719,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà mangé quelque chose qui était tombé par terre depuis plus de 10 secondes ?"
   },
   {
-    "id": 74,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le plus gros mensonge que tu as dit aujourd'hui ?"
   },
   {
-    "id": 72,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà volé quelque chose dans un magasin ?"
   },
   {
-    "id": 219,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà mangé quelque chose qui était tombé par terre depuis plus de 5 secondes ?"
   },
   {
-    "id": 334,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si ton ex t'appelait là maintenant, est-ce que tu décrocherais ?"
   },
   {
-    "id": 455,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères vivre dans une maison hantée ou dans une forêt sauvage ?"
   },
   {
-    "id": 215,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Pour quel montant serais-tu prêt à te raser la tête ?"
   },
   {
-    "id": 840,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est ton plus gros achat compulsif ?"
   },
   {
-    "id": 319,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà dit 'Bonjour' à quelqu'un que tu croyais connaître mais non ?"
   },
   {
-    "id": 701,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu ne plus avoir d'Internet ou ne plus avoir de douches chaudes ?"
   },
   {
-    "id": 842,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la pire odeur que tu aies jamais sentie ?"
   },
   {
-    "id": 700,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus bizarre que tu fasses quand tu es seul chez toi ?"
   },
   {
-    "id": 698,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà caché une bêtise grave à tes parents qui n'a jamais été découverte ?"
   },
   {
-    "id": 696,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu n'as jamais osé dire même à ton meilleur ami ?"
   },
   {
-    "id": 694,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la pire honte que tu aies vécue devant un prof ?"
   },
   {
-    "id": 692,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà pété en public et fait semblant que c'était quelqu'un d'autre ?"
   },
   {
-    "id": 828,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu pouvoir voler ou être invisible ?"
   },
   {
-    "id": 944,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus ridicule que tu aies dite pour impressionner quelqu'un ?"
   },
   {
-    "id": 213,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est l'achat que tu regrettes le plus au monde ?"
   },
   {
-    "id": 67,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà eu une fuite urinaire en riant trop fort ?"
   },
   {
-    "id": 211,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si tu trouvais 100€ par terre, est-ce que tu chercherais le propriétaire ?"
   },
   {
-    "id": 946,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu caches à ton meilleur ami ?"
   },
   {
-    "id": 830,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu avoir une tête de bébé ou un corps de bébé ?"
   },
   {
-    "id": 948,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà lu un journal intime qui ne t'appartenait pas ?"
   },
   {
-    "id": 207,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la leçon la plus importante que ton ex t'a apprise ?"
   },
   {
-    "id": 469,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus sale que tu aies faite dans une cuisine ?"
   },
   {
-    "id": 205,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu ne plus avoir de goût ou ne plus avoir d'odorat ?"
   },
   {
-    "id": 203,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu être toujours en retard de 10 min ou toujours en avance de 2h ?"
   },
   {
-    "id": 467,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le truc le plus dégoûtant que tu aies trouvé dans ton frigo ?"
   },
   {
-    "id": 201,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu vivre 10 ans dans le futur ou 10 ans dans le passé ?"
   },
   {
-    "id": 465,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la somme minimum pour laquelle tu accepterais de manger un insecte vivant ?"
   },
   {
-    "id": 200,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus bizarre que tu fasses quand tu es seul chez toi ?"
   },
   {
-    "id": 198,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà caché une bêtise grave à tes parents qui n'a jamais été découverte ?"
   },
   {
-    "id": 196,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu n'as jamais dit à ton meilleur ami ?"
   },
   {
-    "id": 463,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà trouvé de l'argent et ne l'as pas rendu alors que tu savais à qui il était ?"
   },
   {
-    "id": 217,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la pire odeur que tu aies jamais sentie ?"
   },
   {
-    "id": 461,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus chère que tu aies achetée et que tu n'as jamais utilisée ?"
   },
   {
-    "id": 953,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères pouvoir parler à ton toi de 10 ans ou à ton toi de 80 ans ?"
   },
   {
-    "id": 951,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères vivre 100 ans dans le futur ou 100 ans dans le passé ?"
   },
   {
-    "id": 950,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus folle que tu fasses quand tu es seul ?"
   },
   {
-    "id": 459,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si ton ex se mariait demain, quelle serait ta réaction sincère ?"
   },
   {
-    "id": 442,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà porté un vêtement à l'envers toute la journée sans t'en rendre compte ?"
   },
   {
-    "id": 817,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà eu un accident 'naturel' dans ton pantalon étant adulte ?"
   },
   {
-    "id": 194,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la pire honte que tu aies vécue lors d'un premier rendez-vous ?"
   },
   {
-    "id": 844,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà mangé quelque chose qui était tombé par terre depuis 5 minutes ?"
   },
   {
-    "id": 825,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà trahi la confiance d'un ami pour ton propre intérêt ?"
@@ -3965,424 +3325,264 @@
     "target": "same"
   },
   {
-    "id": 969,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la dernière chose sale que tu aies touchée ?"
   },
   {
-    "id": 457,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Est-ce que tu penses encore à ton ex avant de t'endormir parfois ?"
   },
   {
-    "id": 942,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà envoyé un mail incendiaire et regretté immédiatement ?"
   },
   {
-    "id": 455,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères vivre dans une maison hantée ou dans une forêt sauvage ?"
   },
   {
-    "id": 209,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà envoyé un message à un ex alors que tu étais ivre ?"
   },
   {
-    "id": 82,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose que tu regrettes le plus dans ta dernière relation ?"
   },
   {
-    "id": 959,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà envoyé un message 'accidentel' à un ex ?"
   },
   {
-    "id": 838,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si tu trouvais 1000€ par terre, est-ce que tu les rendrais ?"
   },
   {
-    "id": 444,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus embarrassante que tes parents ont dite devant tes amis ?"
   },
   {
-    "id": 961,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le plus gros montant que tu aies jamais dépensé sur un coup de tête ?"
   },
   {
-    "id": 344,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus sale que tu aies faite par flemme ?"
   },
   {
-    "id": 836,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la somme la plus importante que tu aies jamais perdue ?"
   },
   {
-    "id": 967,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le truc le plus dégoûtant que tu aies vu dans une cuisine de restaurant ?"
   },
   {
-    "id": 957,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose que ton ex détestait le plus chez toi ?"
   },
   {
-    "id": 453,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères voyager dans le passé et rencontrer tes ancêtres ou dans le futur et voir tes descendants ?"
   },
   {
-    "id": 819,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le moment le plus gênant que tu aies vécu lors d'un date ?"
   },
   {
-    "id": 451,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu avoir une queue de singe ou des oreilles de lapin ?"
   },
   {
-    "id": 342,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la dernière fois que tu as vomi et pourquoi ?"
   },
   {
-    "id": 340,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Si tu étais milliardaire, quel serait ton premier achat inutile ?"
   },
   {
-    "id": 84,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà essayé de re-séduire un ex juste par ego ?"
   },
   {
-    "id": 338,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà trouvé de l'argent par terre et tu l'as gardé ?"
   },
   {
-    "id": 832,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà stalké les réseaux sociaux d'un ex cette semaine ?"
   },
   {
-    "id": 87,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la somme la plus importante que tu aies jamais perdue ?"
   },
   {
-    "id": 450,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la vérité que tu n'aimerais jamais que ton patron connaisse ?"
   },
   {
-    "id": 965,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus chère dans cette pièce selon toi ?"
   },
   {
-    "id": 89,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus inutile que tu aies achetée très cher ?"
   },
   {
-    "id": 963,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Es-tu plutôt du genre économe ou flambeur ?"
   },
   {
-    "id": 442,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà porté un vêtement à l'envers toute la journée sans t'en rendre compte ?"
   },
   {
-    "id": 821,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà menti à quelqu'un dans cette pièce aujourd'hui ?"
   },
   {
-    "id": 444,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la chose la plus embarrassante que tes parents ont dite devant tes amis ?"
   },
   {
-    "id": 448,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà fouillé dans les affaires de quelqu'un d'autre ?"
   },
   {
-    "id": 446,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu n'as jamais avoué même à ton journal intime ?"
   },
   {
-    "id": 336,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le montant maximum que tu pourrais prêter à un ami sans hésiter ?"
   },
   {
-    "id": 448,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà fouillé dans les affaires de quelqu'un d'autre ?"
   },
   {
-    "id": 826,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu être toujours mouillé ou toujours avoir froid ?"
   },
   {
-    "id": 450,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quelle est la vérité que tu n'aimerais jamais que ton patron connaisse ?"
   },
   {
-    "id": 451,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Préférerais-tu avoir une queue de singe ou des oreilles de lapin ?"
   },
   {
-    "id": 446,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Quel est le secret que tu n'as jamais avoué même à ton journal intime ?"
   },
   {
-    "id": 453,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "Tu préfères voyager dans le passé et rencontrer tes ancêtres ou dans le futur et voir tes descendants ?"
   },
   {
-    "id": 192,
     "type": "verite",
     "category": "Sans Filtre",
     "text": "As-tu déjà salué quelqu'un qui ne te saluait pas en fait ?"
   },
   {
-    "id": 925,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique pourquoi les jeux rétro sont encore géniaux."
-  },
-  {
-    "id": 877,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime un chat qui essaie d'attraper une mouche."
-  },
-  {
-    "id": 382,
     "type": "action",
     "category": "Soft",
     "text": "Trouve un point commun improbable avec la personne en face de toi."
   },
   {
-    "id": 879,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite un virelangue (ex: Les chaussettes de l'archiduchesse...) 3 fois très vite."
-  },
-  {
-    "id": 882,
     "type": "action",
     "category": "Soft",
     "text": "Fais un compliment original à la personne en face de toi."
   },
   {
-    "id": 423,
     "type": "action",
     "category": "Soft",
     "text": "Imite le cri d'un Wookiee (Chewbacca)."
   },
   {
-    "id": 384,
     "type": "action",
     "category": "Soft",
     "text": "Raconte une anecdote drôle qui t'est arrivée cette semaine."
   },
   {
-    "id": 884,
     "type": "action",
     "category": "Soft",
     "text": "Donne un conseil de vie au groupe."
   },
   {
-    "id": 127,
     "type": "action",
     "category": "Soft",
     "text": "Fais un clin d'œil à chaque personne sans rire."
   },
   {
-    "id": 21,
     "type": "action",
     "category": "Soft",
-    "text": "Mime ta punition préférée quand tu étais petit."
+    "text": "Cite 5 philosophes en moins de 15 secondes."
   },
   {
-    "id": 386,
     "type": "action",
     "category": "Soft",
-    "text": "Imite un poulet qui essaie d'expliquer le sens de la vie."
+    "text": "Danse pendant 30 secondes sans musique."
   },
   {
-    "id": 274,
     "type": "action",
     "category": "Soft",
-    "text": "Chante une comptine de ton enfance de la façon la plus rock possible."
+    "text": "Fais une démonstration de Air Guitar pendant 15 secondes."
   },
   {
-    "id": 35,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 philosophes en moins de 10 secondes."
-  },
-  {
-    "id": 888,
-    "type": "action",
-    "category": "Soft",
-    "text": "Danse le disco pendant 30 secondes sans musique."
-  },
-  {
-    "id": 388,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une démonstration de Air Guitar pendant 30 secondes."
-  },
-  {
-    "id": 272,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime un caprice d'enfant de 3 ans en plein supermarché."
-  },
-  {
-    "id": 890,
-    "type": "action",
-    "category": "Soft",
-    "text": "Parle avec une voix de canard jusqu'à ce que quelqu'un rigole."
-  },
-  {
-    "id": 390,
     "type": "action",
     "category": "Soft",
     "text": "Parle avec une voix de robot jusqu'à ton prochain tour."
   },
   {
-    "id": 33,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique la théorie de la relativité en 30 secondes comme si j'avais 5 ans."
-  },
-  {
-    "id": 392,
     "type": "action",
     "category": "Soft",
     "text": "Désigne la personne qui a le plus de succès en amour dans ce groupe."
   },
   {
-    "id": 409,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 pays d'Afrique et leurs capitales en moins de 20 secondes."
-  },
-  {
-    "id": 394,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte la rumeur la plus absurde que tu aies entendue sur une célébrité."
-  },
-  {
-    "id": 407,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
-  },
-  {
-    "id": 892,
     "type": "action",
     "category": "Soft",
     "text": "Désigne la personne qui pourrait survivre le plus longtemps sur une île déserte."
-  },
-  {
-    "id": 397,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une blague que tu trouvais hilarante quand tu avais 8 ans."
-  },
-  {
-    "id": 269,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un classement des 3 meilleurs danseurs de la pièce."
-  },
-  {
-    "id": 399,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime ta réaction si on t'avait offert le cadeau de tes rêves à 10 ans."
-  },
-  {
-    "id": 31,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite les 10 premières décimales de Pi (ou essaie)."
-  },
-  {
-    "id": 386,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite un poulet qui essaie d'expliquer le sens de la vie."
-  },
-  {
-    "id": 296,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique pourquoi les jeux vidéo ne sont pas que pour les enfants."
   },
   {
     "text": "Fais un câlin de 10 secondes à {target}.",
@@ -4390,76 +3590,19 @@
     "category": "Soft"
   },
   {
-    "id": 20,
     "type": "action",
     "category": "Soft",
     "text": "Raconte un secret que quelqu'un ici t'a confié (sans citer de nom)."
   },
   {
-    "id": 421,
     "type": "action",
     "category": "Soft",
-    "text": "Explique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
+    "text": "Montre le dernier message que tu as reçu"
   },
   {
-    "id": 423,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le cri d'un Wookiee (Chewbacca)."
-  },
-  {
-    "id": 147,
-    "type": "action",
-    "category": "Soft",
-    "text": "Dessine une maison comme si tu avais 4 ans."
-  },
-  {
-    "id": 18,
-    "type": "action",
-    "category": "Soft",
-    "text": "Montre le dernier message 'dossier' que tu as reçu sur WhatsApp."
-  },
-  {
-    "id": 525,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais semblant d'être un robot qui tombe en panne de batterie."
-  },
-  {
-    "id": 298,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le bruit de chargement d'un vieux modem."
-  },
-  {
-    "id": 300,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite un passage célèbre d'un film de SF."
-  },
-  {
-    "id": 16,
-    "type": "action",
-    "category": "Soft",
-    "text": "Désigne la personne ici présente qui est la plus 'drama queen'."
-  },
-  {
-    "id": 10,
     "type": "action",
     "category": "Soft",
     "text": "Donne un compliment sincère à chaque joueur."
-  },
-  {
-    "id": 15,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une battle de danse imaginaire contre toi-même."
-  },
-  {
-    "text": "{player}, laisse {target} te dessiner quelque chose sur le bras avec un stylo.",
-    "type": "action",
-    "category": "Soft",
-    "target": "homme"
   },
   {
     "text": "{player}, fais un câlin de 10 secondes à {target}.",
@@ -4467,805 +3610,127 @@
     "category": "Soft"
   },
   {
-    "id": 11,
     "type": "action",
     "category": "Soft",
     "text": "Parle avec un accent italien jusqu'à ton prochain tour."
   },
   {
-    "id": 894,
     "type": "action",
     "category": "Soft",
-    "text": "Fais une imitation d'un joueur qui boude."
+    "text": "Raconte une rumeur (fausse ou vraie)"
   },
   {
-    "id": 171,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le bruit du sabre laser de Luke Skywalker."
-  },
-  {
-    "id": 50,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique le principe de la Blockchain en 3 phrases."
-  },
-  {
-    "id": 627,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un compliment à la personne qui porte le vêtement le plus coloré."
-  },
-  {
-    "id": 173,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique pourquoi PC est mieux que Console (ou l'inverse) avec passion."
-  },
-  {
-    "id": 175,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une imitation d'un PNJ de jeu vidéo."
-  },
-  {
-    "id": 48,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite l'ordre de lancement des films Star Wars."
-  },
-  {
-    "id": 13,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime un paresseux qui essaie de courir un marathon."
-  },
-  {
-    "id": 644,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une rumeur (fausse ou vraie) que tu as déjà entendue sur un prof."
-  },
-  {
-    "text": "Laisse {target} te maquiller (ou te recoiffer) à l'aveugle pendant 1 minute.",
+    "text": "Laisse {target} te maquiller (ou te recoiffer) pendant 1 minute.",
     "type": "action",
     "category": "Soft",
     "target": "femme"
   },
   {
-    "id": 673,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le son du sabre laser de Dark Vador."
-  },
-  {
-    "id": 267,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite la mimique la plus reconnaissable d'un joueur présent."
-  },
-  {
-    "id": 759,
     "type": "action",
     "category": "Soft",
     "text": "Dis 'Bonjour' dans 5 langues différentes."
   },
   {
-    "id": 142,
-    "type": "action",
-    "category": "Soft",
-    "text": "Désigne la personne qui a le plus de chances de finir dans une télé-réalité."
-  },
-  {
-    "id": 629,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une blague très courte et ris si personne ne rit."
-  },
-  {
-    "id": 409,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 pays d'Afrique et leurs capitales en moins de 20 secondes."
-  },
-  {
-    "id": 140,
-    "type": "action",
-    "category": "Soft",
-    "text": "Marche comme si le sol était de la lave pendant ton prochain déplacement."
-  },
-  {
-    "id": 632,
     "type": "action",
     "category": "Soft",
     "text": "Demande à chaque joueur de te décrire en un seul mot."
   },
   {
-    "id": 138,
-    "type": "action",
-    "category": "Soft",
-    "text": "Essaie de vendre un stylo au groupe comme si c'était un objet magique."
-  },
-  {
-    "id": 634,
     "type": "action",
     "category": "Soft",
     "text": "Fais un high-five à tout le monde dans la pièce le plus vite possible."
   },
   {
-    "id": 136,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite un présentateur de JT qui annonce une nouvelle absurde."
-  },
-  {
-    "id": 636,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite une personne qui essaie de marcher avec des chaussures trop petites."
-  },
-  {
-    "id": 907,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique ce qu'est un trou noir avec des mots simples."
-  },
-  {
-    "id": 338,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une démonstration de danse sans aucune musique pendant 20 secondes."
-  },
-  {
-    "id": 407,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique le fonctionnement d'Internet en 30 secondes sans utiliser de mots techniques."
-  },
-  {
-    "id": 640,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime un paresseux qui essaie de rattraper un bus."
-  },
-  {
-    "id": 899,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite une poésie apprise en primaire."
-  },
-  {
-    "id": 642,
-    "type": "action",
-    "category": "Soft",
-    "text": "Désigne la personne qui a le plus de chances de finir dans une émission de télé-réalité."
-  },
-  {
-    "id": 134,
-    "type": "action",
-    "category": "Soft",
-    "text": "Donne un surnom de super-héros à {target}."
-  },
-  {
-    "id": 144,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte la rumeur la plus folle que tu aies entendue sur toi-même."
-  },
-  {
-    "id": 897,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime ton personnage de dessin animé préféré."
-  },
-  {
-    "id": 800,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique pourquoi PC est mieux que Console (ou l'inverse)."
-  },
-  {
-    "id": 647,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime ta réaction préférée quand tes parents te disaient 'Non' enfant."
-  },
-  {
-    "id": 798,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 10 marques de processeurs ou composants PC."
-  },
-  {
-    "id": 649,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une grimace de bébé et tiens-la pendant 15 secondes."
-  },
-  {
-    "id": 284,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 3 prix Nobel français en moins de 15 secondes."
-  },
-  {
-    "id": 909,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 3 peintres célèbres en moins de 5 secondes."
-  },
-  {
-    "id": 282,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique le concept d'un trou noir avec des couverts ou des verres."
-  },
-  {
-    "id": 23,
     "type": "action",
     "category": "Soft",
     "text": "Chante le générique de ton dessin animé d'enfance préféré."
   },
   {
-    "id": 252,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais semblant d'être un serveur et prends la commande de tout le monde."
-  },
-  {
-    "id": 132,
     "type": "action",
     "category": "Soft",
     "text": "Trouve un point commun avec chaque personne présente."
   },
   {
-    "id": 129,
-    "type": "action",
-    "category": "Soft",
-    "text": "Applaudis chaque fois que quelqu'un termine sa phrase pendant 2 minutes."
-  },
-  {
-    "id": 157,
     "type": "action",
     "category": "Soft",
     "text": "Cite 3 pays commençant par la lettre 'Z' (ou gage)."
   },
   {
-    "id": 525,
+    "text": "Échange tes chaussettes avec {target} pendant 5 minutes.",
     "type": "action",
-    "category": "Soft",
-    "text": "Fais semblant d'être un robot qui tombe en panne de batterie."
+    "category": "Soft"
   },
   {
-    "id": 659,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 capitales européennes en moins de 10 secondes."
-  },
-  {
-    "id": 784,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 prix Nobel français ou étrangers."
-  },
-  {
-    "id": 399,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime ta réaction si on t'avait offert le cadeau de tes rêves à 10 ans."
-  },
-  {
-    "id": 397,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une blague que tu trouvais hilarante quand tu avais 8 ans."
-  },
-  {
-    "id": 25,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une grimace de bébé et garde-la 30 secondes."
-  },
-  {
-    "id": 254,
-    "type": "action",
-    "category": "Soft",
-    "text": "Refais tes lacets avec une seule main."
-  },
-  {
-    "id": 886,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais semblant d'être un présentateur de télé-achat qui vend une brosse à dents usagée."
-  },
-  {
-    "id": 657,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique ce qu'est la photosynthèse comme si j'avais 4 ans."
-  },
-  {
-    "id": 159,
-    "type": "action",
-    "category": "Soft",
-    "text": "Donne une définition compliquée pour un mot très simple."
-  },
-  {
-    "id": 421,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique la différence entre un processeur et de la RAM à quelqu'un qui n'y connaît rien."
-  },
-  {
-    "id": 774,
-    "type": "action",
-    "category": "Soft",
-    "text": "Dessine un bonhomme bâton sur ton bras gauche."
-  },
-  {
-    "id": 671,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique pourquoi les jeux vidéo sont de l'art en moins de 30 secondes."
-  },
-  {
-    "id": 772,
-    "type": "action",
-    "category": "Soft",
-    "text": "Chante le générique de ton dessin animé préféré d'enfance."
-  },
-  {
-    "text": "Laisse {target} te dessiner quelque chose sur le bras avec un stylo.",
-    "type": "action",
-    "category": "Soft",
-    "target": "homme"
-  },
-  {
-    "id": 769,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte la rumeur la plus folle que tu aies entendue sur toi-même."
-  },
-  {
-    "id": 675,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 3 maisons de Harry Potter avec une voix mystérieuse."
-  },
-  {
-    "id": 3,
-    "type": "action",
-    "category": "Soft",
-    "text": "Échange tes chaussettes avec la personne à ta gauche."
-  },
-  {
-    "id": 392,
-    "type": "action",
-    "category": "Soft",
-    "text": "Désigne la personne qui a le plus de succès en amour dans ce groupe."
-  },
-  {
-    "id": 767,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un classement des 3 meilleurs cuisiniers potentiels de la pièce."
-  },
-  {
-    "id": 390,
-    "type": "action",
-    "category": "Soft",
-    "text": "Parle avec une voix de robot jusqu'à ton prochain tour."
-  },
-  {
-    "id": 5,
-    "type": "action",
-    "category": "Soft",
-    "text": "Touche ton nez avec ta langue (ou essaie de le faire)."
-  },
-  {
-    "id": 923,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le cri d'un zombie de jeu vidéo."
-  },
-  {
-    "id": 765,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une imitation d'une célébrité connue par tout le groupe."
-  },
-  {
-    "id": 921,
-    "type": "action",
-    "category": "Soft",
-    "text": "Cite 5 langages de programmation différents."
-  },
-  {
-    "id": 782,
-    "type": "action",
-    "category": "Soft",
-    "text": "Explique un concept scientifique complexe en 30 secondes."
-  },
-  {
-    "id": 761,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime un paresseux qui essaie de faire un sprint."
-  },
-  {
-    "id": 388,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une démonstration de Air Guitar pendant 30 secondes."
-  },
-  {
-    "id": 257,
-    "type": "action",
-    "category": "Soft",
-    "text": "Dis 'Bonjour' dans 5 langues différentes."
-  },
-  {
-    "id": 46,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une imitation parfaite de Yoda."
-  },
-  {
-    "id": 6,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un check original avec chaque personne dans la pièce."
-  },
-  {
-    "id": 384,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une anecdote drôle qui t'est arrivée cette semaine."
-  },
-  {
-    "id": 796,
-    "type": "action",
-    "category": "Soft",
-    "text": "Imite le bruit de chargement d'un vieux modem 56k."
-  },
-  {
-    "id": 259,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un compliment sur les chaussures du joueur en face de toi."
-  },
-  {
-    "id": 394,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte la rumeur la plus absurde que tu aies entendue sur une célébrité."
-  },
-  {
-    "id": 382,
-    "type": "action",
-    "category": "Soft",
-    "text": "Trouve un point commun improbable avec la personne en face de toi."
-  },
-  {
-    "id": 377,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un compliment à chaque personne présente dans la pièce."
-  },
-  {
-    "id": 261,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une histoire triste mais avec une voix de clown ultra joyeuse."
-  },
-  {
-    "id": 757,
-    "type": "action",
-    "category": "Soft",
-    "text": "Demande à ton voisin de droite de te donner un nouveau surnom."
-  },
-  {
-    "id": 263,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une pub pour un produit imaginaire qui rend les gens invisibles."
-  },
-  {
-    "id": 379,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite l'alphabet le plus vite possible sans bégayer."
-  },
-  {
-    "id": 379,
-    "type": "action",
-    "category": "Soft",
-    "text": "Récite l'alphabet le plus vite possible sans bégayer."
-  },
-  {
-    "id": 265,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais une tête de poisson rouge pendant 30 secondes."
-  },
-  {
-    "id": 754,
-    "type": "action",
-    "category": "Soft",
-    "text": "Mime une personne qui essaie de rattraper son bus."
-  },
-  {
-    "id": 377,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un compliment à chaque personne présente dans la pièce."
-  },
-  {
-    "id": 752,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais un clin d'œil à chaque personne sans rire."
-  },
-  {
-    "id": 1,
-    "type": "action",
-    "category": "Soft",
-    "text": "Fais ton plus beau bruit d'animal pendant 10 secondes."
-  },
-  {
-    "id": 8,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte ta pire blague pour briser la glace."
-  },
-  {
-    "id": 763,
-    "type": "action",
-    "category": "Soft",
-    "text": "Parle avec l'accent de ton choix jusqu'à ton prochain tour."
-  },
-  {
-    "id": 149,
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une bêtise pour laquelle ton frère ou ta sœur a été puni à ta place."
-  },
-  {
-    "id": 896,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel était ton surnom au collège ?"
-  },
-  {
-    "id": 253,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est la chose la plus gentille que tu aies faite pour un inconnu ?"
-  },
-  {
-    "id": 396,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel était ton doudou ou ton jouet préféré quand tu étais petit ?"
-  },
-  {
-    "id": 395,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Si on devait créer une télé-réalité avec ce groupe, quel serait le titre ?"
-  },
-  {
-    "id": 393,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Qui est la personne la plus dépensière du groupe selon toi ?"
-  },
-  {
-    "id": 255,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton fruit préféré ?"
-  },
-  {
-    "id": 391,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Selon toi, qui est la personne la plus susceptible de devenir célèbre ici ?"
-  },
-  {
-    "id": 256,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Si tu pouvais changer de prénom, lequel choisirais-tu ?"
-  },
-  {
-    "id": 389,
-    "type": "verite",
-    "category": "Soft",
-    "text": "As-tu une peur totalement irrationnelle (ex: les boutons, les ballons) ?"
-  },
-  {
-    "id": 387,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est la chose la plus ridicule que tu aies achetée sur un coup de tête ?"
-  },
-  {
-    "id": 385,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton réseau social préféré et pourquoi ?"
-  },
-  {
-    "id": 258,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le dernier concert ou spectacle que tu as vu ?"
-  },
-  {
-    "id": 922,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est ta console de jeux préférée de tous les temps ?"
-  },
-  {
-    "id": 381,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais être un animal pendant une journée, lequel serais-tu ?"
   },
   {
-    "id": 262,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le déguisement le plus ridicule que tu aies porté ?"
-  },
-  {
-    "id": 380,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est ta fête préférée dans l'année ?"
-  },
-  {
-    "id": 264,
-    "type": "verite",
-    "category": "Soft",
-    "text": "As-tu déjà ri à un moment où il ne fallait absolument pas ?"
-  },
-  {
-    "id": 137,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est la pire coiffure que tu aies jamais eue ?"
-  },
-  {
-    "id": 266,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Selon toi, qui ici dépense le plus d'argent en bêtises ?"
-  },
-  {
-    "id": 876,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est ta couleur préférée et pourquoi ?"
-  },
-  {
-    "id": 376,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton parfum de pizza préféré ?"
-  },
-  {
-    "id": 878,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Si tu pouvais avoir n'importe quel animal exotique, lequel choisirais-tu ?"
-  },
-  {
-    "id": 281,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel livre pourrais-tu relire 100 fois sans t'ennuyer ?"
-  },
-  {
-    "id": 880,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le meilleur compliment qu'on t'ait jamais fait ?"
-  },
-  {
-    "id": 893,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans le groupe est le plus 'fêtard' ?"
   },
   {
-    "id": 883,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton hobby préféré le week-end ?"
-  },
-  {
-    "id": 9,
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le talent caché que personne ici ne connaît ?"
-  },
-  {
-    "id": 881,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la première chose que tu regardes chez une personne que tu rencontres ?"
   },
   {
-    "id": 887,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chose la plus absurde que tu aies faite par amour ?"
   },
   {
-    "id": 895,
     "type": "verite",
     "category": "Soft",
     "text": "Qui ici a le rire le plus communicatif ?"
   },
   {
-    "id": 271,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton surnom le plus honteux quand tu étais petit ?"
   },
   {
-    "id": 275,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta plus grande peur quand tu étais enfant ?"
   },
   {
-    "id": 270,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans le groupe est le plus 'coeur d'artichaut' ?"
   },
   {
-    "id": 885,
     "type": "verite",
     "category": "Soft",
     "text": "Préfères-tu le thé ou le café ?"
   },
   {
-    "id": 889,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le rêve le plus bizarre dont tu te souviennes ?"
   },
   {
-    "id": 268,
     "type": "verite",
     "category": "Soft",
     "text": "Qui ici a le plus de chances de finir président de la République ?"
   },
   {
-    "id": 273,
     "type": "verite",
     "category": "Soft",
     "text": "Avais-tu un poster de star dans ta chambre ? Si oui, qui ?"
   },
   {
-    "id": 7,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la première impression que tu as eue de {target} ?"
   },
   {
-    "id": 891,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui ici est le plus susceptible de cacher une identité secrète ?"
   },
   {
-    "id": 635,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chose la plus étrange que tu aies mangée par curiosité ?"
@@ -5276,55 +3741,46 @@
     "category": "Soft"
   },
   {
-    "id": 630,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais être invisible pendant une heure, que ferais-tu ?"
   },
   {
-    "id": 32,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le livre qui a changé ta vision du monde ?"
   },
   {
-    "id": 396,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton doudou ou ton jouet préféré quand tu étais petit ?"
   },
   {
-    "id": 406,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais maîtriser n'importe quelle science instantanément, laquelle choisirais-tu ?"
   },
   {
-    "id": 395,
     "type": "verite",
     "category": "Soft",
     "text": "Si on devait créer une télé-réalité avec ce groupe, quel serait le titre ?"
   },
   {
-    "id": 408,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le fait historique qui te semble le plus incroyable ?"
   },
   {
-    "id": 393,
     "type": "verite",
     "category": "Soft",
     "text": "Qui est la personne la plus dépensière du groupe selon toi ?"
   },
   {
-    "id": 410,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est l'inventeur ou le savant que tu admires le plus ?"
   },
   {
-    "id": 34,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la capitale de la Mongolie ? (Gage si erreur : Oulan-Bator)."
@@ -5335,67 +3791,56 @@
     "category": "Soft"
   },
   {
-    "id": 391,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui est la personne la plus susceptible de devenir célèbre ici ?"
   },
   {
-    "id": 378,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le dernier film qui t'a fait pleurer ?"
   },
   {
-    "id": 389,
     "type": "verite",
     "category": "Soft",
     "text": "As-tu une peur totalement irrationnelle (ex: les boutons, les ballons) ?"
   },
   {
-    "id": 376,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton parfum de pizza préféré ?"
   },
   {
-    "id": 387,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chose la plus ridicule que tu aies achetée sur un coup de tête ?"
   },
   {
-    "id": 381,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais être un animal pendant une journée, lequel serais-tu ?"
   },
   {
-    "id": 753,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la dernière série que tu as regardée d'une traite ?"
   },
   {
-    "id": 380,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est ta fête préférée dans l'année ?"
   },
   {
-    "id": 755,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le dernier livre qui t'a passionné ?"
   },
   {
-    "id": 751,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton parfum de glace préféré ?"
   },
   {
-    "id": 756,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais vivre dans n'importe quel pays, lequel choisirais-tu ?"
@@ -5406,25 +3851,21 @@
     "category": "Soft"
   },
   {
-    "id": 126,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton parfum de glace préféré ?"
   },
   {
-    "id": 385,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton réseau social préféré et pourquoi ?"
   },
   {
-    "id": 398,
     "type": "verite",
     "category": "Soft",
     "text": "Quel métier voulais-tu faire quand tu étais enfant ?"
   },
   {
-    "id": 383,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la destination de tes rêves pour un voyage ?"
@@ -5435,19 +3876,16 @@
     "category": "Soft"
   },
   {
-    "id": 760,
     "type": "verite",
     "category": "Soft",
     "text": "Es-tu plutôt du matin ou du soir ?"
   },
   {
-    "id": 130,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est l'endroit où tu te sens le plus apaisé ?"
   },
   {
-    "id": 762,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chute la plus ridicule que tu aies faite en public ?"
@@ -5458,559 +3896,466 @@
     "category": "Soft"
   },
   {
-    "id": 906,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais supprimer un événement de l'histoire, lequel serait-ce ?"
   },
   {
-    "id": 135,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est ta saison préférée et pourquoi ?"
   },
   {
-    "id": 639,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chose la plus ridicule que tu fasses quand tu es seul ?"
   },
   {
-    "id": 641,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui dans ce groupe est le plus 'coeur d'artichaut' ?"
   },
   {
-    "id": 643,
     "type": "verite",
     "category": "Soft",
     "text": "Qui ici a le plus de chances de devenir millionnaire par accident ?"
   },
   {
-    "id": 645,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans le groupe est le plus susceptible de cacher un secret incroyable ?"
   },
   {
-    "id": 133,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le premier film que tu te souviens avoir vu au cinéma ?"
   },
   {
-    "id": 646,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton dessin animé préféré quand tu avais 6 ans ?"
   },
   {
-    "id": 799,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est ta maison dans Harry Potter ?"
   },
   {
-    "id": 648,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton doudou préféré et comment s'appelait-il ?"
   },
   {
-    "id": 797,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu devais vivre dans un univers de jeu vidéo, lequel serait-ce ?"
   },
   {
-    "id": 650,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était la plus grosse bêtise que tu aies faite à l'école primaire ?"
   },
   {
-    "id": 908,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le documentaire le plus intéressant que tu aies vu ?"
   },
   {
-    "id": 22,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton ami imaginaire et à quoi ressemblait-il ?"
   },
   {
-    "id": 910,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le paradoxe qui te fait le plus réfléchir ?"
   },
   {
-    "id": 24,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la plus grosse bêtise que tu as faite à l'école primaire ?"
   },
   {
-    "id": 131,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais avoir un super-pouvoir inutile, ce serait quoi ?"
   },
   {
-    "id": 398,
     "type": "verite",
     "category": "Soft",
     "text": "Quel métier voulais-tu faire quand tu étais enfant ?"
   },
   {
-    "id": 656,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais parler à n'importe quel génie de l'histoire, qui choisirais-tu ?"
   },
   {
-    "id": 658,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le fait scientifique qui te semble le plus fou ?"
   },
   {
-    "id": 785,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la langue la plus difficile à apprendre selon toi ?"
   },
   {
-    "id": 660,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la langue la plus difficile à apprendre selon toi ?"
   },
   {
-    "id": 783,
     "type": "verite",
     "category": "Soft",
     "text": "Combien de décimales de Pi connais-tu ?"
   },
   {
-    "id": 2,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton dessin animé préféré de tous les temps ?"
   },
   {
-    "id": 781,
     "type": "verite",
     "category": "Soft",
     "text": "Quel événement historique aimerais-tu avoir vécu ?"
   },
   {
-    "id": 424,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu devais posséder un objet de film (Sabre laser, Anneau unique...), lequel serait-ce ?"
   },
   {
-    "id": 422,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton jeu vidéo 'plaisir coupable' (dont tu as un peu honte) ?"
   },
   {
-    "id": 128,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la dernière série que tu as regardée d'une traite ?"
   },
   {
-    "id": 775,
     "type": "verite",
     "category": "Soft",
     "text": "Quel métier voulais-tu faire quand tu étais petit ?"
   },
   {
-    "id": 924,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le premier ordinateur ou téléphone que tu as possédé ?"
   },
   {
-    "id": 773,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta plus grande peur quand tu avais 5 ans ?"
   },
   {
-    "id": 672,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est l'univers de fiction dans lequel tu aimerais vivre ?"
   },
   {
-    "id": 771,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton doudou préféré et comment s'appelait-il ?"
   },
   {
-    "id": 770,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui est la personne la plus désordonnée ici ?"
   },
   {
-    "id": 674,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu devais posséder un Pokémon dans la vraie vie, lequel choisirais-tu ?"
   },
   {
-    "id": 768,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans ce groupe est le plus susceptible de devenir riche ?"
   },
   {
-    "id": 4,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu gagnais au loto demain, quelle est la première chose que tu achèterais ?"
   },
   {
-    "id": 766,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui ici mettrait le plus de temps à se préparer pour un date ?"
   },
   {
-    "id": 637,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la pire excuse que tu aies utilisée pour ne pas aller en cours ?"
   },
   {
-    "id": 383,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la destination de tes rêves pour un voyage ?"
   },
   {
-    "id": 764,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le nom le plus bizarre que tu aies donné à un objet ?"
   },
   {
-    "id": 378,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le dernier film qui t'a fait pleurer ?"
   },
   {
-    "id": 633,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton talent caché le plus inutile ?"
   },
   {
-    "id": 139,
     "type": "verite",
     "category": "Soft",
     "text": "As-tu déjà confondu une personne inconnue avec un ami dans la rue ?"
   },
   {
-    "id": 631,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le premier film que tu as vu au cinéma ?"
   },
   {
-    "id": 141,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui ici met le plus de temps à répondre aux messages ?"
   },
   {
-    "id": 260,
     "type": "verite",
     "category": "Soft",
     "text": "Es-tu plutôt du matin ou du soir ?"
   },
   {
-    "id": 628,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est ta saison préférée et pourquoi ?"
   },
   {
-    "id": 626,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton souvenir d'anniversaire le plus mémorable ?"
   },
   {
-    "id": 19,
     "type": "verite",
     "category": "Soft",
     "text": "Selon toi, qui est la personne la plus mal rangée du groupe ?"
   },
   {
-    "id": 17,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans ce groupe serait le premier à mourir dans un film d'horreur ?"
   },
   {
-    "id": 143,
     "type": "verite",
     "category": "Soft",
     "text": "Qui dans ce groupe est le plus susceptible de cacher un secret incroyable ?"
   },
   {
-    "id": 14,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le nom le plus ridicule que tu aies donné à un objet ?"
   },
   {
-    "id": 49,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton Pokémon préféré et pourquoi ?"
   },
   {
-    "id": 47,
     "type": "verite",
     "category": "Soft",
     "text": "Marvel ou DC ? Justifie ton choix."
   },
   {
-    "id": 174,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le jeu vidéo sur lequel tu as passé le plus d'heures ?"
   },
   {
-    "id": 172,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est ta maison dans Harry Potter ?"
   },
   {
-    "id": 758,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton plus vieux souvenir d'enfance ?"
   },
   {
-    "id": 145,
     "type": "verite",
     "category": "Soft",
     "text": "Qui ici choisirais-tu pour t'aider à cacher un corps (purement fictif) ?"
   },
   {
-    "id": 400,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta série ou ton dessin animé préféré au primaire ?"
   },
   {
-    "id": 12,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle est la chute la plus ridicule que tu aies faite en public ?"
   },
   {
-    "id": 299,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais avoir n'importe quel robot, lequel choisirais-tu ?"
   },
   {
-    "id": 146,
     "type": "verite",
     "category": "Soft",
     "text": "Avais-tu un amoureux/amoureuse secret(e) en maternelle ?"
   },
   {
-    "id": 297,
     "type": "verite",
     "category": "Soft",
     "text": "Quel univers de fiction (Marvel, Harry Potter, etc.) est le plus cohérent selon toi ?"
   },
   {
-    "id": 424,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu devais posséder un objet de film (Sabre laser, Anneau unique...), lequel serait-ce ?"
   },
   {
-    "id": 422,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton jeu vidéo 'plaisir coupable' (dont tu as un peu honte) ?"
   },
   {
-    "id": 148,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était le jouet que tu ne voulais absolument pas prêter ?"
   },
   {
-    "id": 400,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta série ou ton dessin animé préféré au primaire ?"
   },
   {
-    "id": 160,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le dernier documentaire que tu as trouvé passionnant ?"
   },
   {
-    "id": 158,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais apprendre une langue instantanément, laquelle serait-ce ?"
   },
   {
-    "id": 410,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est l'inventeur ou le savant que tu admires le plus ?"
   },
   {
-    "id": 408,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est le fait historique qui te semble le plus incroyable ?"
   },
   {
-    "id": 900,
     "type": "verite",
     "category": "Soft",
     "text": "Quel était ton jeu préféré à la récréation ?"
   },
   {
-    "id": 898,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta bêtise préférée pour embêter tes frères et sœurs ?"
   },
   {
-    "id": 156,
     "type": "verite",
     "category": "Soft",
     "text": "Quel événement historique aimerais-tu avoir vécu ?"
   },
   {
-    "id": 150,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle était ta matière préférée à l'école primaire ?"
   },
   {
-    "id": 285,
     "type": "verite",
     "category": "Soft",
     "text": "Quel mot trouves-tu le plus difficile à prononcer correctement ?"
   },
   {
-    "id": 251,
     "type": "verite",
     "category": "Soft",
     "text": "Quel est ton animal de compagnie idéal ?"
   },
   {
-    "id": 406,
     "type": "verite",
     "category": "Soft",
     "text": "Si tu pouvais maîtriser n'importe quelle science instantanément, laquelle choisirais-tu ?"
   },
   {
-    "id": 283,
     "type": "verite",
     "category": "Soft",
     "text": "Quelle période historique te fascine le plus ?"
   },
   {
-    "id": 847,
     "type": "action",
     "category": "Séduction",
     "text": "Fais ton plus beau regard charmeur à la caméra de ton téléphone."
   },
   {
-    "id": 98,
     "type": "action",
     "category": "Séduction",
     "text": "Chuchote une phrase romantique en espagnol à ton voisin."
   },
   {
-    "id": 724,
     "type": "action",
     "category": "Séduction",
     "text": "Raconte ton pire râteau avec beaucoup de détails."
   },
   {
-    "id": 474,
     "type": "action",
     "category": "Séduction",
     "text": "Raconte ton pire râteau avec beaucoup de détails."
   },
   {
-    "id": 972,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'œil sexy au joueur de ton choix."
   },
   {
-    "id": 96,
     "type": "action",
     "category": "Séduction",
     "text": "Fais ton plus beau regard de braise à la personne en face de toi."
   },
   {
-    "id": 347,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'œil charmeur à la caméra de ton téléphone."
   },
   {
-    "id": 222,
     "type": "action",
     "category": "Séduction",
     "text": "Dis 'Je t'aime' de 3 façons différentes (timide, passionné, dramatique)."
   },
   {
-    "id": 224,
     "type": "action",
     "category": "Séduction",
     "text": "Murmure une invitation à dîner à la personne à ta gauche."
   },
   {
-    "id": 472,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'oeil charmeur à la personne que tu trouves la plus attirante ici."
   },
   {
-    "id": 472,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'oeil charmeur à la personne que tu trouves la plus attirante ici."
   },
   {
-    "id": 722,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'œil charmeur à la personne que tu trouves la plus attirante ici."
   },
   {
-    "id": 974,
     "type": "action",
     "category": "Séduction",
     "text": "Raconte ton baiser le plus mémorable."
@@ -6022,25 +4367,21 @@
     "target": "opposite"
   },
   {
-    "id": 474,
     "type": "action",
     "category": "Séduction",
     "text": "Raconte ton pire râteau avec beaucoup de détails."
   },
   {
-    "id": 849,
     "type": "action",
     "category": "Séduction",
     "text": "Dis une phrase romantique en espagnol ou en italien."
   },
   {
-    "id": 100,
     "type": "action",
     "category": "Séduction",
     "text": "Fais un compliment sur la partie du corps préférée d'un joueur."
   },
   {
-    "id": 349,
     "type": "action",
     "category": "Séduction",
     "text": "Raconte une disquette (phrase de drague) de façon ultra sérieuse."
@@ -6056,106 +4397,44 @@
     "category": "Séduction"
   },
   {
-    "id": 846,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton plus gros 'turn-on' chez quelqu'un ?"
   },
   {
-    "id": 97,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton plus gros 'turn-on' chez quelqu'un ?"
   },
   {
-    "id": 346,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le premier détail physique que tu regardes chez quelqu'un ?"
   },
   {
-    "id": 471,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le compliment qui te fait le plus rougir ?"
   },
   {
-    "id": 975,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quelle partie de ton corps préfères-tu mettre en avant ?"
-  },
-  {
-    "id": 473,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est ton plus grand atout physique pour séduire ?"
-  },
-  {
-    "id": 99,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quelle est ta meilleure technique pour draguer en soirée ?"
-  },
-  {
-    "id": 848,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "As-tu déjà embrassé quelqu'un au bout de 5 minutes de rencontre ?"
-  },
-  {
-    "id": 475,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est l'endroit le plus romantique pour un premier baiser ?"
-  },
-  {
-    "id": 971,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton type de rendez-vous idéal ?"
   },
   {
-    "id": 471,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est le compliment qui te fait le plus rougir ?"
-  },
-  {
-    "id": 225,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton type physiquement ?"
   },
   {
-    "id": 473,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est ton plus grand atout physique pour séduire ?"
-  },
-  {
-    "id": 221,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le compliment qui te fait craquer à coup sûr ?"
   },
   {
-    "id": 723,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton plus grand atout physique selon toi ?"
-  },
-  {
-    "id": 223,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quelle est la partie de ton visage que tu trouves la plus attirante ?"
-  },
-  {
-    "id": 725,
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est l'endroit le plus romantique pour un premier baiser ?"
   },
   {
     "text": "{player}, si tu devais passer une nuit avec {target}, où l'emmènerais-tu ?",
@@ -6169,31 +4448,26 @@
     "category": "Séduction"
   },
   {
-    "id": 973,
     "type": "verite",
     "category": "Séduction",
     "text": "Quelle est ta meilleure disquette ?"
   },
   {
-    "id": 350,
     "type": "verite",
     "category": "Séduction",
     "text": "Comment décrirais-tu ton style de séduction ?"
   },
   {
-    "id": 850,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est ton meilleur atout physique pour séduire ?"
   },
   {
-    "id": 475,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est l'endroit le plus romantique pour un premier baiser ?"
   },
   {
-    "id": 348,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le rendez-vous le plus romantique que tu aies eu ?"
@@ -6204,7 +4478,6 @@
     "category": "Séduction"
   },
   {
-    "id": 721,
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le compliment qui te fait rougir à coup sûr ?"
