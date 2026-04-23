@@ -193,12 +193,15 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0,
           actions: [
             // --- BOUTON PARAMÈTRES EN HAUT À DROITE ---
-            IconButton(
-              iconSize: 35,
-              icon: const Icon(Icons.settings, color: Colors.white70),
-              onPressed: _showSettingsDialog,
+            Padding(
+              padding: const EdgeInsets.only(top: 20), // Ajoute 20 pixels d'espace en haut
+              child: IconButton(
+                iconSize: 50, // Augmente la taille de l'icône pour une meilleure accessibilité
+                icon: const Icon(Icons.settings, color: Colors.white70),
+                onPressed: _showSettingsDialog,
+              ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 15), // Espace par rapport à la droite
           ],
         ),
         body: Container(
