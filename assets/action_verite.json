@@ -4188,57 +4188,7 @@
   {
     "type": "verite",
     "category": "Soft",
-    "text": "Qui ici choisirais-tu pour t'aider à cacher un corps (purement fictif) ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle était ta série ou ton dessin animé préféré au primaire ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle est la chute la plus ridicule que tu aies faite en public ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Si tu pouvais avoir n'importe quel robot, lequel choisirais-tu ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Avais-tu un amoureux/amoureuse secret(e) en maternelle ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel univers de fiction (Marvel, Harry Potter, etc.) est le plus cohérent selon toi ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
     "text": "Si tu devais posséder un objet de film (Sabre laser, Anneau unique...), lequel serait-ce ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton jeu vidéo 'plaisir coupable' (dont tu as un peu honte) ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel était le jouet que tu ne voulais absolument pas prêter ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle était ta série ou ton dessin animé préféré au primaire ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le dernier documentaire que tu as trouvé passionnant ?"
   },
   {
     "type": "verite",
@@ -4246,175 +4196,15 @@
     "text": "Si tu pouvais apprendre une langue instantanément, laquelle serait-ce ?"
   },
   {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est l'inventeur ou le savant que tu admires le plus ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est le fait historique qui te semble le plus incroyable ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel était ton jeu préféré à la récréation ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle était ta bêtise préférée pour embêter tes frères et sœurs ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel événement historique aimerais-tu avoir vécu ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle était ta matière préférée à l'école primaire ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel mot trouves-tu le plus difficile à prononcer correctement ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quel est ton animal de compagnie idéal ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Si tu pouvais maîtriser n'importe quelle science instantanément, laquelle choisirais-tu ?"
-  },
-  {
-    "type": "verite",
-    "category": "Soft",
-    "text": "Quelle période historique te fascine le plus ?"
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais ton plus beau regard charmeur à la caméra de ton téléphone."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Chuchote une phrase romantique en espagnol à ton voisin."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Raconte ton pire râteau avec beaucoup de détails."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Raconte ton pire râteau avec beaucoup de détails."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais un clin d'œil sexy au joueur de ton choix."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais ton plus beau regard de braise à la personne en face de toi."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais un clin d'œil charmeur à la caméra de ton téléphone."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Dis 'Je t'aime' de 3 façons différentes (timide, passionné, dramatique)."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Murmure une invitation à dîner à la personne à ta gauche."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais un clin d'oeil charmeur à la personne que tu trouves la plus attirante ici."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais un clin d'oeil charmeur à la personne que tu trouves la plus attirante ici."
-  },
-  {
     "type": "action",
     "category": "Séduction",
     "text": "Fais un clin d'œil charmeur à la personne que tu trouves la plus attirante ici."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Raconte ton baiser le plus mémorable."
   },
   {
     "text": "{player}, assieds-toi sur les genoux de {target} pendant les 2 prochains tours.",
     "type": "action",
     "category": "Séduction",
     "target": "opposite"
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Raconte ton pire râteau avec beaucoup de détails."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Dis une phrase romantique en espagnol ou en italien."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Fais un compliment sur la partie du corps préférée d'un joueur."
-  },
-  {
-    "type": "action",
-    "category": "Séduction",
-    "text": "Raconte une disquette (phrase de drague) de façon ultra sérieuse."
-  },
-  {
-    "text": "{player}, assieds-toi sur les genoux de {target} pendant les 2 prochains tours.",
-    "type": "action",
-    "category": "Séduction"
-  },
-  {
-    "text": "Asseyez-vous sur les genoux de {target} pendant les 2 prochains tours.",
-    "type": "action",
-    "category": "Séduction"
-  },
-  {
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est ton plus gros 'turn-on' chez quelqu'un ?"
-  },
-  {
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est ton plus gros 'turn-on' chez quelqu'un ?"
-  },
-  {
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est le premier détail physique que tu regardes chez quelqu'un ?"
-  },
-  {
-    "type": "verite",
-    "category": "Séduction",
-    "text": "Quel est le compliment qui te fait le plus rougir ?"
   },
   {
     "type": "verite",
