@@ -565,9 +565,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                   onPressed: () async {
                     String pseudo = _pseudoController.text.trim();
                     if (pseudo.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange));
                       return;
                     }
 
@@ -577,45 +575,56 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                       MaterialPageRoute(builder: (context) => const QRScannerScreen()),
                     );
 
-                    // 2. Si le scan a marché
-                    if (result != null && result is Map) {
+                    // Si l'utilisateur a appuyé sur retour sans scanner
+                    if (result == null) return;
+
+                    // 2. Si le scan a marché et renvoie des données
+                    if (result is Map) {
                       setState(() => _isLoading = true);
                       
-                      String scannedLobbyId = result['lobbyId'].toString();
-                      String scannedPassword = result['password'].toString();
+                      String scannedLobbyId = result['lobbyId']?.toString().trim() ?? "";
+                      String scannedPassword = result['password']?.toString().trim() ?? "";
+
+                      // VÉRIFICATION 1 : Est-ce qu'on a bien reçu l'ID ?
+                      if (scannedLobbyId.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erreur: ID introuvable dans le QR Code"), backgroundColor: Colors.red));
+                        setState(() => _isLoading = false);
+                        return;
+                      }
 
                       try {
                         var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
                         
-                        if (!doc.exists || doc.data()?['password'] != scannedPassword) {
-                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lobby introuvable ou mauvais mot de passe."), backgroundColor: Colors.red));
-                        } else {
-                          // On connecte le joueur !
+                        // VÉRIFICATION 2 : Est-ce que le lobby existe sur Firebase ?
+                        if (!doc.exists) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lobby introuvable sur Firebase (ID: $scannedLobbyId)"), backgroundColor: Colors.red));
+                        } 
+                        // VÉRIFICATION 3 : Est-ce que le mot de passe est bon ?
+                        else if (doc.data()?['password'] != scannedPassword) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mauvais mot de passe dans le QR !"), backgroundColor: Colors.red));
+                        } 
+                        // TOUT EST BON : ON CONNECTE !
+                        else {
                           String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
                           await doc.reference.update({
                             'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
                           });
 
                           if (!mounted) return;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WaitingRoomScreen(
-                                lobbyId: scannedLobbyId,
-                                lobbyName: lobbyName,
-                                currentPlayerName: pseudo,
-                                currentPlayerGender: _selectedGender,
-                                isHost: false,
-                                password: scannedPassword,
-                              ),
-                            ),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => WaitingRoomScreen(
+                                lobbyId: scannedLobbyId, lobbyName: lobbyName,
+                                currentPlayerName: pseudo, currentPlayerGender: _selectedGender,
+                                isHost: false, password: scannedPassword,
+                          )));
                         }
                       } catch (e) {
-                        debugPrint("Erreur scan : $e");
+                        // VÉRIFICATION 4 : Erreur de connexion / Firebase
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur système: $e"), backgroundColor: Colors.red));
                       } finally {
                         if (mounted) setState(() => _isLoading = false);
                       }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Format QR non reconnu par l'écran."), backgroundColor: Colors.red));
                     }
                   },
                 ),
