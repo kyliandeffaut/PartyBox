@@ -27,40 +27,44 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         children: [
           MobileScanner(
             onDetect: (capture) {
-              if (_isProcessing) return; // Si on traite déjà un code, on bloque
+              if (_isProcessing) return;
 
               final List<Barcode> barcodes = capture.barcodes;
               for (final barcode in barcodes) {
                 if (barcode.rawValue != null) {
                   setState(() => _isProcessing = true);
-                  
                   String scannedData = barcode.rawValue!;
                   
-                  // On vérifie si c'est un lien Web PartyBox
-                  if (scannedData.startsWith('http') && scannedData.contains('id=')) {
-                    Uri uri = Uri.parse(scannedData);
-                    String? lobbyId = uri.queryParameters['id'];
-                    String? password = uri.queryParameters['pwd'];
-                    
-                    if (lobbyId != null && password != null) {
-                      Navigator.pop(context, {'lobbyId': lobbyId, 'password': password});
+                  // 1. ANALYSE DU NOUVEAU FORMAT (URL)
+                  if (scannedData.contains('id=') && scannedData.contains('pwd=')) {
+                    try {
+                      Uri uri = Uri.parse(scannedData);
+                      String? lobbyId = uri.queryParameters['id'];
+                      String? password = uri.queryParameters['pwd'];
+                      
+                      if (lobbyId != null && password != null) {
+                        Navigator.pop(context, {'lobbyId': lobbyId, 'password': password});
+                        return; // On sort de la fonction
+                      }
+                    } catch (e) {
+                      debugPrint("Erreur de lecture URL : $e");
                     }
                   } 
-                  // L'ancien système de secours au cas où
+                  
+                  // 2. ANALYSE DE L'ANCIEN FORMAT (ID|MDP) - Pour la compatibilité
                   else if (scannedData.contains('|')) {
                     List<String> parts = scannedData.split('|');
                     Navigator.pop(context, {'lobbyId': parts[0], 'password': parts[1]});
-                  } 
-                  // Si c'est un QR Code de menu de restaurant...
-                  else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Ceci n'est pas un code PartyBox ❌"), backgroundColor: Colors.redAccent),
-                    );
-                    Future.delayed(const Duration(seconds: 2), () {
-                      if (mounted) setState(() => _isProcessing = false);
-                    });
+                    return;
                   }
-                  break; // On arrête la boucle dès qu'on a trouvé un code
+
+                  // 3. SI LE CODE EST INVALIDE
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Ceci n'est pas un code PartyBox valide ❌"), backgroundColor: Colors.redAccent),
+                  );
+                  Future.delayed(const Duration(seconds: 2), () {
+                    if (mounted) setState(() => _isProcessing = false);
+                  });
                 }
               }
             },
