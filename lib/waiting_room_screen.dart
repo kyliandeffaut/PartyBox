@@ -7,6 +7,7 @@ import 'je_nai_jamais_screen.dart';
 import 'tribunal_screen.dart';
 import 'tu_prefere_screen.dart';
 import 'main.dart';
+import 'live_chat_widget.dart';
 
 class WaitingRoomScreen extends StatefulWidget {
   final String lobbyId;
@@ -117,6 +118,30 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
+  void _showChatSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A1D),
+      isScrollControlled: true, // Très important pour que le clavier ne cache pas le texte
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return Padding(
+          // Ça permet au chat de remonter tout seul quand le clavier s'ouvre
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6, // Le chat prendra 60% de l'écran quand il est ouvert
+            child: LiveChatWidget(
+              lobbyId: widget.lobbyId,
+              currentPlayerName: widget.currentPlayerName,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -157,6 +182,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        elevation: 8,
+        onPressed: () => _showChatSheet(context),
+        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+      ),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -233,145 +264,151 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   },
                 ),
 
-                const SizedBox(height: 40),
-                const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
-                const SizedBox(height: 20),
+                // --- LISTE DES JOUEURS ---
 
                 Expanded(
-                  child: StreamBuilder<DocumentSnapshot>(
-                    stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
-                      if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 40),
+                      const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
+                      const SizedBox(height: 15),
+                      Expanded(
+                        child: StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
+                            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
 
-                      var data = snapshot.data!.data() as Map<String, dynamic>?;
-                      if (data == null) return const Center(child: Text("Introuvable", style: TextStyle(color: Colors.white)));
+                            var data = snapshot.data!.data() as Map<String, dynamic>?;
+                            if (data == null) return const Center(child: Text("Introuvable", style: TextStyle(color: Colors.white)));
 
-                      List players = data['players'] ?? [];
-                      String hostName = data['host'] ?? '';
+                            List players = data['players'] ?? [];
+                            String hostName = data['host'] ?? '';
 
-                      bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
+                            bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
 
-                      if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (context.mounted) {
-                            Navigator.of(context).pop(); 
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chef t'a expulsé ❌"), backgroundColor: Colors.redAccent));
-                          }
-                        });
-                        return const Center(child: Text("Expulsion...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
-                      }
-
-                      bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
-
-                      if (data['status'] == 'playing' && amIActive) {
-                        if (!_isNavigatingToGame) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (context.mounted) {
-                              setState(() { _isNavigatingToGame = true; });
-
-                              Widget targetScreen;
-                              String gameMode = data['gameMode'] ?? 'Action ou Vérité';
-
-                              if (gameMode == "Je n'ai jamais") {
-                                targetScreen = JeNaiJamaisScreen(
-                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                  isOnline: true,
-                                  lobbyId: widget.lobbyId,
-                                  currentPlayerName: widget.currentPlayerName,
-                                );
-                              } else if (gameMode == "Le Tribunal") {
-                                targetScreen = TribunalScreen(
-                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                  isOnline: true,
-                                  lobbyId: widget.lobbyId,
-                                  currentPlayerName: widget.currentPlayerName,
-                                );
-                              } else if (gameMode == "Tu préfères ?") {
-                                targetScreen = TuPrefereScreen(
-                                  players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                  isOnline: true,
-                                  lobbyId: widget.lobbyId,
-                                  currentPlayerName: widget.currentPlayerName,
-                                );
-                              } else {
-                                targetScreen = ActionVeriteScreen(
-                                  lobbyId: widget.lobbyId,
-                                  category: data['category'] ?? 'Soft',
-                                  isOnline: true,
-                                  currentPlayerName: widget.currentPlayerName,
-                                  currentPlayerGender: widget.currentPlayerGender,
-                                );
-                              }
-
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)).then((_) {
-                                if (context.mounted) setState(() { _isNavigatingToGame = false; });
+                            if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(); 
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chef t'a expulsé ❌"), backgroundColor: Colors.redAccent));
+                                }
                               });
+                              return const Center(child: Text("Expulsion...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
                             }
-                          });
-                        }
-                        return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
-                      }
 
-                      if (players.isEmpty) return const Center(child: Text("Attente...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
+                            bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
 
-                      return ListView.builder(
-                        itemCount: players.length,
-                        itemBuilder: (context, index) {
-                          var player = players[index] as Map<String, dynamic>;
-                          String name = player['name'] ?? "Anonyme";
-                          String gender = player['gender'] ?? "H";
+                            if (data['status'] == 'playing' && amIActive) {
+                              if (!_isNavigatingToGame) {
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  if (context.mounted) {
+                                    setState(() { _isNavigatingToGame = true; });
 
-                          bool isMe = name == widget.currentPlayerName; 
-                          bool isHost = name == hostName; 
-                          bool amIHost = widget.currentPlayerName == hostName; 
-                          
-                          // ✅ LOGIQUE "EN JEU" OU "PRÊT"
-                          bool gameIsActive = data['status'] == 'playing' || (data['activePlayers'] as List? ?? []).isNotEmpty;
-                          bool isInGame = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == name);
+                                    Widget targetScreen;
+                                    String gameMode = data['gameMode'] ?? 'Action ou Vérité';
 
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
-                            child: ListTile(
-                              leading: Icon(Icons.person, color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent),
-                              title: Row(
-                                children: [
-                                  Text(name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
-                                  if (isHost) ...[const SizedBox(width: 8), const Icon(Icons.star, color: Colors.amber, size: 20)]
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min, 
-                                children: [
-                                  if (gameIsActive && isInGame)
-                                    const Text("En jeu 🎮", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold))
-                                  else
-                                    const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
-                                    
-                                  if (amIHost && !isMe) ...[
-                                    const SizedBox(width: 5), 
-                                    IconButton(
-                                      icon: const Icon(Icons.close, color: Colors.redAccent),
-                                      onPressed: () async {
-                                        var doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
-                                        if (doc.exists) {
-                                          List pList = List.from(doc.data()?['players'] ?? []);
-                                          pList.removeWhere((p) => p['name'] == name);
-                                          List aList = List.from(doc.data()?['activePlayers'] ?? []);
-                                          aList.removeWhere((p) => p['name'] == name);
-                                          await doc.reference.update({'players': pList, 'activePlayers': aList});
-                                        }
-                                      },
+                                    if (gameMode == "Je n'ai jamais") {
+                                      targetScreen = JeNaiJamaisScreen(
+                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                        isOnline: true,
+                                        lobbyId: widget.lobbyId,
+                                        currentPlayerName: widget.currentPlayerName,
+                                      );
+                                    } else if (gameMode == "Le Tribunal") {
+                                      targetScreen = TribunalScreen(
+                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                        isOnline: true,
+                                        lobbyId: widget.lobbyId,
+                                        currentPlayerName: widget.currentPlayerName,
+                                      );
+                                    } else if (gameMode == "Tu préfères ?") {
+                                      targetScreen = TuPrefereScreen(
+                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                        isOnline: true,
+                                        lobbyId: widget.lobbyId,
+                                        currentPlayerName: widget.currentPlayerName,
+                                      );
+                                    } else {
+                                      targetScreen = ActionVeriteScreen(
+                                        lobbyId: widget.lobbyId,
+                                        category: data['category'] ?? 'Soft',
+                                        isOnline: true,
+                                        currentPlayerName: widget.currentPlayerName,
+                                        currentPlayerGender: widget.currentPlayerGender,
+                                      );
+                                    }
+
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)).then((_) {
+                                      if (context.mounted) setState(() { _isNavigatingToGame = false; });
+                                    });
+                                  }
+                                });
+                              }
+                              return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
+                            }
+
+                            if (players.isEmpty) return const Center(child: Text("Attente...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
+
+                            return ListView.builder(
+                              itemCount: players.length,
+                              itemBuilder: (context, index) {
+                                var player = players[index] as Map<String, dynamic>;
+                                String name = player['name'] ?? "Anonyme";
+                                String gender = player['gender'] ?? "H";
+
+                                bool isMe = name == widget.currentPlayerName; 
+                                bool isHost = name == hostName; 
+                                bool amIHost = widget.currentPlayerName == hostName; 
+                                
+                                bool gameIsActive = data['status'] == 'playing' || (data['activePlayers'] as List? ?? []).isNotEmpty;
+                                bool isInGame = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == name);
+
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
+                                  child: ListTile(
+                                    leading: Icon(Icons.person, color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent),
+                                    title: Row(
+                                      children: [
+                                        Text(name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
+                                        if (isHost) ...[const SizedBox(width: 8), const Icon(Icons.star, color: Colors.amber, size: 16)]
+                                      ],
                                     ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
-                        },
-                      );
-                    },
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min, 
+                                      children: [
+                                        if (gameIsActive && isInGame)
+                                          const Text("En jeu 🎮", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold))
+                                        else
+                                          const Icon(Icons.check_circle, color: Colors.greenAccent, size: 18),
+                                          
+                                        if (amIHost && !isMe) ...[
+                                          const SizedBox(width: 5), 
+                                          IconButton(
+                                            icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
+                                            onPressed: () async {
+                                              var doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
+                                              if (doc.exists) {
+                                                List pList = List.from(doc.data()?['players'] ?? []);
+                                                pList.removeWhere((p) => p['name'] == name);
+                                                List aList = List.from(doc.data()?['activePlayers'] ?? []);
+                                                aList.removeWhere((p) => p['name'] == name);
+                                                await doc.reference.update({'players': pList, 'activePlayers': aList});
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
