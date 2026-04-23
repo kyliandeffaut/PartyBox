@@ -6,6 +6,7 @@ import 'waiting_room_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'qr_scanner_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 
 // --- ÉCRAN D'ACCUEIL PRINCIPAL ---
 class HomeScreen extends StatefulWidget {
@@ -18,37 +19,42 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // 1. On crée le lecteur audio
   final AudioPlayer _bgmPlayer = AudioPlayer();
-  
-  // ... tes autres variables (_secretTapCount, etc.)
+  // 2. Variables pour le code secret
+  int _secretTapCount = 0;
+  bool _isPremiumUnlocked = false;
+
+  bool _hasMusicStarted = false;
 
   @override
   void initState() {
     super.initState();
-    _checkPremiumStatus(); // On vérifie si c'est déjà débloqué au lancement
-    super.initState();
-    _checkPremiumStatus();
-    _startBackgroundMusic(); // 2. On lance la musique au démarrage
+    _checkPremiumStatus(); 
+    
+    // NOUVEAU : Si on N'EST PAS sur le web (!kIsWeb), on lance direct !
+    if (!kIsWeb) {
+      _startBackgroundMusic();
+    }
   }
 
   // 3. La fonction magique pour la musique
   void _startBackgroundMusic() async {
-    // Règle le lecteur pour qu'il tourne en boucle infinie
-    _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-    
-    // Lance la musique avec un volume à 40% pour ne pas exploser les oreilles
-    await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: 0.4);
+    // Si la musique a déjà démarré, on ne fait rien
+    if (_hasMusicStarted) return; 
+
+    try {
+      _hasMusicStarted = true; // On valide que le son est lancé
+      _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+      await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: 0.4);
+    } catch (e) {
+      debugPrint("❌ Erreur critique Audio : $e");
+    }
   }
 
   @override
   void dispose() {
-    // 4. TRÈS IMPORTANT : On coupe la musique si l'application est fermée
     _bgmPlayer.dispose();
     super.dispose();
   }
-
-  // 1. LES VARIABLES DE L'EASTER EGG
-  int _secretTapCount = 0;
-  bool _isPremiumUnlocked = false; 
 
   Future<void> _checkPremiumStatus() async {
     final prefs = await SharedPreferences.getInstance();
@@ -129,72 +135,76 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: const Color(0xFF101012),
-          image: DecorationImage(
-            image: const AssetImage('assets/images/background.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withValues(alpha: 0.6),
-              BlendMode.darken,
+    // NOUVEAU : Le Listener écoute le tout premier clic sur l'écran
+    return Listener(
+      onPointerDown: (_) => _startBackgroundMusic(),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFF101012),
+            image: DecorationImage(
+              image: const AssetImage('assets/images/background.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withValues(alpha: 0.6),
+                BlendMode.darken,
+              ),
             ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // ON REND LE TITRE CLIQUABLE
-              GestureDetector(
-                onTap: _handleSecretTap,
-                child: const Text(
-                  "PARTYBOX",
-                  style: TextStyle(
-                    fontSize: 45,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 8,
-                    shadows: [
-                      Shadow(color: Colors.pinkAccent, blurRadius: 20),
-                      Shadow(color: Colors.blueAccent, blurRadius: 40),
-                    ],
-                  ),
-                )
-                .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                .scaleXY(end: 1.15, duration: 2.seconds)
-                .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
-              ),
-
-              // Petit indicateur discret (optionnel, pour que tu saches si c'est activé)
-              if (_isPremiumUnlocked)
-                const Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Text("👑 Version VIP", style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // ON REND LE TITRE CLIQUABLE
+                GestureDetector(
+                  onTap: _handleSecretTap,
+                  child: const Text(
+                    "PARTYBOX",
+                    style: TextStyle(
+                      fontSize: 45,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 8,
+                      shadows: [
+                        Shadow(color: Colors.pinkAccent, blurRadius: 20),
+                        Shadow(color: Colors.blueAccent, blurRadius: 40),
+                      ],
+                    ),
+                  )
+                  .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                  .scaleXY(end: 1.15, duration: 2.seconds)
+                  .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
                 ),
 
-              const SizedBox(height: 80),
+                // Petit indicateur discret (optionnel, pour que tu saches si c'est activé)
+                if (_isPremiumUnlocked)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text("👑 Version VIP", style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
 
-              _mainButton(context, "CRÉER UN LOBBY", Icons.add_moderator, Colors.pinkAccent, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateLobbyScreen()));
-              }),
+                const SizedBox(height: 80),
 
-              const SizedBox(height: 20),
+                _mainButton(context, "CRÉER UN LOBBY", Icons.add_moderator, Colors.pinkAccent, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateLobbyScreen()));
+                }),
 
-              _mainButton(context, "REJOINDRE UN LOBBY", Icons.login, Colors.blueAccent, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const JoinLobbyScreen()));
-              }),
+                const SizedBox(height: 20),
 
-              const SizedBox(height: 50),
-              const Divider(color: Colors.white24, indent: 50, endIndent: 50),
-              const SizedBox(height: 30),
+                _mainButton(context, "REJOINDRE UN LOBBY", Icons.login, Colors.blueAccent, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const JoinLobbyScreen()));
+                }),
 
-              _mainButton(context, "JOUER EN LOCAL", Icons.phone_android, Colors.greenAccent, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const PlayerScreen()));
-              }),
-            ],
+                const SizedBox(height: 50),
+                const Divider(color: Colors.white24, indent: 50, endIndent: 50),
+                const SizedBox(height: 30),
+
+                _mainButton(context, "JOUER EN LOCAL", Icons.phone_android, Colors.greenAccent, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const PlayerScreen()));
+                }),
+              ],
+            ),
           ),
         ),
       ),
