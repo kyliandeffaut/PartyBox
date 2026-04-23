@@ -189,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         extendBodyBehindAppBar: true, // Permet à l'image de fond d'être sous l'appbar
         appBar: AppBar(
-          toolbarHeight: 90, // On agrandit la boîte de l'AppBar !
+          toolbarHeight: 70, // On agrandit la boîte de l'AppBar !
           backgroundColor: Colors.transparent,
           elevation: 0,
           actions: [
@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 20), // Ajoute 20 pixels d'espace en haut
               child: IconButton(
-                iconSize: 50, // Augmente la taille de l'icône pour une meilleure accessibilité
+                iconSize: 45, // Augmente la taille de l'icône pour une meilleure accessibilité
                 icon: const Icon(Icons.settings, color: Colors.white70),
                 onPressed: _showSettingsDialog,
               ),
@@ -267,6 +267,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 _mainButton(context, "JOUER EN LOCAL", Icons.phone_android, Colors.greenAccent, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const PlayerScreen()));
                 }),
+                
+                // Placée en bas, elle repousse tout ton bloc central vers le haut !
+                const SizedBox(height: 50),
               ],
             ),
           ),
