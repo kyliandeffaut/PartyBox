@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'waiting_room_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'qr_scanner_screen.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 // --- ÉCRAN D'ACCUEIL PRINCIPAL ---
 class HomeScreen extends StatefulWidget {
@@ -15,15 +16,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // 1. LES VARIABLES DE L'EASTER EGG
-  int _secretTapCount = 0;
-  bool _isPremiumUnlocked = false; 
+  // 1. On crée le lecteur audio
+  final AudioPlayer _bgmPlayer = AudioPlayer();
+  
+  // ... tes autres variables (_secretTapCount, etc.)
 
   @override
   void initState() {
     super.initState();
     _checkPremiumStatus(); // On vérifie si c'est déjà débloqué au lancement
+    super.initState();
+    _checkPremiumStatus();
+    _startBackgroundMusic(); // 2. On lance la musique au démarrage
   }
+
+  // 3. La fonction magique pour la musique
+  void _startBackgroundMusic() async {
+    // Règle le lecteur pour qu'il tourne en boucle infinie
+    _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    
+    // Lance la musique avec un volume à 40% pour ne pas exploser les oreilles
+    await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: 0.4);
+  }
+
+  @override
+  void dispose() {
+    // 4. TRÈS IMPORTANT : On coupe la musique si l'application est fermée
+    _bgmPlayer.dispose();
+    super.dispose();
+  }
+
+  // 1. LES VARIABLES DE L'EASTER EGG
+  int _secretTapCount = 0;
+  bool _isPremiumUnlocked = false; 
 
   Future<void> _checkPremiumStatus() async {
     final prefs = await SharedPreferences.getInstance();
