@@ -37,12 +37,12 @@
   {
     "type": "verite",
     "category": "Bar",
-    "text": "Quelle est la pire chose que tu aies faite en étant ivre ?"
+    "text": "Quelle est ta chanson de karaoké préférée ?"
   },
   {
     "type": "verite",
     "category": "Bar",
-    "text": "Quel est le bar le plus stylé que tu aies jamais visité ?"
+    "text": "As-tu déjà quitté un bar sans payer (volontairement ou non) ?"
   },
   {
     "type": "verite",
@@ -82,7 +82,7 @@
   {
     "type": "verite",
     "category": "Bar",
-    "text": "Quelle est ta chanson de karaoké préférée ?"
+    "text": "Quelle est la pire chose que tu aies faite en étant ivre ?"
   },
   {
     "type": "verite",
@@ -102,7 +102,7 @@
   {
     "type": "verite",
     "category": "Bar",
-    "text": "As-tu déjà quitté un bar sans payer (volontairement ou non) ?"
+    "text": "Quel est le bar le plus stylé que tu aies jamais visité ?"
   },
   {
     "type": "verite",
@@ -120,14 +120,69 @@
     "text": "Fais une liste de 3 choses que tu changerais chez ton/ta partenaire ."
   },
   {
+    "text": "{player}, fais un bisou là où {target} le décide.",
     "type": "action",
-    "category": "Couple",
-    "text": "Fais un massage des mains sensuel à un autre joueur."
+    "category": "Couple"
   },
   {
     "text": "{player}, fais un bisou là où {target} le décide.",
     "type": "action",
     "category": "Couple"
+  },
+  {
+    "type": "action",
+    "category": "Couple",
+    "text": "Fais un massage des mains sensuel à un autre joueur."
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus romantique que tu aies faite pour quelqu'un ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la première chose qui t'a attiré chez ton partenaire actuel ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus romantique que tu aies faite ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la première chose qui t'a attiré chez ton/ta partenaire actuel(le) ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus folle que tu aies faite par amour ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus romantique que tu aies reçue de quelqu'un ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus romantique que tu aies reçue de quelqu'un ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la première chose qui t'a attiré chez ton/ta partenaire actuel(le) ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la dispute la plus bête que tu aies eue avec un partenaire ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {target} ?"
   },
   {
     "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {target} ?",
@@ -160,15 +215,34 @@
     "text": "Quelle est la qualité que tu apprécies le plus chez ton partenaire ?"
   },
   {
-    "text": "{player}, fais un bisou dans le cou de {target}.",
-    "type": "action",
-    "category": "Hot",
-    "target": "opposite"
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la chose la plus folle que tu aies faite par amour ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la pire dispute que tu aies eue avec un partenaire ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la pire dispute que tu aies eue avec un partenaire ?"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la qualité que tu apprécies le plus chez ton partenaire ?"
   },
   {
     "type": "action",
     "category": "Hot",
-    "text": "Masse les mains d'un joueur de façon sensuelle."
+    "text": "Enlève le haut pour les 3 prochains tours."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Fais un bisou dans le cou du joueur de ton choix."
   },
   {
     "type": "action",
@@ -241,9 +315,10 @@
     "text": "Fais un massage sensuel des épaules à ton voisin de gauche."
   },
   {
+    "text": "{player}, fais un bisou dans le cou de {target}.",
     "type": "action",
     "category": "Hot",
-    "text": "Enlève le haut pour les 3 prochains tours."
+    "target": "opposite"
   },
   {
     "type": "action",
@@ -312,7 +387,7 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Fais un bisou dans le cou du joueur de ton choix."
+    "text": "Masse les mains d'un joueur de façon sensuelle."
   },
   {
     "text": "{player}, masse le dos de {target} sous son vêtement pendant 1 minute.",
@@ -454,7 +529,7 @@
   {
     "type": "action",
     "category": "Sans Filtre",
-    "text": "Mélange 4 boissons différentes et bois un fond de verre."
+    "text": "Demande à chaque joueur de te décrire en un seul mot."
   },
   {
     "text": "{player}, fais un massage des épaules de 2 minutes à {target}.",
@@ -470,6 +545,11 @@
     "text": "Regarde {target} dans les yeux pendant 1 minute sans rigoler. Si tu perds, tu fais 10 pompes.",
     "type": "action",
     "category": "Sans Filtre"
+  },
+  {
+    "type": "action",
+    "category": "Sans Filtre",
+    "text": "Laisse quelqu'un fouiller dans ton téléphone pendant 30 secondes."
   },
   {
     "type": "action",
@@ -532,20 +612,19 @@
     "text": "Appelle ton dernier ex et raccroche dès qu'il/elle répond."
   },
   {
-    "text": "Dis-nous le pire défaut de {target} selon toi.",
-    "type": "verite",
+    "type": "action",
+    "category": "Sans Filtre",
+    "text": "Raconte une rumeur (fausse ou vraie)"
+  },
+  {
+    "text": "Échange tes chaussettes avec {target} pendant 5 minutes.",
+    "type": "action",
     "category": "Sans Filtre"
   },
   {
-    "text": "De 1 à 10, quelle note donnerais-tu au charme de {target} ?",
-    "type": "verite",
+    "type": "action",
     "category": "Sans Filtre",
-    "target": "femme"
-  },
-  {
-    "type": "verite",
-    "category": "Sans Filtre",
-    "text": "Quel est le montant maximum que tu pourrais prêter à un ami sans hésiter ?"
+    "text": "Mélange 4 boissons différentes et bois un fond de verre."
   },
   {
     "type": "verite",
@@ -553,9 +632,10 @@
     "text": "Quelle est la chose que tu regrettes le plus dans ta dernière relation ?"
   },
   {
+    "text": "{player} de 1 à 10, quelle note donnerais-tu au charme de {target} ?",
     "type": "verite",
     "category": "Sans Filtre",
-    "text": "Quelle est la chose que ton ex détestait le plus chez toi ?"
+    "target": "opposite"
   },
   {
     "text": "{player}, quel est le pire défaut de {target} selon toi ? Sois honnête.",
@@ -576,7 +656,7 @@
     "text": "Trouves-tu que {target} a un beau style vestimentaire ? Sois honnête.",
     "type": "verite",
     "category": "Sans Filtre",
-    "target": "homme"
+    "target": "opposite"
   },
   {
     "type": "verite",
@@ -584,14 +664,29 @@
     "text": "Quelle est la chose la plus illégale que tu aies jamais faite ?"
   },
   {
-    "type": "action",
-    "category": "Soft",
-    "text": "Raconte une rumeur (fausse ou vraie)"
+    "text": "Dis-nous le pire défaut de {target} selon toi.",
+    "type": "verite",
+    "category": "Sans Filtre"
+  },
+  {
+    "type": "verite",
+    "category": "Sans Filtre",
+    "text": "Quel est le montant maximum que tu pourrais prêter à un ami sans hésiter ?"
+  },
+  {
+    "type": "verite",
+    "category": "Sans Filtre",
+    "text": "Quelle est la chose que ton ex détestait le plus chez toi ?"
   },
   {
     "type": "action",
     "category": "Soft",
-    "text": "Demande à chaque joueur de te décrire en un seul mot."
+    "text": "Désigne la personne qui pourrait survivre le plus longtemps sur une île déserte."
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Fais un clin d'œil à chaque personne sans rire."
   },
   {
     "text": "Échange tes chaussettes avec {target} pendant 5 minutes.",
@@ -646,7 +741,7 @@
   {
     "type": "action",
     "category": "Soft",
-    "text": "Fais un clin d'œil à chaque personne sans rire."
+    "text": "Demande à chaque joueur de te décrire en un seul mot."
   },
   {
     "type": "action",
@@ -676,7 +771,7 @@
   {
     "type": "action",
     "category": "Soft",
-    "text": "Désigne la personne qui pourrait survivre le plus longtemps sur une île déserte."
+    "text": "Raconte une rumeur (fausse ou vraie)"
   },
   {
     "text": "Fais un câlin de 10 secondes à {target}.",
@@ -706,7 +801,7 @@
   {
     "type": "action",
     "category": "Soft",
-    "text": "Trouve un point commun avec chaque personne présente."
+    "text": "Dis 'Bonjour' dans 5 langues différentes."
   },
   {
     "text": "Laisse {target} te maquiller (ou te recoiffer) pendant 1 minute.",
@@ -717,7 +812,7 @@
   {
     "type": "action",
     "category": "Soft",
-    "text": "Dis 'Bonjour' dans 5 langues différentes."
+    "text": "Trouve un point commun avec chaque personne présente."
   },
   {
     "type": "verite",
@@ -767,12 +862,12 @@
   {
     "type": "verite",
     "category": "Soft",
-    "text": "Tu préfères voyager dans le passé et rencontrer tes ancêtres ou dans le futur et voir tes descendants ?"
+    "text": "Si tu devais posséder un objet de film (Sabre laser, Anneau unique...), lequel serait-ce ?"
   },
   {
     "type": "verite",
     "category": "Soft",
-    "text": "Si tu devais posséder un objet de film (Sabre laser, Anneau unique...), lequel serait-ce ?"
+    "text": "Tu préfères voyager dans le passé et rencontrer tes ancêtres ou dans le futur et voir tes descendants ?"
   },
   {
     "type": "action",
@@ -850,5 +945,15 @@
     "type": "verite",
     "category": "Séduction",
     "text": "Quel est le compliment qui te fait rougir à coup sûr ?"
+  },
+  {
+    "type": "verite",
+    "category": "Séduction",
+    "text": "Préfères-tu faire le premier pas ou qu'on vienne t'aborder ?"
+  },
+  {
+    "type": "verite",
+    "category": "Séduction",
+    "text": "Quel est ton 'Red Flag' absolu, le truc qui te fait fuir immédiatement lors d'un premier date ?"
   }
 ]
