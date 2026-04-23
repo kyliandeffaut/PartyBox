@@ -38,6 +38,10 @@ class _TribunalScreenState extends State<TribunalScreen> {
 
   static const String _fieldQuestion = 'currentQuestion';
 
+  // --- 🔄 VARIABLES POUR LE MODE LOCAL (Hors-ligne) ---
+  final Map<String, int> _localVotes = {};
+  int _localVoteCount = 0;
+
   @override
   void initState() {
     super.initState();
@@ -109,7 +113,6 @@ class _TribunalScreenState extends State<TribunalScreen> {
         _isLoading = false;
       });
 
-      // Auto pick au lancement si vide
       if (amIHost && (_currentQuestion == "Le chef choisit..." || data[_fieldQuestion] == null)) {
         _nextQuestionOnline();
       }
@@ -177,19 +180,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
     if (widget.lobbyId == null) return;
     if (_questions.isEmpty) {
       await _loadQuestions();
-      if (_questions.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Impossible de charger les questions (Tribunal). Vérifie l'asset puis redémarre l'app.",
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
-          );
-        }
-        return;
-      }
+      if (_questions.isEmpty) return;
     }
 
     final String newQ = _questions[Random().nextInt(_questions.length)];
@@ -222,25 +213,42 @@ class _TribunalScreenState extends State<TribunalScreen> {
       });
     } catch (e) {
       debugPrint("Erreur update Firestore (Tribunal): $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Impossible de mettre à jour la question. Réessaie."),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-      }
     }
   }
 
+  // --- 🔄 FONCTIONS POUR LE MODE LOCAL ---
   void _pickNextLocal() {
     if (_questions.isEmpty) return;
     setState(() {
       _currentQuestion = _questions[Random().nextInt(_questions.length)];
       _hasVotedThisTurn = false;
       _myVoteTarget = null;
+      _localVotes.clear(); // On réinitialise les votes locaux
+      _localVoteCount = 0; // On remet le compteur à zéro
     });
   }
+
+  void _handleLocalVote(String targetName) {
+    setState(() {
+      _localVotes[targetName] = (_localVotes[targetName] ?? 0) + 1;
+      _localVoteCount++;
+
+      // Si tout le monde a voté, on affiche les résultats
+      if (_localVoteCount >= widget.players.length) {
+        _hasVotedThisTurn = true; 
+      } else {
+        // Affiche un petit message pour dire de passer le téléphone
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Vote enregistré ! Passe le téléphone à ${widget.players[_localVoteCount].name}"),
+            duration: const Duration(seconds: 1, milliseconds: 500),
+            backgroundColor: Colors.purpleAccent,
+          ),
+        );
+      }
+    });
+  }
+  // ---------------------------------------
 
   Widget _glassCard({required Widget child}) {
     return Container(
@@ -295,16 +303,18 @@ class _TribunalScreenState extends State<TribunalScreen> {
                         final data = snap.data!.data() as Map<String, dynamic>;
                         fbPlayers = data['activePlayers'] ?? [];
                       }
+                      
+                      // 🔄 CHOIX DYNAMIQUE (LIGNE OU LOCAL) POUR LES STATS
                       final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
-                      final counts = widget.isOnline ? _countVotes(fbPlayers) : <String, int>{};
-                      final totalVotes = widget.isOnline ? fbPlayers.length : 0;
+                      final counts = widget.isOnline ? _countVotes(fbPlayers) : _localVotes;
+                      final totalVotes = widget.isOnline ? fbPlayers.length : _localVoteCount;
 
                       return Column(
                         children: [
                           const SizedBox(height: 10),
-                          Text(
+                          const Text(
                             "LE TRIBUNAL • QUI DE NOUS DEUX ?",
-                            style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 13),
+                            style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 13),
                           ),
                           const SizedBox(height: 16),
                           _glassCard(
@@ -332,6 +342,12 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                 itemBuilder: (context, i) {
                                   final p = widget.players[i];
                                   final isMe = widget.isOnline && p.name == widget.currentPlayerName;
+                                  
+                                  // En local, on ne s'affiche pas soi-même dans la liste pour ne pas voter pour soi
+                                  if (!widget.isOnline && p.name == widget.players[_localVoteCount].name) {
+                                    return const SizedBox(); 
+                                  }
+
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 10),
                                     decoration: BoxDecoration(
@@ -357,10 +373,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                               if (widget.isOnline) {
                                                 _voteOnline(p.name);
                                               } else {
-                                                setState(() {
-                                                  _hasVotedThisTurn = true;
-                                                  _myVoteTarget = p.name;
-                                                });
+                                                _handleLocalVote(p.name); // 👈 Appel local
                                               }
                                             },
                                     ),
@@ -369,11 +382,14 @@ class _TribunalScreenState extends State<TribunalScreen> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            if (widget.isOnline)
-                              Text(
-                                _hasVotedThisTurn ? "Vote envoyé ✅" : "Choisis un joueur…",
-                                style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.white38),
-                              ),
+                            Text(
+                              _hasVotedThisTurn 
+                                ? "Vote envoyé ✅" 
+                                : (widget.isOnline 
+                                    ? "Choisis un joueur…" 
+                                    : "Au tour de ${widget.players[_localVoteCount].name} de voter !"),
+                              style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, fontWeight: FontWeight.bold),
+                            ),
                             const SizedBox(height: 10),
                           ] else ...[
                             const Text("RÉSULTATS", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2)),
@@ -408,7 +424,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                       ),
                                     ).animate().fadeIn().slideY(begin: 0.1);
                                   }).toList()),
-                                  if (_myVoteTarget != null)
+                                  if (widget.isOnline && _myVoteTarget != null)
                                     _glassCard(
                                       child: Text(
                                         "Ton vote : $_myVoteTarget",
@@ -458,4 +474,3 @@ class _TribunalScreenState extends State<TribunalScreen> {
     );
   }
 }
-

@@ -39,6 +39,9 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
 
   static const String _fieldQuestion = 'currentQuestion';
 
+  final Map<String, int> _localChoices = {'A': 0, 'B': 0};
+  int _localVoteCount = 0;
+
   @override
   void initState() {
     super.initState();
@@ -190,22 +193,8 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
 
   Future<void> _nextQuestionOnline() async {
     if (widget.lobbyId == null) return;
-    if (_questions.isEmpty) {
-      await _loadQuestions();
-      if (_questions.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Impossible de charger les questions (Tu préfères ?). Vérifie l'asset puis redémarre l'app.",
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
-          );
-        }
-        return;
-      }
-    }
+    if (_questions.isEmpty) return;
+    
     final q = _questions[Random().nextInt(_questions.length)];
 
     try {
@@ -236,17 +225,10 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
       });
     } catch (e) {
       debugPrint("Erreur update Firestore (Tu préfères): $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Impossible de mettre à jour la question. Réessaie."),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-      }
     }
   }
 
+  // --- 🔄 FONCTIONS POUR LE MODE LOCAL ---
   void _pickNextLocal() {
     if (_questions.isEmpty) return;
     final q = _questions[Random().nextInt(_questions.length)];
@@ -255,8 +237,31 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
       _optionB = q['b'] ?? '';
       _hasVotedThisTurn = false;
       _myChoice = null;
+      _localChoices['A'] = 0;
+      _localChoices['B'] = 0;
+      _localVoteCount = 0;
     });
   }
+
+  void _handleLocalChoice(String choice) {
+    setState(() {
+      _localChoices[choice] = (_localChoices[choice] ?? 0) + 1;
+      _localVoteCount++;
+
+      if (_localVoteCount >= widget.players.length) {
+        _hasVotedThisTurn = true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Choix enregistré ! Passe le téléphone à ${widget.players[_localVoteCount].name}"),
+            duration: const Duration(seconds: 1, milliseconds: 500),
+            backgroundColor: Colors.purpleAccent,
+          ),
+        );
+      }
+    });
+  }
+  // ---------------------------------------
 
   Widget _choiceButton({
     required String label,
@@ -332,9 +337,11 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                         fbPlayers = data['activePlayers'] ?? [];
                       }
 
+                      // 🔄 CHOIX DYNAMIQUE (LIGNE OU LOCAL) POUR LES STATS
                       final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
-                      final counts = widget.isOnline ? _countChoices(fbPlayers) : {'A': 0, 'B': 0};
-                      final total = widget.isOnline ? fbPlayers.length : 0;
+                      final counts = widget.isOnline ? _countChoices(fbPlayers) : _localChoices;
+                      final total = widget.isOnline ? fbPlayers.length : _localVoteCount;
+                      
                       final int a = counts['A'] ?? 0;
                       final int b = counts['B'] ?? 0;
                       final int pctA = total == 0 ? 0 : ((a / total) * 100).round();
@@ -366,10 +373,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                     if (widget.isOnline) {
                                       _voteOnline('A');
                                     } else {
-                                      setState(() {
-                                        _hasVotedThisTurn = true;
-                                        _myChoice = 'A';
-                                      });
+                                      _handleLocalChoice('A'); // 👈 Appel local
                                     }
                                   },
                                 ),
@@ -382,10 +386,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                     if (widget.isOnline) {
                                       _voteOnline('B');
                                     } else {
-                                      setState(() {
-                                        _hasVotedThisTurn = true;
-                                        _myChoice = 'B';
-                                      });
+                                      _handleLocalChoice('B'); // 👈 Appel local
                                     }
                                   },
                                 ),
@@ -397,8 +398,12 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
 
                           if (!allVoted) ...[
                             Text(
-                              _hasVotedThisTurn ? "Vote envoyé ✅" : "Choisis… (vote secret)",
-                              style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.white38, fontWeight: FontWeight.bold),
+                              _hasVotedThisTurn 
+                                ? "Vote envoyé ✅" 
+                                : (widget.isOnline 
+                                    ? "Choisis… (vote secret)" 
+                                    : "Au tour de ${widget.players[_localVoteCount].name} de choisir !"),
+                              style: TextStyle(color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
                             Expanded(
@@ -453,10 +458,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                   const SizedBox(height: 8),
                                   Text(majority, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
                                   Text(minority, style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
-                                  if (_myChoice != null) ...[
-                                    const SizedBox(height: 8),
-                                    Text("Ton vote : $_myChoice", style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
-                                  ],
                                 ],
                               ),
                             ).animate().fadeIn().scale(),
@@ -489,4 +490,3 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
     );
   }
 }
-
