@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:779421460538:android:686a2230f3836746fbed03",
+        "android_client_info": {
+          "package_name": "com.deffautstudio.partybox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtp_A4D1enVeSSlChOG1eXLRlL_7xJok4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:779421460538:android:f84f23abfd1634cdfbed03",
         "android_client_info": {
           "package_name": "com.example.action_verite"

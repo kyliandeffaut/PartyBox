@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBtp_A4D1enVeSSlChOG1eXLRlL_7xJok4',
-    appId: '1:779421460538:android:f84f23abfd1634cdfbed03',
+    appId: '1:779421460538:android:686a2230f3836746fbed03',
     messagingSenderId: '779421460538',
     projectId: 'partybox-98bce',
     storageBucket: 'partybox-98bce.firebasestorage.app',
@@ -60,7 +60,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB5z6Eh_4Rhcggh0zldls7OStFTpvYNpbo',
-    appId: '1:779421460538:ios:bb2c7a7d050812a1fbed03',
+    appId: '1:779421460538:ios:c932699d057aa5d2fbed03',
     messagingSenderId: '779421460538',
     projectId: 'partybox-98bce',
     storageBucket: 'partybox-98bce.firebasestorage.app',
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '779421460538',
     projectId: 'partybox-98bce',
     storageBucket: 'partybox-98bce.firebasestorage.app',
-    iosBundleId: 'com.deffautstudio.partybox',
+    iosBundleId: 'com.example.actionVerite',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -84,4 +84,5 @@ class DefaultFirebaseOptions {
     authDomain: 'partybox-98bce.firebaseapp.com',
     storageBucket: 'partybox-98bce.firebasestorage.app',
   );
+
 }
