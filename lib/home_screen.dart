@@ -344,88 +344,6 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
                     _genderButton(label: "FEMME", value: "F"),
                   ],
                 ),
-
-                // --- BOUTON DE SCAN QR CODE ---
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent.withValues(alpha: 0.2),
-                    side: const BorderSide(color: Colors.pinkAccent),
-                    minimumSize: const Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  ),
-                  icon: const Icon(Icons.qr_code_scanner, color: Colors.pinkAccent),
-                  label: const Text(
-                    "SCANNER UN QR CODE",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
-                  ),
-                  onPressed: () async {
-                    String pseudo = _pseudoController.text.trim();
-                    if (pseudo.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange),
-                      );
-                      return;
-                    }
-
-                    // 1. Ouvre la caméra
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
-                    );
-
-                    // 2. Si le scan a marché
-                    if (result != null && result is Map<String, String>) {
-                      setState(() => _isLoading = true);
-                      
-                      String scannedLobbyId = result['lobbyId']!;
-                      String scannedPassword = result['password']!;
-
-                      try {
-                        var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
-                        
-                        if (!doc.exists || doc.data()?['password'] != scannedPassword) {
-                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lobby introuvable ou mauvais mot de passe."), backgroundColor: Colors.red));
-                        } else {
-                          // On connecte le joueur !
-                          String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
-                          await doc.reference.update({
-                            'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
-                          });
-
-                          if (!mounted) return;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WaitingRoomScreen(
-                                lobbyId: scannedLobbyId,
-                                lobbyName: lobbyName,
-                                currentPlayerName: pseudo,
-                                currentPlayerGender: _selectedGender,
-                                isHost: false,
-                                password: scannedPassword,
-                              ),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        debugPrint("Erreur scan : $e");
-                      } finally {
-                        if (mounted) setState(() => _isLoading = false);
-                      }
-                    }
-                  },
-                ),
-                
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Row(
-                    children: [
-                      Expanded(child: Divider(color: Colors.white24)),
-                      Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text("OU", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold))),
-                      Expanded(child: Divider(color: Colors.white24)),
-                    ],
-                  ),
-                ),
                 
                 const SizedBox(height: 30),
                 const Divider(color: Colors.white24),
@@ -628,7 +546,90 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                     _genderButton(label: "FEMME", value: "F"),
                   ],
                 ),
+
+                const SizedBox(height: 25),
+
+                // --- BOUTON DE SCAN QR CODE ---
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent.withValues(alpha: 0.2),
+                    side: const BorderSide(color: Colors.pinkAccent),
+                    minimumSize: const Size(double.infinity, 55),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  ),
+                  icon: const Icon(Icons.qr_code_scanner, color: Colors.pinkAccent),
+                  label: const Text(
+                    "SCANNER UN QR CODE",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
+                  ),
+                  onPressed: () async {
+                    String pseudo = _pseudoController.text.trim();
+                    if (pseudo.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange),
+                      );
+                      return;
+                    }
+
+                    // 1. Ouvre la caméra
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+                    );
+
+                    // 2. Si le scan a marché
+                    if (result != null && result is Map<String, String>) {
+                      setState(() => _isLoading = true);
+                      
+                      String scannedLobbyId = result['lobbyId']!;
+                      String scannedPassword = result['password']!;
+
+                      try {
+                        var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
+                        
+                        if (!doc.exists || doc.data()?['password'] != scannedPassword) {
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lobby introuvable ou mauvais mot de passe."), backgroundColor: Colors.red));
+                        } else {
+                          // On connecte le joueur !
+                          String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
+                          await doc.reference.update({
+                            'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
+                          });
+
+                          if (!mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WaitingRoomScreen(
+                                lobbyId: scannedLobbyId,
+                                lobbyName: lobbyName,
+                                currentPlayerName: pseudo,
+                                currentPlayerGender: _selectedGender,
+                                isHost: false,
+                                password: scannedPassword,
+                              ),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint("Erreur scan : $e");
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    }
+                  },
+                ),
                 
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                    children: [
+                      Expanded(child: Divider(color: Colors.white24)),
+                      Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text("OU", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold))),
+                      Expanded(child: Divider(color: Colors.white24)),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 25),
                 _buildInput(controller: _nameController, hint: "Nom du Lobby", icon: Icons.meeting_room),
                 const SizedBox(height: 20),
