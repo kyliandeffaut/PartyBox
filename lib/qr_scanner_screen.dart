@@ -58,9 +58,13 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     return;
                   }
 
-                  // 3. SI LE CODE EST INVALIDE
+                  // 3. SI LE CODE EST INVALIDE (Le Mouchard)
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Ceci n'est pas un code PartyBox valide ❌"), backgroundColor: Colors.redAccent),
+                    SnackBar(
+                      content: Text("La caméra a lu : $scannedData", style: const TextStyle(fontSize: 12)), 
+                      backgroundColor: Colors.redAccent,
+                      duration: const Duration(seconds: 6), // Laisse 6 secondes pour bien lire
+                    ),
                   );
                   Future.delayed(const Duration(seconds: 2), () {
                     if (mounted) setState(() => _isProcessing = false);
