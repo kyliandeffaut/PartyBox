@@ -581,8 +581,8 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                     if (result != null && result is Map) {
                       setState(() => _isLoading = true);
                       
-                      String scannedLobbyId = result['lobbyId']!;
-                      String scannedPassword = result['password']!;
+                      String scannedLobbyId = result['lobbyId'].toString();
+                      String scannedPassword = result['password'].toString();
 
                       try {
                         var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
