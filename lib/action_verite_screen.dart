@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'live_chat_fab.dart';
 
 class GamePlayer {
   final String name;
@@ -316,6 +317,10 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        floatingActionButton: LiveChatFAB(
+          lobbyId: widget.lobbyId!,
+          currentPlayerName: widget.currentPlayerName!,
+        ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

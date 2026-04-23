@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'main.dart';
+import 'live_chat_fab.dart';
 
 class JeNaiJamaisScreen extends StatefulWidget {
   final List<Player> players;
@@ -347,6 +348,10 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        floatingActionButton: LiveChatFAB(
+          lobbyId: widget.lobbyId!,
+          currentPlayerName: widget.currentPlayerName!,
+        ),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,

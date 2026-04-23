@@ -7,7 +7,7 @@ import 'je_nai_jamais_screen.dart';
 import 'tribunal_screen.dart';
 import 'tu_prefere_screen.dart';
 import 'main.dart';
-import 'live_chat_widget.dart';
+import 'live_chat_fab.dart';
 
 class WaitingRoomScreen extends StatefulWidget {
   final String lobbyId;
@@ -118,30 +118,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
-  void _showChatSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A1D),
-      isScrollControlled: true, // Très important pour que le clavier ne cache pas le texte
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) {
-        return Padding(
-          // Ça permet au chat de remonter tout seul quand le clavier s'ouvre
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6, // Le chat prendra 60% de l'écran quand il est ouvert
-            child: LiveChatWidget(
-              lobbyId: widget.lobbyId,
-              currentPlayerName: widget.currentPlayerName,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -182,12 +158,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blueAccent,
-        elevation: 8,
-        onPressed: () => _showChatSheet(context),
-        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-      ),
+        floatingActionButton: LiveChatFAB(
+          lobbyId: widget.lobbyId,
+          currentPlayerName: widget.currentPlayerName,
+        ),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
