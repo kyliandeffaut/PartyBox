@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'action_verite_screen.dart';
 import 'je_nai_jamais_screen.dart';
 import 'tribunal_screen.dart';
@@ -62,6 +63,54 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     } catch (e) {
       debugPrint("Erreur sortie lobby : $e");
     }
+  }
+
+  void _showQRCodeDialog(BuildContext context, String lobbyId, String password) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1D),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text(
+            'SCANNE-MOI',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Tes amis peuvent scanner ce code pour rejoindre le lobby instantanément !',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+              // LE FAMEUX QR CODE
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Fond blanc obligatoire pour le contraste
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: QrImageView(
+                  data: "$lobbyId|$password", // C'est notre clé secrète !
+                  version: QrVersions.auto,
+                  size: 200.0,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('FERMER', style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -158,6 +207,21 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
                             const SizedBox(width: 8),
                             Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
+
+                            const SizedBox(width: 15),
+
+                            // NOUVEAU BOUTON QR CODE
+                            GestureDetector(
+                              onTap: () => _showQRCodeDialog(context, widget.lobbyId, widget.password),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.pinkAccent.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.qr_code_2, color: Colors.pinkAccent, size: 22),
+                              ),
+                            ),
                           ],
                         ),
                       ),
