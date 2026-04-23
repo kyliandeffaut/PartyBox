@@ -98,7 +98,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   width: 200,
                   height: 200,
                   child: QrImageView(
-                    data: "$lobbyId|$password",
+                    data: "https://partybox-98bce.web.app/join?id=$lobbyId&pwd=$password",
                     version: QrVersions.auto,
                     size: 200.0,
                     backgroundColor: Colors.white,

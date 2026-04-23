@@ -36,19 +36,26 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   
                   String scannedData = barcode.rawValue!;
                   
-                  // On vérifie si c'est bien un QR Code de ton application (avec le symbole |)
-                  if (scannedData.contains('|')) {
-                    List<String> parts = scannedData.split('|');
-                    String lobbyId = parts[0];
-                    String password = parts[1];
+                  // On vérifie si c'est un lien Web PartyBox
+                  if (scannedData.startsWith('http') && scannedData.contains('id=')) {
+                    Uri uri = Uri.parse(scannedData);
+                    String? lobbyId = uri.queryParameters['id'];
+                    String? password = uri.queryParameters['pwd'];
                     
-                    // On renvoie ces données à la page précédente et on ferme la caméra
-                    Navigator.pop(context, {'lobbyId': lobbyId, 'password': password});
-                  } else {
+                    if (lobbyId != null && password != null) {
+                      Navigator.pop(context, {'lobbyId': lobbyId, 'password': password});
+                    }
+                  } 
+                  // L'ancien système de secours au cas où
+                  else if (scannedData.contains('|')) {
+                    List<String> parts = scannedData.split('|');
+                    Navigator.pop(context, {'lobbyId': parts[0], 'password': parts[1]});
+                  } 
+                  // Si c'est un QR Code de menu de restaurant...
+                  else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Ceci n'est pas un code PartyBox ❌"), backgroundColor: Colors.redAccent),
                     );
-                    // On attend 2 secondes avant d'autoriser un nouveau scan
                     Future.delayed(const Duration(seconds: 2), () {
                       if (mounted) setState(() => _isProcessing = false);
                     });
