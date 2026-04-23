@@ -8,7 +8,6 @@ import 'qr_scanner_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
-// --- ÉCRAN D'ACCUEIL PRINCIPAL ---
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -17,40 +16,54 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // 1. On crée le lecteur audio
   final AudioPlayer _bgmPlayer = AudioPlayer();
-  // 2. Variables pour le code secret
   int _secretTapCount = 0;
   bool _isPremiumUnlocked = false;
-
   bool _hasMusicStarted = false;
+
+  // --- NOUVELLES VARIABLES DE PARAMÈTRES ---
+  double _volume = 0.2; // Volume de base baissé à 20%
+  bool _isMuted = false;
 
   @override
   void initState() {
     super.initState();
     _checkPremiumStatus(); 
-    
-    // NOUVEAU : Si on N'EST PAS sur le web (!kIsWeb), on lance direct !
     if (!kIsWeb) {
       _startBackgroundMusic();
     }
   }
 
-  // 3. La fonction magique pour la musique
   void _startBackgroundMusic() async {
-    // Si la musique a déjà démarré, on ne fait rien
     if (_hasMusicStarted) return; 
 
     try {
-      debugPrint("🎵 Clic détecté ! Tentative de lancement de la musique...");
-      _hasMusicStarted = true; // On valide que le son est lancé
+      _hasMusicStarted = true;
       _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-      await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: 0.4);
-      debugPrint("✅ Musique lancée avec succès !");
+      // On utilise la variable _volume ici
+      await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: _isMuted ? 0 : _volume);
     } catch (e) {
-      _hasMusicStarted = false; // On annule si ça a planté
+      _hasMusicStarted = false;
       debugPrint("❌ Erreur critique Audio : $e");
     }
+  }
+
+  // --- FONCTION POUR METTRE À JOUR LE VOLUME ---
+  void _updateVolume(double newVolume) {
+    setState(() {
+      _volume = newVolume;
+      if (!_isMuted) {
+        _bgmPlayer.setVolume(_volume);
+      }
+    });
+  }
+
+  // --- FONCTION POUR LE MODE MUET ---
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      _bgmPlayer.setVolume(_isMuted ? 0 : _volume);
+    });
   }
 
   @override
@@ -66,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // 2. LA FONCTION DES CLICS SECRETS
   void _handleSecretTap() {
     _secretTapCount++;
     if (_secretTapCount >= 7) {
@@ -75,10 +87,60 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 3. LA FENÊTRE MAGIQUE
+  // --- FENÊTRE DES PARAMÈTRES ---
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1D),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text("PARAMÈTRES", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Volume de la musique", style: TextStyle(color: Colors.white70)),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up, color: Colors.pinkAccent),
+                    onPressed: () {
+                      _toggleMute();
+                      setModalState(() {}); // Met à jour l'icône dans la fenêtre
+                    },
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: _volume,
+                      min: 0.0,
+                      max: 1.0,
+                      activeColor: Colors.pinkAccent,
+                      inactiveColor: Colors.white12,
+                      onChanged: _isMuted ? null : (val) {
+                        _updateVolume(val);
+                        setModalState(() {}); // Met à jour le slider dans la fenêtre
+                      },
+                    ),
+                  ),
+                  Text("${(_volume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("FERMER", style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showSecretDialog() {
     TextEditingController secretController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -95,38 +157,22 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () async {
-              // CODE POUR DÉBLOQUER
               if (secretController.text == "KYKS606") {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('isPremium', true);
-                
                 if (context.mounted) {
                   setState(() => _isPremiumUnlocked = true);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("✨ Modes Premium débloqués à vie !"), backgroundColor: Colors.green),
-                  );
                 }
-              }
-              // NOUVEAU CODE POUR REVERROUILLER
-              else if (secretController.text == "DEFF606") {
+              } else if (secretController.text == "DEFF606") {
                 final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('isPremium', false); // On remet la mémoire à false
-                
+                await prefs.setBool('isPremium', false);
                 if (context.mounted) {
-                  setState(() => _isPremiumUnlocked = false); // On met à false pour l'affichage
+                  setState(() => _isPremiumUnlocked = false);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("🔒 Premium désactivé"), backgroundColor: Colors.orange),
-                  );
                 }
-              }
-              // MAUVAIS CODE
-              else {
+              } else {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("❌ Code invalide."), backgroundColor: Colors.red),
-                );
               }
             },
             child: const Text("VALIDER", style: TextStyle(color: Colors.pinkAccent)),
@@ -138,10 +184,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // NOUVEAU : Le Listener écoute le tout premier clic sur l'écran
     return Listener(
       onPointerDown: (_) => _startBackgroundMusic(),
       child: Scaffold(
+        extendBodyBehindAppBar: true, // Permet à l'image de fond d'être sous l'appbar
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: [
+            // --- BOUTON PARAMÈTRES EN HAUT À DROITE ---
+            IconButton(
+              icon: const Icon(Icons.settings, color: Colors.white70),
+              onPressed: _showSettingsDialog,
+            ),
+            const SizedBox(width: 10),
+          ],
+        ),
         body: Container(
           width: double.infinity,
           decoration: BoxDecoration(
@@ -159,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // ON REND LE TITRE CLIQUABLE
                 GestureDetector(
                   onTap: _handleSecretTap,
                   child: const Text(
@@ -180,7 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.5)),
                 ),
 
-                // Petit indicateur discret (optionnel, pour que tu saches si c'est activé)
                 if (_isPremiumUnlocked)
                   const Padding(
                     padding: EdgeInsets.only(top: 10),
