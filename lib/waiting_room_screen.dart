@@ -90,14 +90,18 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.white, // Fond blanc obligatoire pour le contraste
+                  color: Colors.white, 
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: QrImageView(
-                  data: "$lobbyId|$password", // C'est notre clé secrète !
-                  version: QrVersions.auto,
-                  size: 200.0,
-                  backgroundColor: Colors.white,
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: QrImageView(
+                    data: "$lobbyId|$password",
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
               ),
             ],
