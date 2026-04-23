@@ -414,7 +414,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   },
                                 );
                               },
-                              child: Text("MODE : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                              child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
                             ),
                             const SizedBox(height: 15),
                             OutlinedButton(
@@ -453,7 +453,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                 children: [
                                   const Icon(Icons.gamepad, color: Colors.pinkAccent, size: 20),
                                   const SizedBox(width: 10),
-                                  Text("MODE PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                                  Text("JEUX PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                                 ],
                               ),
                             ),
@@ -509,7 +509,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     ),
                     child: SwitchListTile(
                       title: const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      subtitle: const Text("Cache les scores jusqu'à la fin", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      subtitle: const Text("Cache les scores et les réponses jusqu'à la fin", style: TextStyle(color: Colors.white54, fontSize: 12)),
                       value: isSecret,
                       activeColor: Colors.purpleAccent,
                       inactiveThumbColor: Colors.grey,
