@@ -147,26 +147,21 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                       FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'waiting'});
                     }
 
-                    bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
-
-                    if (amITheHost) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
-                              const SizedBox(width: 8),
-                              Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
-                            ],
-                          ),
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
+                            const SizedBox(width: 8),
+                            Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
+                          ],
                         ),
-                      );
-                    }
-                    return const SizedBox(); 
+                      ),
+                    );
                   },
                 ),
 
