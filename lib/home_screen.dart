@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasMusicStarted = false;
 
   // --- NOUVELLES VARIABLES DE PARAMÈTRES ---
-  double _volume = 0.2; // Volume de base baissé à 20%
+  double _volume = 0.1; // Volume de base baissé à 20%
   bool _isMuted = false;
 
   @override
@@ -194,10 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             // --- BOUTON PARAMÈTRES EN HAUT À DROITE ---
             IconButton(
+              iconSize: 35,
               icon: const Icon(Icons.settings, color: Colors.white70),
               onPressed: _showSettingsDialog,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 15),
           ],
         ),
         body: Container(
