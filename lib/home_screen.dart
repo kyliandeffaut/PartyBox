@@ -42,10 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_hasMusicStarted) return; 
 
     try {
+      debugPrint("🎵 Clic détecté ! Tentative de lancement de la musique...");
       _hasMusicStarted = true; // On valide que le son est lancé
       _bgmPlayer.setReleaseMode(ReleaseMode.loop);
       await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: 0.4);
+      debugPrint("✅ Musique lancée avec succès !");
     } catch (e) {
+      _hasMusicStarted = false; // On annule si ça a planté
       debugPrint("❌ Erreur critique Audio : $e");
     }
   }
