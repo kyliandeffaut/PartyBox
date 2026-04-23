@@ -479,8 +479,6 @@ class CategoryScreen extends StatelessWidget {
 
   final List<Map<String, dynamic>> categories = [
   {'name': 'Soft', 'color': const Color(0xFF4ADE80), 'emoji': '🍭'},
-  {'name': 'Famille', 'color': const Color(0xFF2DD4BF), 'emoji': '🏠'},
-  {'name': 'Dehors', 'color': const Color(0xFF3B82F6), 'emoji': '🌳'},
   {'name': 'Bar', 'color': const Color(0xFF8B5CF6), 'emoji': '🍻'},
   {'name': 'Sans Filtre', 'color': const Color(0xFFF59E0B), 'emoji': '🙊'},
   {'name': 'Séduction', 'color': const Color(0xFFF43F5E), 'emoji': '🫦'},

@@ -130,6 +130,16 @@
     "category": "Couple"
   },
   {
+    "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {target} ?",
+    "type": "verite",
+    "category": "Couple"
+  },
+  {
+    "type": "verite",
+    "category": "Couple",
+    "text": "Quelle est la dispute la plus bête que tu aies eue avec un partenaire ?"
+  },
+  {
     "type": "verite",
     "category": "Couple",
     "text": "Quelle est la chose la plus romantique que tu aies faite pour quelqu'un ?"
@@ -150,19 +160,112 @@
     "text": "Quelle est la qualité que tu apprécies le plus chez ton partenaire ?"
   },
   {
-    "text": "Lequel de vous deux est le plus jaloux dans la vie de tous les jours, toi ou {target} ?",
-    "type": "verite",
-    "category": "Couple"
+    "text": "{player}, fais un bisou dans le cou de {target}.",
+    "type": "action",
+    "category": "Hot",
+    "target": "opposite"
   },
   {
-    "type": "verite",
-    "category": "Couple",
-    "text": "Quelle est la dispute la plus bête que tu aies eue avec un partenaire ?"
+    "type": "action",
+    "category": "Hot",
+    "text": "Masse les mains d'un joueur de façon sensuelle."
   },
   {
     "type": "action",
     "category": "Hot",
     "text": "Enlève un vêtement (accessoires exclus)."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, fais un massage du cuir chevelu de 2 minutes à {target} en le/la regardant dans les yeux.",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, assieds-toi sur les genoux de {target} jusqu'à ton prochain tour.",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Fais un massage sensuel des épaules à la personne de ton choix."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Fais une danse du ventre ou un strip-tease de 15 secondes (avec vêtements)."
+  },
+  {
+    "text": "{player}, fais un bisou dans le cou de {target}.",
+    "type": "action",
+    "category": "Hot",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, fais un massage du cuir chevelu de 2 minutes à {target} en le/la regardant dans les yeux.",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Reste en sous-vêtements pour le prochain tour."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, assieds-toi sur les genoux de {target} jusqu'à ton prochain tour.",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Finis la partie en sous-vêtements ou bois 3 verres cul-sec."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Laisse le joueur de ton choix déposer un glaçon où il veut sur ton corps et laisse-le fondre pendant 10 secondes."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Enlève un vêtement au choix du joueur à ta droite."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Fais un massage sensuel des épaules à ton voisin de gauche."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Enlève le haut pour les 3 prochains tours."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Fais un tour de la pièce en sous-vêtements."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "Enlève tes chaussettes de façon sensuelle."
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, laisse {target} te bander les yeux et devine quelle partie de son corps il/elle a posé sur ta main.",
+    "target": "opposite"
+  },
+  {
+    "type": "action",
+    "category": "Hot",
+    "text": "{player}, fais un bisou dans le cou de {target}.",
+    "target": "opposite"
   },
   {
     "type": "action",
@@ -182,12 +285,12 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Fais un massage sensuel des épaules à ton voisin de gauche."
+    "text": "Déboutonne ton pantalon/chemise et reste comme ça 2 tours."
   },
   {
-    "text": "{player}, fais un bisou dans le cou de {target}.",
     "type": "action",
     "category": "Hot",
+    "text": "{player}, approche-toi de {target} et murmure-lui ce que tu lui ferais si vous étiez seuls.",
     "target": "opposite"
   },
   {
@@ -199,12 +302,12 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Fais un massage sensuel des épaules à la personne de ton choix."
+    "text": "Échange un vêtement avec une personne du sexe opposé."
   },
   {
     "type": "action",
     "category": "Hot",
-    "text": "Masse les mains d'un joueur de façon sensuelle."
+    "text": "Fais un massage sensuel à la personne de ton choix pendant 1 minute."
   },
   {
     "type": "action",
@@ -218,15 +321,14 @@
     "target": "opposite"
   },
   {
-    "text": "{player}, fais un bisou dans le cou de {target}.",
     "type": "action",
     "category": "Hot",
-    "target": "opposite"
+    "text": "Laisse quelqu'un t'attacher les mains avec une ceinture pour 2 tours."
   },
   {
     "type": "action",
     "category": "Hot",
-    "text": "Fais une danse du ventre ou un strip-tease de 15 secondes (avec vêtements)."
+    "text": "Échange un vêtement avec le joueur de ton choix (les chaussettes ne comptent pas)."
   },
   {
     "type": "action",
@@ -246,7 +348,7 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Bande-toi les yeux et laisse quelqu'un te faire deviner quelque chose."
+    "text": "Fais un body-shot sur le ventre du joueur de ton choix."
   },
   {
     "type": "action",
@@ -256,7 +358,7 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Laisse quelqu'un t'attacher les mains avec une ceinture pour 2 tours."
+    "text": "Enlève un vêtement au choix du joueur à ta droite."
   },
   {
     "type": "action",
@@ -266,52 +368,52 @@
   {
     "type": "action",
     "category": "Hot",
-    "text": "Enlève un vêtement au choix du joueur à ta droite."
+    "text": "Bande-toi les yeux et laisse quelqu'un te faire deviner quelque chose."
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Échange un vêtement avec une personne du sexe opposé."
+    "text": "Quel est ton plus grand fantasme inavoué ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Déboutonne ton pantalon/chemise et reste comme ça 2 tours."
+    "text": "Quel est ton plus grand tue-l'amour au lit ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Enlève tes chaussettes de façon sensuelle."
+    "text": "Quel est ton fantasme secret ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Fais un tour de la pièce en sous-vêtements."
+    "text": "Es-tu plutôt du genre dominant ou dominé ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Enlève le haut pour les 3 prochains tours."
+    "text": "Dors-tu nu, en pyjama ou en sous-vêtements ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Enlève un vêtement au choix du joueur à ta droite."
+    "text": "Quelle est la partie de ton corps dont tu es le plus fier ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Fais un body-shot sur le ventre du joueur de ton choix."
+    "text": "As-tu déjà fait du naturisme ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Finis la partie en sous-vêtements ou bois 3 verres cul-sec."
+    "text": "Quelle est la chose la plus folle que tu aies faite par pur désir physique ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Hot",
-    "text": "Reste en sous-vêtements pour le prochain tour."
+    "text": "As-tu déjà simulé (quoi que ce soit) au lit pour abréger les choses ?"
   },
   {
     "type": "verite",
@@ -336,42 +438,12 @@
   {
     "type": "verite",
     "category": "Hot",
-    "text": "As-tu déjà eu un fantasme sur quelqu'un de ce groupe ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
-    "text": "Quel est ton plus grand fantasme inavoué ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
     "text": "As-tu déjà eu une aventure avec quelqu'un d'ici ?"
   },
   {
     "type": "verite",
     "category": "Hot",
-    "text": "Quel est ton fantasme secret ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
-    "text": "Es-tu plutôt du genre dominant ou dominé ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
-    "text": "Dors-tu nu, en pyjama ou en sous-vêtements ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
-    "text": "As-tu déjà fait du naturisme ?"
-  },
-  {
-    "type": "verite",
-    "category": "Hot",
-    "text": "Quelle est la partie de ton corps dont tu es le plus fier ?"
+    "text": "As-tu déjà eu un fantasme sur quelqu'un de ce groupe ?"
   },
   {
     "text": "{player}, donne ton téléphone à {target} et laisse-le envoyer un message à la personne de son choix.",
@@ -460,30 +532,9 @@
     "text": "Appelle ton dernier ex et raccroche dès qu'il/elle répond."
   },
   {
-    "type": "verite",
-    "category": "Sans Filtre",
-    "text": "Quelle est la chose la plus illégale que tu aies jamais faite ?"
-  },
-  {
-    "type": "verite",
-    "category": "Sans Filtre",
-    "text": "Quelle est la chose la plus étrange que tu caches dans ta chambre ?"
-  },
-  {
-    "type": "verite",
-    "category": "Sans Filtre",
-    "text": "As-tu déjà fouillé dans les affaires de quelqu'un d'autre ?"
-  },
-  {
     "text": "Dis-nous le pire défaut de {target} selon toi.",
     "type": "verite",
     "category": "Sans Filtre"
-  },
-  {
-    "text": "Trouves-tu que {target} a un beau style vestimentaire ? Sois honnête.",
-    "type": "verite",
-    "category": "Sans Filtre",
-    "target": "homme"
   },
   {
     "text": "De 1 à 10, quelle note donnerais-tu au charme de {target} ?",
@@ -510,6 +561,57 @@
     "text": "{player}, quel est le pire défaut de {target} selon toi ? Sois honnête.",
     "type": "verite",
     "category": "Sans Filtre"
+  },
+  {
+    "type": "verite",
+    "category": "Sans Filtre",
+    "text": "As-tu déjà fouillé dans les affaires de quelqu'un d'autre ?"
+  },
+  {
+    "type": "verite",
+    "category": "Sans Filtre",
+    "text": "Quelle est la chose la plus étrange que tu caches dans ta chambre ?"
+  },
+  {
+    "text": "Trouves-tu que {target} a un beau style vestimentaire ? Sois honnête.",
+    "type": "verite",
+    "category": "Sans Filtre",
+    "target": "homme"
+  },
+  {
+    "type": "verite",
+    "category": "Sans Filtre",
+    "text": "Quelle est la chose la plus illégale que tu aies jamais faite ?"
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Raconte une rumeur (fausse ou vraie)"
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Demande à chaque joueur de te décrire en un seul mot."
+  },
+  {
+    "text": "Échange tes chaussettes avec {target} pendant 5 minutes.",
+    "type": "action",
+    "category": "Soft"
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Cite 3 pays commençant par la lettre 'Z' (ou gage)."
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Chante le générique de ton dessin animé d'enfance préféré."
+  },
+  {
+    "type": "action",
+    "category": "Soft",
+    "text": "Fais un high-five à tout le monde dans la pièce le plus vite possible."
   },
   {
     "type": "action",
@@ -604,7 +706,7 @@
   {
     "type": "action",
     "category": "Soft",
-    "text": "Raconte une rumeur (fausse ou vraie)"
+    "text": "Trouve un point commun avec chaque personne présente."
   },
   {
     "text": "Laisse {target} te maquiller (ou te recoiffer) pendant 1 minute.",
@@ -618,34 +720,34 @@
     "text": "Dis 'Bonjour' dans 5 langues différentes."
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Soft",
-    "text": "Demande à chaque joueur de te décrire en un seul mot."
+    "text": "Lequel des joueurs présents ici a la pire influence sur toi ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Soft",
-    "text": "Fais un high-five à tout le monde dans la pièce le plus vite possible."
+    "text": "Donne ton téléphone au joueur de droite. Il a le droit de lire ton dernier SMS reçu à voix haute."
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Soft",
-    "text": "Chante le générique de ton dessin animé d'enfance préféré."
+    "text": "Quel est le dernier message que tu as effacé avant de l'envoyer, et à qui était-il destiné ?"
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Soft",
-    "text": "Trouve un point commun avec chaque personne présente."
+    "text": "Montre la toute dernière photo de ta pellicule à tout le groupe, sans avoir le droit de vérifier ce que c'est avant."
   },
   {
-    "type": "action",
+    "type": "verite",
     "category": "Soft",
-    "text": "Cite 3 pays commençant par la lettre 'Z' (ou gage)."
+    "text": "Quelle est la recherche la plus inavouable que tu as faite sur Internet ce mois-ci ?"
   },
   {
-    "text": "Échange tes chaussettes avec {target} pendant 5 minutes.",
-    "type": "action",
-    "category": "Soft"
+    "type": "verite",
+    "category": "Soft",
+    "text": "Si on ouvrait tes DM Instagram tout de suite, quelle est la chose la plus gênante qu'on y trouverait ?"
   },
   {
     "type": "verite",

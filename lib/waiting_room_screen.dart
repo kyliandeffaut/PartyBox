@@ -480,8 +480,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
 
     final List<Map<String, dynamic>> actionCats = [
-      {'n': 'Soft', 'e': '🍭'}, {'n': 'Famille', 'e': '🏠'}, {'n': 'Dehors', 'e': '🌳'},
-      {'n': 'Bar', 'e': '🍻'}, {'n': 'Sans Filtre', 'e': '🙊'}, {'n': 'Séduction', 'e': '🫦'},
+      {'n': 'Soft', 'e': '🍭'},{'n': 'Bar', 'e': '🍻'}, {'n': 'Sans Filtre', 'e': '🙊'}, {'n': 'Séduction', 'e': '🫦'},
       {'n': 'Couple', 'e': '💞'}, {'n': 'Hot', 'e': '🔥'},
     ];
     final List<Map<String, dynamic>> jnjCats = [
