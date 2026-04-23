@@ -33,7 +33,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               for (final barcode in barcodes) {
                 if (barcode.rawValue != null) {
                   setState(() => _isProcessing = true);
-                  String scannedData = barcode.rawValue!;
+                  String scannedData = barcode.rawValue!.trim();
                   
                   // 1. ANALYSE DU NOUVEAU FORMAT (URL)
                   if (scannedData.contains('id=') && scannedData.contains('pwd=')) {
