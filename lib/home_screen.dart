@@ -189,6 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         extendBodyBehindAppBar: true, // Permet à l'image de fond d'être sous l'appbar
         appBar: AppBar(
+          toolbarHeight: 90, // On agrandit la boîte de l'AppBar !
           backgroundColor: Colors.transparent,
           elevation: 0,
           actions: [
