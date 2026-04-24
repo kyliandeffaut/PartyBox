@@ -348,13 +348,6 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        // On affiche le chat SEULEMENT si on est en ligne !
-        floatingActionButton: widget.isOnline 
-            ? LiveChatFAB(
-                lobbyId: widget.lobbyId!,
-                currentPlayerName: widget.currentPlayerName!,
-              )
-            : null, // <-- Sinon, on n'affiche rien du tout
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -363,22 +356,31 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
             onPressed: _quit,
           ),
         ),
-        body: Container(
-          width: double.infinity, height: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFF101012),
-            image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover, opacity: 0.3),
-          ),
-          child: isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
-            : SafeArea(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: selectedCategory.isEmpty 
-                    ? _buildCategorySelection() 
-                    : _buildGameBoard(),
-                ),
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity, height: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFF101012),
+                image: DecorationImage(image: AssetImage('assets/images/background.jpg'), fit: BoxFit.cover, opacity: 0.3),
               ),
+              child: isLoading 
+                ? const Center(child: CircularProgressIndicator(color: Colors.purpleAccent))
+                : SafeArea(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      child: selectedCategory.isEmpty 
+                        ? _buildCategorySelection() 
+                        : _buildGameBoard(),
+                    ),
+                  ),
+            ),
+            if (widget.isOnline && widget.lobbyId != null)
+              LiveChatFAB(
+                lobbyId: widget.lobbyId!,
+                currentPlayerName: widget.currentPlayerName!,
+              ),
+          ],  
         ),
       ),
     );

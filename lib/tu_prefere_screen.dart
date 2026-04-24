@@ -312,13 +312,6 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        // On affiche le chat SEULEMENT si on est en ligne !
-        floatingActionButton: widget.isOnline 
-            ? LiveChatFAB(
-                lobbyId: widget.lobbyId!,
-                currentPlayerName: widget.currentPlayerName!,
-              )
-            : null, // <-- Sinon, on n'affiche rien du tout
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -327,184 +320,193 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
             onPressed: _quit,
           ),
         ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFF101012),
-            image: DecorationImage(
-              image: AssetImage('assets/images/background.jpg'),
-              fit: BoxFit.cover,
-              opacity: 0.30,
-            ),
-          ),
-          child: SafeArea(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: Colors.pinkAccent))
-                : StreamBuilder<DocumentSnapshot>(
-                    stream: widget.isOnline ? FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots() : null,
-                    builder: (context, snap) {
-                      List<dynamic> fbPlayers = [];
-                      if (widget.isOnline && snap.hasData && snap.data!.exists) {
-                        final data = snap.data!.data() as Map<String, dynamic>;
-                        fbPlayers = data['activePlayers'] ?? [];
-                      }
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFF101012),
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.jpg'),
+                  fit: BoxFit.cover,
+                  opacity: 0.30,
+                ),
+              ),
+              child: SafeArea(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator(color: Colors.pinkAccent))
+                    : StreamBuilder<DocumentSnapshot>(
+                        stream: widget.isOnline ? FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots() : null,
+                        builder: (context, snap) {
+                          List<dynamic> fbPlayers = [];
+                          if (widget.isOnline && snap.hasData && snap.data!.exists) {
+                            final data = snap.data!.data() as Map<String, dynamic>;
+                            fbPlayers = data['activePlayers'] ?? [];
+                          }
 
-                      final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
-                      final counts = widget.isOnline ? _countChoices(fbPlayers) : _localChoices;
-                      final total = widget.isOnline ? fbPlayers.length : _localVoteCount;
-                      
-                      final int a = counts['A'] ?? 0;
-                      final int b = counts['B'] ?? 0;
-                      final int pctA = total == 0 ? 0 : ((a / total) * 100).round();
-                      final int pctB = total == 0 ? 0 : ((b / total) * 100).round();
+                          final allVoted = widget.isOnline ? _allVotedOnline(fbPlayers) : _hasVotedThisTurn;
+                          final counts = widget.isOnline ? _countChoices(fbPlayers) : _localChoices;
+                          final total = widget.isOnline ? fbPlayers.length : _localVoteCount;
+                          
+                          final int a = counts['A'] ?? 0;
+                          final int b = counts['B'] ?? 0;
+                          final int pctA = total == 0 ? 0 : ((a / total) * 100).round();
+                          final int pctB = total == 0 ? 0 : ((b / total) * 100).round();
 
-                      final String majority =
-                          a == b ? "ÉGALITÉ" : (a > b ? "MAJORITÉ : A" : "MAJORITÉ : B");
-                      final String minority =
-                          a == b ? "MINORITÉ : —" : (a < b ? "MINORITÉ : A" : "MINORITÉ : B");
+                          final String majority =
+                              a == b ? "ÉGALITÉ" : (a > b ? "MAJORITÉ : A" : "MAJORITÉ : B");
+                          final String minority =
+                              a == b ? "MINORITÉ : —" : (a < b ? "MINORITÉ : A" : "MINORITÉ : B");
 
-                      return Column(
-                        children: [
-                          const SizedBox(height: 10),
-                          const Text(
-                            "TU PRÉFÈRES ? • CHOIX CORNÉLIEN",
-                            style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 13),
-                          ),
-                          const SizedBox(height: 16),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              children: [
-                                _choiceButton(
-                                  label: "CHOIX A",
-                                  choice: _optionA,
-                                  color: Colors.blueAccent,
-                                  onTap: () {
-                                    if (widget.isOnline) {
-                                      _voteOnline('A');
-                                    } else {
-                                      _handleLocalChoice('A'); 
-                                    }
-                                  },
-                                ),
-                                const SizedBox(width: 12),
-                                _choiceButton(
-                                  label: "CHOIX B",
-                                  choice: _optionB,
-                                  color: Colors.pinkAccent,
-                                  onTap: () {
-                                    if (widget.isOnline) {
-                                      _voteOnline('B');
-                                    } else {
-                                      _handleLocalChoice('B'); 
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          if (!allVoted) ...[
-                            Text(
-                              _hasVotedThisTurn 
-                                ? "Vote envoyé ✅" 
-                                : (widget.isOnline 
-                                    ? "VOTE EN SECRET" 
-                                    : "Au tour de ${widget.players[_localVoteCount].name} de choisir !"),
-                              style: TextStyle(
-                                color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, 
-                                fontWeight: FontWeight.w900, 
-                                fontSize: 20, 
-                                letterSpacing: 1
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              const Text(
+                                "TU PRÉFÈRES ? • CHOIX CORNÉLIEN",
+                                style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 13),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
+                              const SizedBox(height: 16),
 
-                          if (!allVoted) ...[
-                            Expanded(
-                              child: ListView.builder(
+                              Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                itemCount: widget.players.length,
-                                itemBuilder: (context, i) {
-                                  final p = widget.players[i];
-                                  final isMe = widget.isOnline && p.name == widget.currentPlayerName;
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(color: Colors.white10),
+                                child: Row(
+                                  children: [
+                                    _choiceButton(
+                                      label: "CHOIX A",
+                                      choice: _optionA,
+                                      color: Colors.blueAccent,
+                                      onTap: () {
+                                        if (widget.isOnline) {
+                                          _voteOnline('A');
+                                        } else {
+                                          _handleLocalChoice('A'); 
+                                        }
+                                      },
                                     ),
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: p.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
-                                        child: Text(p.name.isEmpty ? "?" : p.name[0], style: const TextStyle(color: Colors.white)),
-                                      ),
-                                      title: Text(p.name + (isMe ? " (Moi)" : ""), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                      trailing: const Icon(Icons.lock, color: Colors.white24),
+                                    const SizedBox(width: 12),
+                                    _choiceButton(
+                                      label: "CHOIX B",
+                                      choice: _optionB,
+                                      color: Colors.pinkAccent,
+                                      onTap: () {
+                                        if (widget.isOnline) {
+                                          _voteOnline('B');
+                                        } else {
+                                          _handleLocalChoice('B'); 
+                                        }
+                                      },
                                     ),
-                                  ).animate().fadeIn(delay: (i * 60).ms).slideX(begin: 0.12);
-                                },
+                                  ],
+                                ),
                               ),
-                            ),
-                          ] else ...[
-                            const SizedBox(height: 6),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 20),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Colors.white.withOpacity(0.10), Colors.white.withOpacity(0.03)]),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.white10),
-                              ),
-                              child: Column(
-                                children: [
-                                  const Text("RÉSULTATS", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                              const SizedBox(height: 14),
+
+                              if (!allVoted) ...[
+                                Text(
+                                  _hasVotedThisTurn 
+                                    ? "Vote envoyé ✅" 
+                                    : (widget.isOnline 
+                                        ? "VOTE EN SECRET" 
+                                        : "Au tour de ${widget.players[_localVoteCount].name} de choisir !"),
+                                  style: TextStyle(
+                                    color: _hasVotedThisTurn ? Colors.greenAccent : Colors.purpleAccent, 
+                                    fontWeight: FontWeight.w900, 
+                                    fontSize: 20, 
+                                    letterSpacing: 1
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              if (!allVoted) ...[
+                                Expanded(
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    itemCount: widget.players.length,
+                                    itemBuilder: (context, i) {
+                                      final p = widget.players[i];
+                                      final isMe = widget.isOnline && p.name == widget.currentPlayerName;
+                                      return Container(
+                                        margin: const EdgeInsets.only(bottom: 10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.05),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(color: Colors.white10),
+                                        ),
+                                        child: ListTile(
+                                          leading: CircleAvatar(
+                                            backgroundColor: p.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
+                                            child: Text(p.name.isEmpty ? "?" : p.name[0], style: const TextStyle(color: Colors.white)),
+                                          ),
+                                          title: Text(p.name + (isMe ? " (Moi)" : ""), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          trailing: const Icon(Icons.lock, color: Colors.white24),
+                                        ),
+                                      ).animate().fadeIn(delay: (i * 60).ms).slideX(begin: 0.12);
+                                    },
+                                  ),
+                                ),
+                              ] else ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: [Colors.white.withOpacity(0.10), Colors.white.withOpacity(0.03)]),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white10),
+                                  ),
+                                  child: Column(
                                     children: [
-                                      Text("A", style: TextStyle(color: Colors.blueAccent.shade100, fontWeight: FontWeight.w900)),
-                                      Text("$pctA%", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w900, fontSize: 18)),
-                                      Text("B", style: TextStyle(color: Colors.pinkAccent.shade100, fontWeight: FontWeight.w900)),
-                                      Text("$pctB%", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w900, fontSize: 18)),
+                                      const Text("RÉSULTATS", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("A", style: TextStyle(color: Colors.blueAccent.shade100, fontWeight: FontWeight.w900)),
+                                          Text("$pctA%", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w900, fontSize: 18)),
+                                          Text("B", style: TextStyle(color: Colors.pinkAccent.shade100, fontWeight: FontWeight.w900)),
+                                          Text("$pctB%", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w900, fontSize: 18)),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(majority, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                                      Text(minority, style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(majority, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-                                  Text(minority, style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ).animate().fadeIn().scale(),
-                            const Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purpleAccent,
-                                  minimumSize: const Size(double.infinity, 52),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                ).animate().fadeIn().scale(),
+                                const Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.purpleAccent,
+                                      minimumSize: const Size(double.infinity, 52),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    ),
+                                    onPressed: widget.isOnline
+                                        ? (_isHost ? _nextQuestionOnline : null)
+                                        : _pickNextLocal,
+                                    child: Text(
+                                      widget.isOnline ? (_isHost ? "SUIVANTE ➔" : "ATTENDS LE CHEF…") : "QUESTION SUIVANTE ➔",
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ),
-                                onPressed: widget.isOnline
-                                    ? (_isHost ? _nextQuestionOnline : null)
-                                    : _pickNextLocal,
-                                child: Text(
-                                  widget.isOnline ? (_isHost ? "SUIVANTE ➔" : "ATTENDS LE CHEF…") : "QUESTION SUIVANTE ➔",
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      );
-                    },
-                  ),
-          ),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+              ),
+            ),
+            if (widget.isOnline && widget.lobbyId != null)
+              LiveChatFAB(
+                lobbyId: widget.lobbyId!,
+                currentPlayerName: widget.currentPlayerName!,
+              ),
+          ],
         ),
       ),
     );

@@ -31,7 +31,7 @@ class _LiveChatFABState extends State<LiveChatFAB> {
     // Au démarrage, on place la bulle en bas à droite (comme avant)
     if (!_isInit) {
       final size = MediaQuery.of(context).size;
-      _position = Offset(size.width - 75, size.height - 150);
+      _position = Offset(size.width - 75, size.height - 90);
       _isInit = true;
     }
   }

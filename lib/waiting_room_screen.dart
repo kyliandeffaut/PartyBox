@@ -158,10 +158,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        floatingActionButton: LiveChatFAB(
-          lobbyId: widget.lobbyId,
-          currentPlayerName: widget.currentPlayerName,
-        ),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -170,378 +166,386 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
             onPressed: () => Navigator.maybePop(context), 
           ),
         ),
-        body: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF101012),
-            image: DecorationImage(
-              image: const AssetImage('assets/images/background.jpg'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.8), BlendMode.darken),
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Text(
-                  widget.lobbyName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white,
-                    letterSpacing: 4, shadows: [Shadow(color: Colors.blueAccent, blurRadius: 20)],
-                  ),
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF101012),
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/background.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.8), BlendMode.darken),
                 ),
-                StreamBuilder<DocumentSnapshot>(
-                  stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
-                    
-                    var data = snapshot.data!.data() as Map<String, dynamic>;
-                    List activePlayers = data['activePlayers'] ?? [];
-                    String status = data['status'] ?? 'waiting';
-
-                    if (status == 'playing' && activePlayers.isEmpty) {
-                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'waiting'});
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
-                            const SizedBox(width: 8),
-                            Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
-
-                            const SizedBox(width: 15),
-
-                            // NOUVEAU BOUTON QR CODE
-                            GestureDetector(
-                              onTap: () => _showQRCodeDialog(context, widget.lobbyId, widget.password),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.pinkAccent.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.qr_code_2, color: Colors.pinkAccent, size: 22),
-                              ),
-                            ),
-                          ],
-                        ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      widget.lobbyName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white,
+                        letterSpacing: 4, shadows: [Shadow(color: Colors.blueAccent, blurRadius: 20)],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
+                        
+                        var data = snapshot.data!.data() as Map<String, dynamic>;
+                        List activePlayers = data['activePlayers'] ?? [];
+                        String status = data['status'] ?? 'waiting';
 
-                // --- LISTE DES JOUEURS ---
+                        if (status == 'playing' && activePlayers.isEmpty) {
+                          FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'status': 'waiting'});
+                        }
 
-                Expanded(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 40),
-                      const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
-                      const SizedBox(height: 15),
-                      Expanded(
-                        child: StreamBuilder<DocumentSnapshot>(
-                          stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
-                            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.lock_outline, color: Colors.white70, size: 16),
+                                const SizedBox(width: 8),
+                                Text("MDP : ${widget.password}", style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1)),
 
-                            var data = snapshot.data!.data() as Map<String, dynamic>?;
-                            if (data == null) return const Center(child: Text("Introuvable", style: TextStyle(color: Colors.white)));
+                                const SizedBox(width: 15),
 
-                            List players = data['players'] ?? [];
-                            String hostName = data['host'] ?? '';
+                                // NOUVEAU BOUTON QR CODE
+                                GestureDetector(
+                                  onTap: () => _showQRCodeDialog(context, widget.lobbyId, widget.password),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.pinkAccent.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.qr_code_2, color: Colors.pinkAccent, size: 22),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
 
-                            bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
+                    // --- LISTE DES JOUEURS ---
 
-                            if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(); 
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chef t'a expulsé ❌"), backgroundColor: Colors.redAccent));
-                                }
-                              });
-                              return const Center(child: Text("Expulsion...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
-                            }
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 40),
+                          const Text("Joueurs connectés :", style: TextStyle(color: Colors.white70)),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
+                                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
 
-                            bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
+                                var data = snapshot.data!.data() as Map<String, dynamic>?;
+                                if (data == null) return const Center(child: Text("Introuvable", style: TextStyle(color: Colors.white)));
 
-                            if (data['status'] == 'playing' && amIActive) {
-                              if (!_isNavigatingToGame) {
-                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  if (context.mounted) {
-                                    setState(() { _isNavigatingToGame = true; });
+                                List players = data['players'] ?? [];
+                                String hostName = data['host'] ?? '';
 
-                                    Widget targetScreen;
-                                    String gameMode = data['gameMode'] ?? 'Action ou Vérité';
+                                bool isMeStillHere = players.any((p) => p['name'] == widget.currentPlayerName);
 
-                                    if (gameMode == "Je n'ai jamais") {
-                                      targetScreen = JeNaiJamaisScreen(
-                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                        isOnline: true,
-                                        lobbyId: widget.lobbyId,
-                                        currentPlayerName: widget.currentPlayerName,
-                                      );
-                                    } else if (gameMode == "Le Tribunal") {
-                                      targetScreen = TribunalScreen(
-                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                        isOnline: true,
-                                        lobbyId: widget.lobbyId,
-                                        currentPlayerName: widget.currentPlayerName,
-                                      );
-                                    } else if (gameMode == "Tu préfères ?") {
-                                      targetScreen = TuPrefereScreen(
-                                        players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
-                                        isOnline: true,
-                                        lobbyId: widget.lobbyId,
-                                        currentPlayerName: widget.currentPlayerName,
-                                      );
-                                    } else {
-                                      targetScreen = ActionVeriteScreen(
-                                        lobbyId: widget.lobbyId,
-                                        category: data['category'] ?? 'Soft',
-                                        isOnline: true,
-                                        currentPlayerName: widget.currentPlayerName,
-                                        currentPlayerGender: widget.currentPlayerGender,
-                                      );
+                                if (!isMeStillHere && !_isLeavingManually && !_isNavigatingToGame) {
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop(); 
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chef t'a expulsé ❌"), backgroundColor: Colors.redAccent));
                                     }
+                                  });
+                                  return const Center(child: Text("Expulsion...", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
+                                }
 
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)).then((_) {
-                                      if (context.mounted) setState(() { _isNavigatingToGame = false; });
+                                bool amIActive = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == widget.currentPlayerName);
+
+                                if (data['status'] == 'playing' && amIActive) {
+                                  if (!_isNavigatingToGame) {
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      if (context.mounted) {
+                                        setState(() { _isNavigatingToGame = true; });
+
+                                        Widget targetScreen;
+                                        String gameMode = data['gameMode'] ?? 'Action ou Vérité';
+
+                                        if (gameMode == "Je n'ai jamais") {
+                                          targetScreen = JeNaiJamaisScreen(
+                                            players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                            isOnline: true,
+                                            lobbyId: widget.lobbyId,
+                                            currentPlayerName: widget.currentPlayerName,
+                                          );
+                                        } else if (gameMode == "Le Tribunal") {
+                                          targetScreen = TribunalScreen(
+                                            players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                            isOnline: true,
+                                            lobbyId: widget.lobbyId,
+                                            currentPlayerName: widget.currentPlayerName,
+                                          );
+                                        } else if (gameMode == "Tu préfères ?") {
+                                          targetScreen = TuPrefereScreen(
+                                            players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                            isOnline: true,
+                                            lobbyId: widget.lobbyId,
+                                            currentPlayerName: widget.currentPlayerName,
+                                          );
+                                        } else {
+                                          targetScreen = ActionVeriteScreen(
+                                            lobbyId: widget.lobbyId,
+                                            category: data['category'] ?? 'Soft',
+                                            isOnline: true,
+                                            currentPlayerName: widget.currentPlayerName,
+                                            currentPlayerGender: widget.currentPlayerGender,
+                                          );
+                                        }
+
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => targetScreen)).then((_) {
+                                          if (context.mounted) setState(() { _isNavigatingToGame = false; });
+                                        });
+                                      }
                                     });
                                   }
-                                });
-                              }
-                              return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
-                            }
+                                  return const Center(child: Text("Partie en cours...", style: TextStyle(color: Colors.pinkAccent)));
+                                }
 
-                            if (players.isEmpty) return const Center(child: Text("Attente...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
+                                if (players.isEmpty) return const Center(child: Text("Attente...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
 
-                            return ListView.builder(
-                              itemCount: players.length,
-                              itemBuilder: (context, index) {
-                                var player = players[index] as Map<String, dynamic>;
-                                String name = player['name'] ?? "Anonyme";
-                                String gender = player['gender'] ?? "H";
+                                return ListView.builder(
+                                  itemCount: players.length,
+                                  itemBuilder: (context, index) {
+                                    var player = players[index] as Map<String, dynamic>;
+                                    String name = player['name'] ?? "Anonyme";
+                                    String gender = player['gender'] ?? "H";
 
-                                bool isMe = name == widget.currentPlayerName; 
-                                bool isHost = name == hostName; 
-                                bool amIHost = widget.currentPlayerName == hostName; 
-                                
-                                bool gameIsActive = data['status'] == 'playing' || (data['activePlayers'] as List? ?? []).isNotEmpty;
-                                bool isInGame = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == name);
+                                    bool isMe = name == widget.currentPlayerName; 
+                                    bool isHost = name == hostName; 
+                                    bool amIHost = widget.currentPlayerName == hostName; 
+                                    
+                                    bool gameIsActive = data['status'] == 'playing' || (data['activePlayers'] as List? ?? []).isNotEmpty;
+                                    bool isInGame = (data['activePlayers'] as List? ?? []).any((p) => p['name'] == name);
 
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-                                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
-                                  child: ListTile(
-                                    leading: Icon(Icons.person, color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent),
-                                    title: Row(
-                                      children: [
-                                        Text(name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
-                                        if (isHost) ...[const SizedBox(width: 8), const Icon(Icons.star, color: Colors.amber, size: 16)]
-                                      ],
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min, 
-                                      children: [
-                                        if (gameIsActive && isInGame)
-                                          const Text("En jeu 🎮", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold))
-                                        else
-                                          const Icon(Icons.check_circle, color: Colors.greenAccent, size: 18),
-                                          
-                                        if (amIHost && !isMe) ...[
-                                          const SizedBox(width: 5), 
-                                          IconButton(
-                                            icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
-                                            onPressed: () async {
-                                              var doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
-                                              if (doc.exists) {
-                                                List pList = List.from(doc.data()?['players'] ?? []);
-                                                pList.removeWhere((p) => p['name'] == name);
-                                                List aList = List.from(doc.data()?['activePlayers'] ?? []);
-                                                aList.removeWhere((p) => p['name'] == name);
-                                                await doc.reference.update({'players': pList, 'activePlayers': aList});
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                StreamBuilder<DocumentSnapshot>(
-                  stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
-                    var data = snapshot.data!.data() as Map<String, dynamic>;
-                    bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
-
-                    if (amITheHost) {
-                      final List activePlayers = (data['activePlayers'] as List?) ?? [];
-                      final bool someoneStillInGame = activePlayers.isNotEmpty;
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: someoneStillInGame ? Colors.grey : Colors.greenAccent,
-                                minimumSize: const Size(double.infinity, 60),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              ),
-                              onPressed: someoneStillInGame
-                                  ? () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Attends que tout le monde revienne au lobby avant de relancer ✅"),
-                                          backgroundColor: Colors.orangeAccent,
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
+                                      child: ListTile(
+                                        leading: Icon(Icons.person, color: gender == 'H' ? Colors.blueAccent : Colors.pinkAccent),
+                                        title: Row(
+                                          children: [
+                                            Text(name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
+                                            if (isHost) ...[const SizedBox(width: 8), const Icon(Icons.star, color: Colors.amber, size: 16)]
+                                          ],
                                         ),
-                                      );
-                                    }
-                                  : () async {
-                                final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-                                final doc = await docRef.get();
-                                var currentData = doc.data() as Map<String, dynamic>;
-                                List allPlayers = currentData['players'] ?? [];
-                                
-                                // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
-                                List updatedPlayers = allPlayers.map((p) {
-                                  var newP = Map<String, dynamic>.from(p);
-                                  newP['hasVoted'] = false;
-                                  newP['lastVote'] = null;
-                                  newP['score'] = 0;
-                                  newP['voteTarget'] = null;
-                                  newP['tpChoice'] = null;
-                                  return newP;
-                                }).toList();
-
-                                await docRef.update({
-                                  'status': 'playing',
-                                  'activePlayers': updatedPlayers,
-                                  'players': updatedPlayers,
-                                  'jnjGameEnded': false,
-                                  'currentQuestion': null, // Force une nouvelle pioche
-                                  'lastChoice': null,
-                                  'showNextButton': false,
-                                  'currentPlayerIndex': 0,
-                                });
-                              },
-                              child: Text(
-                                someoneStillInGame ? "JOUEURS ENCORE EN JEU..." : "LANCER LA PARTIE",
-                                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: const Color(0xFF1A1A1D),
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                  builder: (BuildContext context) {
-                                    List<String> gameModes = [
-                                      'Action ou Vérité',
-                                      'Je n\'ai jamais',
-                                      'Le Tribunal',
-                                      'Tu préfères ?',
-                                    ];
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text("CHOISIS UN JEU", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                                          const SizedBox(height: 15),
-                                          ...gameModes.map((mode) {
-                                            bool isSelected = data['gameMode'] == mode;
-                                            return ListTile(
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                                              title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
-                                              trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
-                                              onTap: () {
-                                                FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
-                                                Navigator.pop(context);
-                                              },
-                                            );
-                                          }),
-                                        ],
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min, 
+                                          children: [
+                                            if (gameIsActive && isInGame)
+                                              const Text("En jeu 🎮", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold))
+                                            else
+                                              const Icon(Icons.check_circle, color: Colors.greenAccent, size: 18),
+                                              
+                                            if (amIHost && !isMe) ...[
+                                              const SizedBox(width: 5), 
+                                              IconButton(
+                                                icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
+                                                onPressed: () async {
+                                                  var doc = await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).get();
+                                                  if (doc.exists) {
+                                                    List pList = List.from(doc.data()?['players'] ?? []);
+                                                    pList.removeWhere((p) => p['name'] == name);
+                                                    List aList = List.from(doc.data()?['activePlayers'] ?? []);
+                                                    aList.removeWhere((p) => p['name'] == name);
+                                                    await doc.reference.update({'players': pList, 'activePlayers': aList});
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                       ),
-                                    );
+                                    ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.2);
                                   },
                                 );
                               },
-                              child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
                             ),
-                            const SizedBox(height: 15),
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: const Color(0xFF1A1A1D),
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                  builder: (context) => _buildParamsSheet(data),
-                                );
-                              },
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.settings, color: Colors.white70, size: 18),
-                                  SizedBox(width: 8),
-                                  Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                                ],
-                              ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox();
+                        var data = snapshot.data!.data() as Map<String, dynamic>;
+                        bool amITheHost = widget.currentPlayerName == (data['host'] ?? '');
+
+                        if (amITheHost) {
+                          final List activePlayers = (data['activePlayers'] as List?) ?? [];
+                          final bool someoneStillInGame = activePlayers.isNotEmpty;
+                          return Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Column(
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: someoneStillInGame ? Colors.grey : Colors.greenAccent,
+                                    minimumSize: const Size(double.infinity, 60),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  ),
+                                  onPressed: someoneStillInGame
+                                      ? () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text("Attends que tout le monde revienne au lobby avant de relancer ✅"),
+                                              backgroundColor: Colors.orangeAccent,
+                                            ),
+                                          );
+                                        }
+                                      : () async {
+                                    final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+                                    final doc = await docRef.get();
+                                    var currentData = doc.data() as Map<String, dynamic>;
+                                    List allPlayers = currentData['players'] ?? [];
+                                    
+                                    // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
+                                    List updatedPlayers = allPlayers.map((p) {
+                                      var newP = Map<String, dynamic>.from(p);
+                                      newP['hasVoted'] = false;
+                                      newP['lastVote'] = null;
+                                      newP['score'] = 0;
+                                      newP['voteTarget'] = null;
+                                      newP['tpChoice'] = null;
+                                      return newP;
+                                    }).toList();
+
+                                    await docRef.update({
+                                      'status': 'playing',
+                                      'activePlayers': updatedPlayers,
+                                      'players': updatedPlayers,
+                                      'jnjGameEnded': false,
+                                      'currentQuestion': null, // Force une nouvelle pioche
+                                      'lastChoice': null,
+                                      'showNextButton': false,
+                                      'currentPlayerIndex': 0,
+                                    });
+                                  },
+                                  child: Text(
+                                    someoneStillInGame ? "JOUEURS ENCORE EN JEU..." : "LANCER LA PARTIE",
+                                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: const Color(0xFF1A1A1D),
+                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+                                      builder: (BuildContext context) {
+                                        List<String> gameModes = [
+                                          'Action ou Vérité',
+                                          'Je n\'ai jamais',
+                                          'Le Tribunal',
+                                          'Tu préfères ?',
+                                        ];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 20),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text("CHOISIS UN JEU", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                              const SizedBox(height: 15),
+                                              ...gameModes.map((mode) {
+                                                bool isSelected = data['gameMode'] == mode;
+                                                return ListTile(
+                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                                                  title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
+                                                  trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
+                                                  onTap: () {
+                                                    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
+                                                    Navigator.pop(context);
+                                                  },
+                                                );
+                                              }),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                                ),
+                                const SizedBox(height: 15),
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: const Color(0xFF1A1A1D),
+                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+                                      builder: (context) => _buildParamsSheet(data),
+                                    );
+                                  },
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.settings, color: Colors.white70, size: 18),
+                                      SizedBox(width: 8),
+                                      Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    } 
-                    else {
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.gamepad, color: Colors.pinkAccent, size: 20),
-                                  const SizedBox(width: 10),
-                                  Text("JEUX PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                                ],
-                              ),
+                          );
+                        } 
+                        else {
+                          return Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(15),
+                                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.gamepad, color: Colors.pinkAccent, size: 20),
+                                      const SizedBox(width: 10),
+                                      Text("JEUX PRÉVU : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                const Center(child: Text("En attente du chef...", style: TextStyle(color: Colors.white38, fontSize: 12, fontStyle: FontStyle.italic))),
+                              ],
                             ),
-                            const SizedBox(height: 15),
-                            const Center(child: Text("En attente du chef...", style: TextStyle(color: Colors.white38, fontSize: 12, fontStyle: FontStyle.italic))),
-                          ],
-                        ),
-                      );
-                    }
-                  },
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            LiveChatFAB(
+              lobbyId: widget.lobbyId,
+              currentPlayerName: widget.currentPlayerName,
+            ),
+          ],
         ),
       )
     );
