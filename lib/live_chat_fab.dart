@@ -20,6 +20,22 @@ class _LiveChatFABState extends State<LiveChatFAB> {
   int _lastSeenMessageCount = 0;
   bool _isChatOpen = false;
 
+  // --- VARIABLES POUR LE DÉPLACEMENT ---
+  Offset _position = const Offset(0, 0);
+  bool _isInit = false;
+  bool _isDragging = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Au démarrage, on place la bulle en bas à droite (comme avant)
+    if (!_isInit) {
+      final size = MediaQuery.of(context).size;
+      _position = Offset(size.width - 75, size.height - 150);
+      _isInit = true;
+    }
+  }
+
   void _showChatSheet(BuildContext context) {
     setState(() {
       _isChatOpen = true;
@@ -45,15 +61,18 @@ class _LiveChatFABState extends State<LiveChatFAB> {
         );
       },
     ).then((_) {
-      // Quand on ferme le chat, on considère qu'on a tout lu
-      setState(() {
-        _isChatOpen = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isChatOpen = false;
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('lobbies')
@@ -63,40 +82,82 @@ class _LiveChatFABState extends State<LiveChatFAB> {
       builder: (context, snapshot) {
         int currentCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
         
-        // Si le chat est ouvert, on met à jour le compteur de "lus" en temps réel
         if (_isChatOpen) {
           _lastSeenMessageCount = currentCount;
         }
 
         bool hasNewMessages = currentCount > _lastSeenMessageCount && !_isChatOpen;
 
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            FloatingActionButton(
-              backgroundColor: Colors.blueAccent,
-              elevation: 8,
-              onPressed: () {
-                _lastSeenMessageCount = currentCount; // On marque comme lu
-                _showChatSheet(context);
-              },
-              child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-            ),
-            // LA PETITE BULLE ROUGE (Badge)
-            if (hasNewMessages)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
+        // AnimatedPositioned permet de faire glisser la bulle en douceur quand on lâche
+        return AnimatedPositioned(
+          duration: _isDragging ? Duration.zero : const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          left: _position.dx,
+          top: _position.dy,
+          child: GestureDetector(
+            onPanStart: (details) {
+              setState(() => _isDragging = true);
+            },
+            onPanUpdate: (details) {
+              // La bulle suit le doigt
+              setState(() {
+                _position += details.delta;
+              });
+            },
+            onPanEnd: (details) {
+              // EFFET MAGNÉTIQUE (Snap aux bords)
+              double newX = _position.dx;
+              double newY = _position.dy;
+
+              // Si on lâche la bulle dans la moitié droite, elle colle à droite, sinon à gauche
+              if (newX + 28 > size.width / 2) {
+                newX = size.width - 75; // Collé à droite
+              } else {
+                newX = 15; // Collé à gauche
+              }
+
+              // On empêche la bulle de sortir de l'écran en haut ou en bas
+              if (newY < 60) newY = 60;
+              if (newY > size.height - 100) newY = size.height - 100;
+
+              setState(() {
+                _isDragging = false;
+                _position = Offset(newX, newY);
+              });
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FloatingActionButton(
+                    backgroundColor: Colors.blueAccent,
+                    elevation: _isDragging ? 15 : 8, // L'ombre grandit quand on soulève la bulle
+                    onPressed: () {
+                      _lastSeenMessageCount = currentCount;
+                      _showChatSheet(context);
+                    },
+                    child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
                   ),
-                  constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
-                ),
+                  // LA PETITE BULLE ROUGE (Badge)
+                  if (hasNewMessages)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 4)],
+                        ),
+                        constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                      ),
+                    ),
+                ],
               ),
-          ],
+            ),
+          ),
         );
       },
     );

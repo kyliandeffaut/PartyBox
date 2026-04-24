@@ -317,13 +317,6 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        // On affiche le chat SEULEMENT si on est en ligne !
-        floatingActionButton: widget.isOnline 
-            ? LiveChatFAB(
-                lobbyId: widget.lobbyId!,
-                currentPlayerName: widget.currentPlayerName!,
-              )
-            : null, // <-- Sinon, on n'affiche rien du tout
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -471,6 +464,11 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                   ],
                 ),
               ),
+            ),
+            if (widget.isOnline && widget.lobbyId != null)
+            LiveChatFAB(
+              lobbyId: widget.lobbyId!,
+              currentPlayerName: widget.currentPlayerName!,
             ),
         ],
       ),
