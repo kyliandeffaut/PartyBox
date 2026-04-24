@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final AudioPlayer _bgmPlayer = AudioPlayer();
   int _secretTapCount = 0;
   bool _isPremiumUnlocked = false;
@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkPremiumStatus(); 
     if (!kIsWeb) {
       _startBackgroundMusic();
@@ -68,8 +69,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _bgmPlayer.dispose();
     super.dispose();
+  }
+
+  // --- GESTION DE L'ARRIÈRE-PLAN ---
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      // L'appli passe en arrière-plan (ou téléphone verrouillé) ➔ PAUSE
+      _bgmPlayer.pause();
+    } else if (state == AppLifecycleState.resumed) {
+      // L'appli revient au premier plan ➔ LECTURE (sauf si on avait mis mute)
+      if (!_isMuted) {
+        _bgmPlayer.resume();
+      }
+    }
   }
 
   Future<void> _checkPremiumStatus() async {
