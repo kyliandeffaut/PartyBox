@@ -348,10 +348,13 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        floatingActionButton: LiveChatFAB(
-          lobbyId: widget.lobbyId!,
-          currentPlayerName: widget.currentPlayerName!,
-        ),
+        // On affiche le chat SEULEMENT si on est en ligne !
+        floatingActionButton: widget.isOnline 
+            ? LiveChatFAB(
+                lobbyId: widget.lobbyId!,
+                currentPlayerName: widget.currentPlayerName!,
+              )
+            : null, // <-- Sinon, on n'affiche rien du tout
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
