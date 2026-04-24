@@ -8,6 +8,14 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// --- DÉBUT AJOUT : Lecture du fichier secret ---
+val keystoreProperties = java.util.Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+}
+// --- FIN AJOUT ---
+
 android {
     namespace = "com.deffautstudio.partybox"
     compileSdk = flutter.compileSdkVersion
@@ -33,11 +41,22 @@ android {
         versionName = flutter.versionName
     }
 
+    // --- DÉBUT AJOUT : Application de ta clé de signature ---
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = file(keystoreProperties.getProperty("storeFile") ?: "")
+            storePassword = keystoreProperties.getProperty("storePassword")
+        }
+    }
+    // --- FIN AJOUT ---
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
