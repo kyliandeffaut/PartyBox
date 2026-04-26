@@ -278,6 +278,7 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
     final bool disabled = _hasVotedThisTurn;
     return Expanded(
       child: InkWell(
+        onTapDown: disabled ? null : (_) => playPop(),
         onTap: disabled ? null : onTap,
         child: Container(
           padding: const EdgeInsets.all(18),
@@ -479,18 +480,24 @@ class _TuPrefereScreenState extends State<TuPrefereScreen> {
                                 const Spacer(),
                                 Padding(
                                   padding: const EdgeInsets.all(20),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.purpleAccent,
-                                      minimumSize: const Size(double.infinity, 52),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    ),
-                                    onPressed: widget.isOnline
-                                        ? (_isHost ? _nextQuestionOnline : null)
-                                        : _pickNextLocal,
-                                    child: Text(
-                                      widget.isOnline ? (_isHost ? "SUIVANTE ➔" : "ATTENDS LE CHEF…") : "QUESTION SUIVANTE ➔",
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  child: Listener(
+                                    onPointerDown: (_) {
+                                      // On joue le son uniquement si c'est le chef ou si on est en local
+                                      if (!widget.isOnline || _isHost) playPop();
+                                    },
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.purpleAccent,
+                                        minimumSize: const Size(double.infinity, 52),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      ),
+                                      onPressed: widget.isOnline
+                                          ? (_isHost ? _nextQuestionOnline : null)
+                                          : _pickNextLocal,
+                                      child: Text(
+                                        widget.isOnline ? (_isHost ? "SUIVANTE ➔" : "ATTENDS LE CHEF…") : "QUESTION SUIVANTE ➔",
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
