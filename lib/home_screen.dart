@@ -270,12 +270,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 const SizedBox(height: 80),
 
                 _mainButton(context, "CRÉER UN LOBBY", Icons.add_moderator, Colors.pinkAccent, () {
+                  playPop();
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateLobbyScreen()));
                 }),
 
                 const SizedBox(height: 20),
 
                 _mainButton(context, "REJOINDRE UN LOBBY", Icons.login, Colors.blueAccent, () {
+                  playPop();
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const JoinLobbyScreen()));
                 }),
 
@@ -284,6 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 const SizedBox(height: 30),
 
                 _mainButton(context, "JOUER EN LOCAL", Icons.phone_android, Colors.greenAccent, () {
+                  playPop();
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const PlayerScreen()));
                 }),
                 

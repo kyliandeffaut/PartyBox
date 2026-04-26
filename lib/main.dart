@@ -8,6 +8,15 @@ import 'home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:audioplayers/audioplayers.dart';
+
+// --- GESTIONNAIRE DE BRUITAGES (SFX) ---
+final AudioPlayer globalSfxPlayer = AudioPlayer();
+
+void playPop() {
+  // On joue le son pop.mp3 (assure-toi qu'il est bien dans le dossier assets/audio/)
+  globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Indispensable pour Firebase
