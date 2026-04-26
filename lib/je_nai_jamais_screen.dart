@@ -435,6 +435,9 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
       child: InkWell(
+        onTapDown: (_) {
+          playPop(); 
+        },
         onTap: () => _selectCategory(name),
         child: Container(
           padding: const EdgeInsets.all(20),
@@ -572,6 +575,9 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
 
   Widget _voteBtn(String text, Color color, VoidCallback onTap) {
     return InkWell(
+      onTapDown: (_) {
+        playPop(); 
+      },
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),

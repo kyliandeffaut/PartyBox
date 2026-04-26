@@ -325,6 +325,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: GestureDetector(
+                    onTapDown: (_) {
+                      playPop(); 
+                    },
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => GameSelectionScreen(players: players))),
                     child: Container(
                       width: double.infinity,
@@ -365,6 +368,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Widget _genderButton(String label, String gender) {
     bool isSelected = selectedGender == gender;
     return GestureDetector(
+      onTapDown: (_) {
+        playPop(); 
+      },
       onTap: () => setState(() => selectedGender = gender),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -490,6 +496,9 @@ class GameSelectionScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: InkWell(
+        onTapDown: (_) {
+          playPop();
+        },
         onTap: onPress,
         borderRadius: BorderRadius.circular(25),
         child: Container(
