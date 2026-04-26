@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'live_chat_fab.dart';
+import 'main.dart';
 
 class GamePlayer {
   final String name;
@@ -375,6 +376,9 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                         child: Material(
                           color: const Color.fromARGB(255, 28, 126, 36).withValues(alpha: 0.95),
                           child: InkWell(
+                            onTapDown: (_) {
+                              playPop(); 
+                            },
                             onTap: showNext ? null : () => pickQuestion('verite', cIndex),
                             child: SizedBox(
                               height: double.infinity,
@@ -407,6 +411,9 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
                         child: Material(
                           color: const Color(0xFF6B1124).withValues(alpha: 0.95),
                           child: InkWell(
+                            onTapDown: (_) {
+                              playPop(); 
+                            },
                             onTap: showNext ? null : () => pickQuestion('action', cIndex),
                             child: SizedBox(
                               height: double.infinity,
@@ -533,6 +540,9 @@ class CategoryScreen extends StatelessWidget {
               final cat = categories[index];
               return InkWell(
                 borderRadius: BorderRadius.circular(25),
+                onTapDown: (_) {
+                  playPop(); 
+                },
                 onTap: () {
                   List<GamePlayer> formattedPlayers = players.map((p) => GamePlayer(
                     name: p.name, 
