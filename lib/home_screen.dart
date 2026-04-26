@@ -22,11 +22,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _hasMusicStarted = false;
 
   // --- VARIABLES DE PARAMÈTRES ---
-  double _volume = 0.1; // Volume de base baissé
+  double _volume = 0.1;
   bool _isMuted = false;
-
-  double _sfxVolume = 1.0; // Par défaut à 100%
-  bool _isSfxMuted = false;
 
   @override
   void initState() {
@@ -81,17 +78,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _updateSfxVolume(double newVolume) {
     setState(() {
-      _sfxVolume = newVolume;
-      if (!_isSfxMuted) {
-        globalSfxPlayer.setVolume(_sfxVolume);
-      }
+      userSfxVolume = newVolume;
     });
   }
 
   void _toggleSfxMute() {
     setState(() {
-      _isSfxMuted = !_isSfxMuted;
-      globalSfxPlayer.setVolume(_isSfxMuted ? 0 : _sfxVolume);
+      isSfxMuted = !isSfxMuted; 
     });
   }
 
@@ -164,13 +157,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Text("${(_volume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
                 ],
               ),
-              // --- SLIDER BRUITAGES ---
+              // --- 2. SLIDER BRUITAGES ---
               const Text("Volume des bruitages", style: TextStyle(color: Colors.white70)),
               const SizedBox(height: 10),
               Row(
                 children: [
                   IconButton(
-                    icon: Icon(_isSfxMuted ? Icons.volume_off : Icons.volume_up, color: Colors.blueAccent),
+                    icon: Icon(isSfxMuted ? Icons.volume_off : Icons.volume_up, color: Colors.blueAccent),
                     onPressed: () {
                       _toggleSfxMute();
                       setModalState(() {});
@@ -178,22 +171,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   Expanded(
                     child: Slider(
-                      value: _sfxVolume,
+                      value: userSfxVolume, 
                       min: 0.0,
                       max: 1.0,
                       activeColor: Colors.blueAccent,
                       inactiveColor: Colors.white12,
-                      onChanged: _isSfxMuted ? null : (val) {
+                      onChanged: isSfxMuted ? null : (val) { 
                         _updateSfxVolume(val);
                         setModalState(() {}); 
                       },
                       onChangeEnd: (val) {
-                        // Quand l'utilisateur lâche le curseur, ça fait "pop" pour lui faire écouter le volume !
-                        if (!_isSfxMuted) playPop(); 
+                        if (!isSfxMuted) playPop();
                       },
                     ),
                   ),
-                  Text("${(_sfxVolume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
+                  Text("${(userSfxVolume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
                 ],
               ),
             ],

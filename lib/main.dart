@@ -11,19 +11,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 // --- GESTIONNAIRE DE BRUITAGES (SFX) ---
-// On prépare le lecteur en mode faible latence pour les sons courts
 final AudioPlayer globalSfxPlayer = AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
 
-void playPop() async {
+// 1. LES PARAMÈTRES GLOBAUX DU JOUEUR (Accessibles depuis tous les écrans)
+double userSfxVolume = 0.5; // Le curseur commence à 50% par défaut
+bool isSfxMuted = false;
+
+// 2. LE MIXEUR INTELLIGENT
+void playSfx(String fileName, {double soundRatio = 1.0}) async {
+  if (isSfxMuted) return; // Si le joueur a mis mute, on ne joue rien
+  
   try {
-    // On essaie de stopper et jouer
     await globalSfxPlayer.stop();
-    await globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
+    // LE CALCUL MAGIQUE : Volume Curseur (ex: 0.5) * Volume du Son (ex: 0.4)
+    await globalSfxPlayer.setVolume(userSfxVolume * soundRatio); 
+    await globalSfxPlayer.play(AssetSource('audio/$fileName'));
   } catch (e) {
-    // Si on clique trop vite et que le lecteur s'étouffe, 
-    // on capture l'erreur en silence pour éviter le crash !
     debugPrint("SFX ignoré (clic trop rapide)");
   }
+}
+
+// 3. TES SONS PRÉCONFIGURÉS
+void playPop() {
+  // Le son pop de base est très fort, on le bride à 40% (0.4)
+  playSfx('pop.mp3', soundRatio: 0.4); 
+}
+
+void playBruitageFaible() {
+  // Exemple pour un autre son plus tard : on le booste ou on le laisse à 100% (1.0)
+  playSfx('son_faible.mp3', soundRatio: 1.0); 
 }
 
 void main() async {
