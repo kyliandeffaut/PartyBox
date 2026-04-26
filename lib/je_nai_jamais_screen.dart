@@ -416,8 +416,11 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
                   activeColor: Colors.purpleAccent,
                   inactiveThumbColor: Colors.grey,
                   inactiveTrackColor: Colors.white12,
-                  onChanged: (val) => setState(() => _localSecretMode = val),
-                ),
+                  onChanged: (val) {
+                    playPop(); 
+                    setState(() => _localSecretMode = val); 
+                  },
+                )
               ],
             ),
           ),
@@ -656,9 +659,23 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
           trailingWidget = Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (!gameEnded) IconButton(icon: const Icon(Icons.remove, color: Colors.redAccent), onPressed: () => _updateScoreLocal(widget.players[index], -1)),
+              if (!gameEnded)
+              Listener(
+                onPointerDown: (_) => playPop(),
+                child: IconButton(
+                  icon: const Icon(Icons.remove, color: Colors.redAccent),
+                  onPressed: () => _updateScoreLocal(widget.players[index], -1),
+                ),
+              ),
               Text(showScore ? "$score" : "?", style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-              if (!gameEnded) IconButton(icon: const Icon(Icons.add, color: Colors.greenAccent), onPressed: () => _updateScoreLocal(widget.players[index], 1)),
+              if (!gameEnded)
+              Listener(
+                onPointerDown: (_) => playPop(),
+                child: IconButton(
+                  icon: const Icon(Icons.add, color: Colors.greenAccent), 
+                  onPressed: () => _updateScoreLocal(widget.players[index], 1),
+                ),
+              ),
             ],
           );
         }

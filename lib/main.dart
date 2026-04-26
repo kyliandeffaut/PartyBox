@@ -226,10 +226,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Listener(
+          onPointerDown: (_) => playPop(),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        )
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -289,7 +292,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     hintText: "Entrez un prénom...",
                     filled: true,
                     fillColor: Colors.white.withValues(alpha: 0.05),
-                    suffixIcon: IconButton(icon: const Icon(Icons.add_circle, color: Colors.greenAccent), onPressed: addPlayer),
+                    suffixIcon: Listener(
+                      onPointerDown: (_) => playPop(),
+                      child: IconButton(
+                        icon: const Icon(Icons.add_circle, color: Colors.greenAccent), 
+                        onPressed: addPlayer,
+                      ),
+                    ),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                   ),
                   onSubmitted: (_) => addPlayer(),
@@ -309,9 +318,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         color: players[index].gender == 'H' ? Colors.blue : Colors.pinkAccent,
                       ),
                       title: Text(players[index].name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
-                        onPressed: () => setState(() => players.removeAt(index)),
+                      trailing: Listener(
+                        onPointerDown: (_) => playPop(),
+                        child: IconButton(
+                          icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                          onPressed: () => setState(() => players.removeAt(index)),
+                        ),
                       ),
                     ),
                   )

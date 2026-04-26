@@ -326,28 +326,31 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () async {
-            if (widget.isOnline && widget.lobbyId != null) {
-              final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-              final doc = await docRef.get();
-              if (doc.exists) {
-                final data = doc.data() as Map<String, dynamic>;
-                final List activeP = List.from(data['activePlayers'] ?? []);
-                activeP.removeWhere((p) => p is Map && p['name'] == widget.currentPlayerName);
-                await docRef.update({
-                  'activePlayers': activeP,
-                  'lastAction': '${widget.currentPlayerName} est retourné au salon.'
-                });
+        leading: Listener(
+          onPointerDown: (_) => playPop(),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () async {
+              if (widget.isOnline && widget.lobbyId != null) {
+                final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+                final doc = await docRef.get();
+                if (doc.exists) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final List activeP = List.from(data['activePlayers'] ?? []);
+                  activeP.removeWhere((p) => p is Map && p['name'] == widget.currentPlayerName);
+                  await docRef.update({
+                    'activePlayers': activeP,
+                    'lastAction': '${widget.currentPlayerName} est retourné au salon.'
+                  });
+                }
               }
-            }
-            
-            if (mounted) {
-              Navigator.pop(context);
-            }
-          },
-        ),
+              
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            },
+          ),
+        )
       ),
       body: Stack(
         children: [
