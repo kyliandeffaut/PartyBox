@@ -207,20 +207,25 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          isMyTurn
-            ? ElevatedButton( 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 70),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  elevation: 10,
-                ),
-                onPressed: () {
-                  setState(() => _lastChoice = ''); 
-                  _updateTurn(cIndex);
+          isMyTurn 
+            ? Listener(
+                onPointerDown: (_) {
+                  playPop(); // Le son se joue instantanément
                 },
-                child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    minimumSize: const Size(double.infinity, 70),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    elevation: 10,
+                  ),
+                  onPressed: () {
+                    setState(() => _lastChoice = '');
+                    _updateTurn(cIndex);
+                  },
+                  child: const Text("TOUR SUIVANT ➔", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                ),
               )
             : Text( 
                 "Attends que ${currentPlayer.name} passe au tour suivant...",
