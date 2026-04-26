@@ -439,27 +439,33 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                 if (!widget.isOnline)
                                   Padding(
                                     padding: const EdgeInsets.all(20),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.purpleAccent,
-                                        minimumSize: const Size(double.infinity, 52),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: Listener(
+                                      onPointerDown: (_) => playPop(), 
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.purpleAccent,
+                                          minimumSize: const Size(double.infinity, 52),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        ),
+                                        onPressed: _pickNextLocal,
+                                        child: const Text("QUESTION SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ),
-                                      onPressed: _pickNextLocal,
-                                      child: const Text("QUESTION SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                     ),
                                   )
                                 else if (_isHost)
                                   Padding(
                                     padding: const EdgeInsets.all(20),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.purpleAccent,
-                                        minimumSize: const Size(double.infinity, 52),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: Listener(
+                                      onPointerDown: (_) => playPop(),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.purpleAccent,
+                                          minimumSize: const Size(double.infinity, 52),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        ),
+                                        onPressed: _nextQuestionOnline,
+                                        child: const Text("SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ),
-                                      onPressed: _nextQuestionOnline,
-                                      child: const Text("SUIVANTE ➔", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                     ),
                                   )
                                 else
