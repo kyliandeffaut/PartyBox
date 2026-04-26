@@ -351,9 +351,12 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.close, color: Colors.white, size: 30),
-            onPressed: _quit,
+          leading: Listener(
+            onPointerDown: (_) => playPop(),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              onPressed: _quit,
+            ),
           ),
         ),
         body: Stack(
