@@ -15,10 +15,15 @@ import 'package:audioplayers/audioplayers.dart';
 final AudioPlayer globalSfxPlayer = AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
 
 void playPop() async {
-  // On stoppe net le son précédent s'il était en cours (pour les clics rapides)
-  await globalSfxPlayer.stop();
-  // On joue le son
-  await globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
+  try {
+    // On essaie de stopper et jouer
+    await globalSfxPlayer.stop();
+    await globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
+  } catch (e) {
+    // Si on clique trop vite et que le lecteur s'étouffe, 
+    // on capture l'erreur en silence pour éviter le crash !
+    debugPrint("SFX ignoré (clic trop rapide)");
+  }
 }
 
 void main() async {
