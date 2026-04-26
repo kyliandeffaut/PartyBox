@@ -23,7 +23,7 @@ void playSfx(String fileName, {double soundRatio = 1.0}) async {
   
   try {
     await globalSfxPlayer.stop();
-    // LE CALCUL MAGIQUE : Volume Curseur (ex: 0.5) * Volume du Son (ex: 0.4)
+    // Volume Curseur (ex: 0.5) * Volume du Son (ex: 0.4)
     await globalSfxPlayer.setVolume(userSfxVolume * soundRatio); 
     await globalSfxPlayer.play(AssetSource('audio/$fileName'));
   } catch (e) {
