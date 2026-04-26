@@ -22,16 +22,35 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _hasMusicStarted = false;
 
   // --- NOUVELLES VARIABLES DE PARAMÈTRES ---
-  double _volume = 0.1; // Volume de base baissé à 20%
+  double _volume = 0.1; // Volume de base baissé
   bool _isMuted = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    // 1. ON ACTIVE L'ÉCOUTE DU TÉLÉPHONE AU DÉMARRAGE
+    WidgetsBinding.instance.addObserver(this); 
+    
     _checkPremiumStatus(); 
     if (!kIsWeb) {
       _startBackgroundMusic();
+    }
+  }
+
+  // 2. LA FONCTION QUI INTERCEPTE LA MISE EN ARRIÈRE-PLAN
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Si l'application est réduite, cachée, ou qu'on ouvre le tiroir d'applications
+    if (state == AppLifecycleState.paused || 
+        state == AppLifecycleState.inactive || 
+        state == AppLifecycleState.hidden) {
+      _bgmPlayer.pause();
+    } 
+    // Si on revient sur l'application
+    else if (state == AppLifecycleState.resumed) {
+      if (!_isMuted) {
+        _bgmPlayer.resume();
+      }
     }
   }
 
@@ -41,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       _hasMusicStarted = true;
       _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-      // On utilise la variable _volume ici
       await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: _isMuted ? 0 : _volume);
     } catch (e) {
       _hasMusicStarted = false;
@@ -49,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  // --- FONCTION POUR METTRE À JOUR LE VOLUME ---
   void _updateVolume(double newVolume) {
     setState(() {
       _volume = newVolume;
@@ -59,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  // --- FONCTION POUR LE MODE MUET ---
   void _toggleMute() {
     setState(() {
       _isMuted = !_isMuted;
@@ -69,23 +85,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    // 3. ON ARRÊTE L'ÉCOUTE QUAND ON QUITTE
+    WidgetsBinding.instance.removeObserver(this); 
     _bgmPlayer.dispose();
     super.dispose();
-  }
-
-  // --- GESTION DE L'ARRIÈRE-PLAN ---
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
-      // L'appli passe en arrière-plan (ou téléphone verrouillé) ➔ PAUSE
-      _bgmPlayer.pause();
-    } else if (state == AppLifecycleState.resumed) {
-      // L'appli revient au premier plan ➔ LECTURE (sauf si on avait mis mute)
-      if (!_isMuted) {
-        _bgmPlayer.resume();
-      }
-    }
   }
 
   Future<void> _checkPremiumStatus() async {
