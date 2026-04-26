@@ -11,11 +11,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 // --- GESTIONNAIRE DE BRUITAGES (SFX) ---
-final AudioPlayer globalSfxPlayer = AudioPlayer();
+// On prépare le lecteur en mode faible latence pour les sons courts
+final AudioPlayer globalSfxPlayer = AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
 
-void playPop() {
-  // On joue le son pop.mp3 (assure-toi qu'il est bien dans le dossier assets/audio/)
-  globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
+void playPop() async {
+  // On stoppe net le son précédent s'il était en cours (pour les clics rapides)
+  await globalSfxPlayer.stop();
+  // On joue le son
+  await globalSfxPlayer.play(AssetSource('audio/pop.mp3'));
 }
 
 void main() async {
@@ -24,6 +27,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Précharger le son en mémoire vive pour zéro latence
+  await globalSfxPlayer.setSource(AssetSource('audio/pop.mp3'));
 
   cleanOldLobbies();
   runApp(const ActionVeriteApp());
