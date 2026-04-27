@@ -453,11 +453,12 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     }
   }
 
-  // Fonction pour les boutons de genre (à copier-coller aussi)
+  // Fonction pour les boutons de genre
   Widget _genderButton({required String label, required String value}) {
     bool isSelected = _selectedGender == value;
     return Expanded(
       child: GestureDetector(
+        onTapDown: (_) => playPop(),
         onTap: () => setState(() => _selectedGender = value),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15),
