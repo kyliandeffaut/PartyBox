@@ -37,7 +37,7 @@ void playPop() {
 }
 
 void playHammer() {
-  playSfx('hammer.mp3', soundRatio: 0.8); 
+  playSfx('hammer.mp3', soundRatio: 0.4); 
 }
 
 void main() async {
