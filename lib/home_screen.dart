@@ -533,14 +533,17 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
 
                 _isLoading 
                 ? const CircularProgressIndicator(color: Colors.pinkAccent)
-                : ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pinkAccent,
-                      minimumSize: const Size(double.infinity, 60),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                : Listener(
+                    onPointerDown: (_) => playPop(),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pinkAccent,
+                        minimumSize: const Size(double.infinity, 60),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      onPressed: _createLobby,
+                      child: const Text("CRÉER ET REJOINDRE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
-                    onPressed: _createLobby,
-                    child: const Text("CRÉER ET REJOINDRE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
               ],
             ),
@@ -733,83 +736,86 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                 const SizedBox(height: 25),
 
                 // --- BOUTON DE SCAN QR CODE ---
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent.withValues(alpha: 0.2),
-                    side: const BorderSide(color: Colors.pinkAccent),
-                    minimumSize: const Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  ),
-                  icon: const Icon(Icons.qr_code_scanner, color: Colors.pinkAccent),
-                  label: const Text(
-                    "SCANNER UN QR CODE",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
-                  ),
-                  onPressed: () async {
-                    String pseudo = _pseudoController.text.trim();
-                    if (pseudo.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange));
-                      return;
-                    }
-
-                    // 1. Ouvre la caméra
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
-                    );
-
-                    // Si l'utilisateur a appuyé sur retour sans scanner
-                    if (result == null) return;
-
-                    // 2. Si le scan a marché et renvoie des données
-                    if (result is Map) {
-                      setState(() => _isLoading = true);
-                      
-                      String scannedLobbyId = result['lobbyId']?.toString().trim() ?? "";
-                      String scannedPassword = result['password']?.toString().trim() ?? "";
-
-                      // VÉRIFICATION 1 : Est-ce qu'on a bien reçu l'ID ?
-                      if (scannedLobbyId.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erreur: ID introuvable dans le QR Code"), backgroundColor: Colors.red));
-                        setState(() => _isLoading = false);
+                Listener(
+                  onPointerDown: (_) => playPop(),
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent.withValues(alpha: 0.2),
+                      side: const BorderSide(color: Colors.pinkAccent),
+                      minimumSize: const Size(double.infinity, 55),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    icon: const Icon(Icons.qr_code_scanner, color: Colors.pinkAccent),
+                    label: const Text(
+                      "SCANNER UN QR CODE",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                    onPressed: () async {
+                      String pseudo = _pseudoController.text.trim();
+                      if (pseudo.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tape ton pseudo en haut d'abord ! 👆"), backgroundColor: Colors.orange));
                         return;
                       }
 
-                      try {
-                        var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
-                        
-                        // VÉRIFICATION 2 : Est-ce que le lobby existe sur Firebase ?
-                        if (!doc.exists) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lobby introuvable sur Firebase (ID: $scannedLobbyId)"), backgroundColor: Colors.red));
-                        } 
-                        // VÉRIFICATION 3 : Est-ce que le mot de passe est bon ?
-                        else if (doc.data()?['password'] != scannedPassword) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mauvais mot de passe dans le QR !"), backgroundColor: Colors.red));
-                        } 
-                        // TOUT EST BON : ON CONNECTE !
-                        else {
-                          String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
-                          await doc.reference.update({
-                            'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
-                          });
+                      // 1. Ouvre la caméra
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+                      );
 
-                          if (!mounted) return;
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => WaitingRoomScreen(
-                                lobbyId: scannedLobbyId, lobbyName: lobbyName,
-                                currentPlayerName: pseudo, currentPlayerGender: _selectedGender,
-                                isHost: false, password: scannedPassword,
-                          )));
+                      // Si l'utilisateur a appuyé sur retour sans scanner
+                      if (result == null) return;
+
+                      // 2. Si le scan a marché et renvoie des données
+                      if (result is Map) {
+                        setState(() => _isLoading = true);
+                        
+                        String scannedLobbyId = result['lobbyId']?.toString().trim() ?? "";
+                        String scannedPassword = result['password']?.toString().trim() ?? "";
+
+                        // VÉRIFICATION 1 : Est-ce qu'on a bien reçu l'ID ?
+                        if (scannedLobbyId.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erreur: ID introuvable dans le QR Code"), backgroundColor: Colors.red));
+                          setState(() => _isLoading = false);
+                          return;
                         }
-                      } catch (e) {
-                        // VÉRIFICATION 4 : Erreur de connexion / Firebase
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur système: $e"), backgroundColor: Colors.red));
-                      } finally {
-                        if (mounted) setState(() => _isLoading = false);
+
+                        try {
+                          var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
+                          
+                          // VÉRIFICATION 2 : Est-ce que le lobby existe sur Firebase ?
+                          if (!doc.exists) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lobby introuvable sur Firebase (ID: $scannedLobbyId)"), backgroundColor: Colors.red));
+                          } 
+                          // VÉRIFICATION 3 : Est-ce que le mot de passe est bon ?
+                          else if (doc.data()?['password'] != scannedPassword) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mauvais mot de passe dans le QR !"), backgroundColor: Colors.red));
+                          } 
+                          // TOUT EST BON : ON CONNECTE !
+                          else {
+                            String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
+                            await doc.reference.update({
+                              'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
+                            });
+
+                            if (!mounted) return;
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => WaitingRoomScreen(
+                                  lobbyId: scannedLobbyId, lobbyName: lobbyName,
+                                  currentPlayerName: pseudo, currentPlayerGender: _selectedGender,
+                                  isHost: false, password: scannedPassword,
+                            )));
+                          }
+                        } catch (e) {
+                          // VÉRIFICATION 4 : Erreur de connexion / Firebase
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur système: $e"), backgroundColor: Colors.red));
+                        } finally {
+                          if (mounted) setState(() => _isLoading = false);
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Format QR non reconnu par l'écran."), backgroundColor: Colors.red));
                       }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Format QR non reconnu par l'écran."), backgroundColor: Colors.red));
-                    }
-                  },
+                    },
+                  ),
                 ),
                 
                 const Padding(
