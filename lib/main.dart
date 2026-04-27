@@ -33,13 +33,11 @@ void playSfx(String fileName, {double soundRatio = 1.0}) async {
 
 // 3. TES SONS PRÉCONFIGURÉS
 void playPop() {
-  // Le son pop de base est très fort, on le bride à 40% (0.4)
   playSfx('pop.mp3', soundRatio: 0.4); 
 }
 
-void playBruitageFaible() {
-  // Exemple pour un autre son plus tard : on le booste ou on le laisse à 100% (1.0)
-  playSfx('son_faible.mp3', soundRatio: 1.0); 
+void playHammer() {
+  playSfx('hammer.mp3', soundRatio: 0.8); 
 }
 
 void main() async {
@@ -51,6 +49,7 @@ void main() async {
 
   // Précharger le son en mémoire vive pour zéro latence
   await globalSfxPlayer.setSource(AssetSource('audio/pop.mp3'));
+  await globalSfxPlayer.setSource(AssetSource('audio/hammer.mp3'));
 
   cleanOldLobbies();
   runApp(const ActionVeriteApp());

@@ -182,7 +182,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
     if (widget.lobbyId == null) return;
     if (_questions.isEmpty) return;
 
-    // 👈 NOUVEAU SYSTÈME ALÉATOIRE SANS DOUBLON
+    // SYSTÈME ALÉATOIRE SANS DOUBLON
     if (_remainingQuestions.isEmpty) {
       _remainingQuestions = List.from(_questions)..shuffle(); // On recharge le sac s'il est vide
     }
@@ -371,7 +371,7 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                         child: Listener(
                                           onPointerDown: (_) {
                                             // 2. LE SON SE JOUE SEULEMENT SI ON N'A PAS ENCORE VOTÉ
-                                            if (!_hasVotedThisTurn) playPop(); 
+                                            if (!_hasVotedThisTurn) playHammer(); 
                                           },
                                           child: ListTile(
                                             leading: CircleAvatar(
