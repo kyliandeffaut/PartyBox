@@ -210,7 +210,7 @@ class _ActionVeriteScreenState extends State<ActionVeriteScreen> {
           isMyTurn 
             ? Listener(
                 onPointerDown: (_) {
-                  playPop(); // Le son se joue instantanément
+                  playSwoosh(); // Le son se joue instantanément
                 },
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
