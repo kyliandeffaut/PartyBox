@@ -656,6 +656,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
     bool isSelected = _selectedGender == value;
     return Expanded(
       child: GestureDetector(
+        onTapDown: (_) => playPop(),
         onTap: () => setState(() => _selectedGender = value),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15),
