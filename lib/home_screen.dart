@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'waiting_room_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'qr_scanner_screen.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,62 +15,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  final AudioPlayer _bgmPlayer = AudioPlayer();
   int _secretTapCount = 0;
   bool _isPremiumUnlocked = false;
-  bool _hasMusicStarted = false;
-
-  // --- VARIABLES DE PARAMÈTRES ---
-  double _volume = 0.5;
-  bool _isMuted = false;
 
   @override
   void initState() {
     super.initState();
-    // 1. ON ACTIVE L'ÉCOUTE DU TÉLÉPHONE AU DÉMARRAGE
     WidgetsBinding.instance.addObserver(this); 
-    
     _checkPremiumStatus(); 
     if (!kIsWeb) {
-      _startBackgroundMusic();
+      startGlobalBgm(); // Appel de la nouvelle fonction globale
     }
   }
 
   // 2. LA FONCTION QUI INTERCEPTE LA MISE EN ARRIÈRE-PLAN
-  @override
+@override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Si l'application est réduite, cachée, ou qu'on ouvre le tiroir d'applications
-    if (state == AppLifecycleState.paused || 
-        state == AppLifecycleState.inactive || 
-        state == AppLifecycleState.hidden) {
-      _bgmPlayer.pause();
+    // ON NE CIBLE QUE 'PAUSED' MAINTENANT
+    if (state == AppLifecycleState.paused) {
+      globalBgmPlayer.pause();
     } 
-    // Si on revient sur l'application
     else if (state == AppLifecycleState.resumed) {
-      if (!_isMuted) {
-        _bgmPlayer.resume();
+      if (!isGlobalBgmMuted) {
+        globalBgmPlayer.resume();
       }
-    }
-  }
-
-  void _startBackgroundMusic() async {
-    if (_hasMusicStarted) return; 
-
-    try {
-      _hasMusicStarted = true;
-      _bgmPlayer.setReleaseMode(ReleaseMode.loop);
-      await _bgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: _isMuted ? 0 : _volume);
-    } catch (e) {
-      _hasMusicStarted = false;
-      debugPrint("❌ Erreur critique Audio : $e");
     }
   }
 
   void _updateVolume(double newVolume) {
     setState(() {
-      _volume = newVolume;
-      if (!_isMuted) {
-        _bgmPlayer.setVolume(_volume);
+      globalBgmVolume = newVolume;
+      if (!isGlobalBgmMuted) {
+        globalBgmPlayer.setVolume(globalBgmVolume);
       }
     });
   }
@@ -90,16 +65,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _toggleMute() {
     setState(() {
-      _isMuted = !_isMuted;
-      _bgmPlayer.setVolume(_isMuted ? 0 : _volume);
+      isGlobalBgmMuted = !isGlobalBgmMuted;
+      globalBgmPlayer.setVolume(isGlobalBgmMuted ? 0 : globalBgmVolume);
     });
   }
 
   @override
   void dispose() {
-    // 3. ON ARRÊTE L'ÉCOUTE QUAND ON QUITTE
     WidgetsBinding.instance.removeObserver(this); 
-    _bgmPlayer.dispose();
+    // (J'ai retiré le _bgmPlayer.dispose() qui tuait la musique)
     super.dispose();
   }
 
@@ -135,26 +109,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Row(
                 children: [
                   IconButton(
-                    icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up, color: Colors.pinkAccent),
+                    icon: Icon(isGlobalBgmMuted ? Icons.volume_off : Icons.volume_up, color: Colors.pinkAccent),
                     onPressed: () {
                       _toggleMute();
-                      setModalState(() {}); // Met à jour l'icône dans la fenêtre
+                      setModalState(() {});
                     },
                   ),
                   Expanded(
                     child: Slider(
-                      value: _volume,
+                      value: globalBgmVolume,
                       min: 0.0,
                       max: 1.0,
                       activeColor: Colors.pinkAccent,
                       inactiveColor: Colors.white12,
-                      onChanged: _isMuted ? null : (val) {
+                      onChanged: isGlobalBgmMuted ? null : (val) {
                         _updateVolume(val);
-                        setModalState(() {}); // Met à jour le slider dans la fenêtre
+                        setModalState(() {});
                       },
                     ),
                   ),
-                  Text("${(_volume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
+                  Text("${(globalBgmVolume * 100).toInt()}%", style: const TextStyle(color: Colors.white, fontSize: 12)),
                 ],
               ),
               // --- 2. SLIDER BRUITAGES ---
@@ -247,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Listener(
-      onPointerDown: (_) => _startBackgroundMusic(),
+      onPointerDown: (_) => startGlobalBgm(),
       child: Scaffold(
         extendBodyBehindAppBar: true, // Permet à l'image de fond d'être sous l'appbar
         appBar: AppBar(

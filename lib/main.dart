@@ -52,6 +52,24 @@ void playSwoosh() {
   playSfx('swoosh.mp3', soundRatio: 0.4); 
 }
 
+// --- LECTEUR DE MUSIQUE GLOBAL ---
+final AudioPlayer globalBgmPlayer = AudioPlayer();
+bool isBgmStarted = false;
+double globalBgmVolume = 0.1;
+bool isGlobalBgmMuted = false;
+
+void startGlobalBgm() async {
+  if (isBgmStarted) return;
+  try {
+    isBgmStarted = true;
+    globalBgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await globalBgmPlayer.play(AssetSource('audio/party_theme.mp3'), volume: isGlobalBgmMuted ? 0 : globalBgmVolume);
+  } catch (e) {
+    isBgmStarted = false;
+    debugPrint("Erreur BGM globale: $e");
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Indispensable pour Firebase
   
