@@ -79,7 +79,7 @@ void main() async {
 
   await AudioPlayer.global.setAudioContext(AudioContext(
     iOS: AudioContextIOS(
-      category: AVAudioSessionCategory.ambient, // Autorise de jouer par-dessus d'autres sons sur iPhone
+      category: AVAudioSessionCategory.playback, // Autorise de jouer par-dessus d'autres sons sur iPhone
       options: {AVAudioSessionOptions.mixWithOthers},
     ),
     android: AudioContextAndroid(
