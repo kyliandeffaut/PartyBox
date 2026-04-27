@@ -406,7 +406,17 @@ class GameSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, 
+        elevation: 0,
+        leading: Listener(
+          onPointerDown: (_) => playPop(),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white), 
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -481,7 +491,7 @@ class GameSelectionScreen extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // --- JEU 4 : TU PRÉFÈRES ? 👈 NOUVEAU ---
+                // --- JEU 4 : TU PRÉFÈRES ? ---
                 _menuCard(
                   context, 
                   "Tu préfères ?", 
