@@ -479,7 +479,14 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: const BackButton(color: Colors.white)),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, 
+        elevation: 0, 
+        leading: Listener(
+          onPointerDown: (_) => playPop(),
+          child: const BackButton(color: Colors.white),
+        ),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -679,7 +686,14 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: const BackButton(color: Colors.white)),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, 
+        elevation: 0, 
+        leading: Listener(
+          onPointerDown: (_) => playPop(),
+          child: const BackButton(color: Colors.white),
+        ),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity, // Pour remplir tout l'écran
@@ -815,7 +829,9 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
 
                 _isLoading 
                 ? const CircularProgressIndicator(color: Colors.blueAccent)
-                : ElevatedButton(
+                : Listener(
+                  onPointerDown: (_) => playPop(),
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       minimumSize: const Size(double.infinity, 60),
@@ -824,6 +840,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                     onPressed: _joinLobby,
                     child: const Text("SE CONNECTER", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
+                ),
               ],
             ),
           ),

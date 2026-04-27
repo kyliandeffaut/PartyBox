@@ -432,7 +432,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                       var currentData = doc.data() as Map<String, dynamic>;
                                       List allPlayers = currentData['players'] ?? [];
                                       
-                                      // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
                                       List updatedPlayers = allPlayers.map((p) {
                                         var newP = Map<String, dynamic>.from(p);
                                         newP['hasVoted'] = false;
