@@ -483,14 +483,17 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                               const SizedBox(height: 15),
                                               ...gameModes.map((mode) {
                                                 bool isSelected = data['gameMode'] == mode;
-                                                return ListTile(
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                                                  title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
-                                                  trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
-                                                  onTap: () {
-                                                    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
-                                                    Navigator.pop(context);
-                                                  },
+                                                return Listener(
+                                                  onPointerDown: (_) => playPop(),
+                                                  child: ListTile(
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                                                    title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
+                                                    trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
+                                                    onTap: () {
+                                                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
                                                 );
                                               }),
                                             ],
@@ -502,23 +505,26 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
                                 ),
                                 const SizedBox(height: 15),
-                                OutlinedButton(
-                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: const Color(0xFF1A1A1D),
-                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                      builder: (context) => _buildParamsSheet(data),
-                                    );
-                                  },
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.settings, color: Colors.white70, size: 18),
-                                      SizedBox(width: 8),
-                                      Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                                    ],
+                                Listener(
+                                  onPointerDown: (_) => playPop(),
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: const Color(0xFF1A1A1D),
+                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+                                        builder: (context) => _buildParamsSheet(data),
+                                      );
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.settings, color: Colors.white70, size: 18),
+                                        SizedBox(width: 8),
+                                        Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -621,14 +627,17 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   const SizedBox(height: 10),
                   ...cats.map((c) {
                     bool isSelected = c['n'] == currentCategory;
-                    return ListTile(
-                      leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
-                      title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-                      trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
-                      onTap: () {
-                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
-                        Navigator.pop(context);
-                      },
+                    return Listener(
+                      onPointerDown: (_) => playPop(),
+                      child: ListTile(
+                        leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
+                        title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                        trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
+                        onTap: () {
+                          FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
+                          Navigator.pop(context);
+                        },
+                      ),
                     );
                   }),
                 ] else ...[
