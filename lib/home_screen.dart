@@ -258,10 +258,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             // --- BOUTON PARAMÈTRES EN HAUT À DROITE ---
             Padding(
               padding: const EdgeInsets.only(top: 20), // Ajoute 20 pixels d'espace en haut
-              child: IconButton(
-                iconSize: 45, // Augmente la taille de l'icône pour une meilleure accessibilité
-                icon: const Icon(Icons.settings, color: Colors.white70),
-                onPressed: _showSettingsDialog,
+              child: Listener(
+                onPointerDown: (_) => playPop(),
+                child: IconButton(
+                  iconSize: 45, 
+                  icon: const Icon(Icons.settings, color: Colors.white70),
+                  onPressed: _showSettingsDialog,
+                ),
               ),
             ),
             const SizedBox(width: 15), // Espace par rapport à la droite
