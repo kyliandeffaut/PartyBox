@@ -77,6 +77,20 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  await AudioPlayer.global.setAudioContext(AudioContext(
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient, // Autorise de jouer par-dessus d'autres sons sur iPhone
+      options: {AVAudioSessionOptions.mixWithOthers},
+    ),
+    android: AudioContextAndroid(
+      isSpeakerphoneOn: false,
+      stayAwake: true,
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.media,
+      audioFocus: AndroidAudioFocus.none, // Ne pas voler la priorité audio !
+    ),
+  ));
+
   // Précharger le son en mémoire vive pour zéro latence
   await globalSfxPlayer.setSource(AssetSource('audio/pop.mp3'));
   await globalSfxPlayer.setSource(AssetSource('audio/hammer.mp3'));
