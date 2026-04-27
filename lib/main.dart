@@ -40,6 +40,14 @@ void playHammer() {
   playSfx('hammer.mp3', soundRatio: 0.4); 
 }
 
+void playBloop() {
+  playSfx('bloop.mp3', soundRatio: 0.4); 
+}
+
+void playBloopNotif() {
+  playSfx('bloop_notif.mp3', soundRatio: 0.4); 
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Indispensable pour Firebase
   
@@ -50,6 +58,8 @@ void main() async {
   // Précharger le son en mémoire vive pour zéro latence
   await globalSfxPlayer.setSource(AssetSource('audio/pop.mp3'));
   await globalSfxPlayer.setSource(AssetSource('audio/hammer.mp3'));
+  await globalSfxPlayer.setSource(AssetSource('audio/bloop.mp3'));
+  await globalSfxPlayer.setSource(AssetSource('audio/bloop_notif.mp3'));
 
   cleanOldLobbies();
   runApp(const ActionVeriteApp());

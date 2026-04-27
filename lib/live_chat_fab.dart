@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'live_chat_widget.dart';
+import 'main.dart';
 
 class LiveChatFAB extends StatefulWidget {
   final String lobbyId;
@@ -18,6 +19,7 @@ class LiveChatFAB extends StatefulWidget {
 
 class _LiveChatFABState extends State<LiveChatFAB> {
   int _lastSeenMessageCount = 0;
+  int _notifiedMessageCount = 0;
   bool _isChatOpen = false;
 
   // --- VARIABLES POUR LE DÉPLACEMENT ---
@@ -84,9 +86,15 @@ class _LiveChatFABState extends State<LiveChatFAB> {
         
         if (_isChatOpen) {
           _lastSeenMessageCount = currentCount;
+          _notifiedMessageCount = currentCount;
         }
 
         bool hasNewMessages = currentCount > _lastSeenMessageCount && !_isChatOpen;
+
+        if (hasNewMessages && currentCount > _notifiedMessageCount) {
+          _notifiedMessageCount = currentCount;
+          playBloopNotif();
+        }
 
         // AnimatedPositioned permet de faire glisser la bulle en douceur quand on lâche
         return AnimatedPositioned(
@@ -132,9 +140,11 @@ class _LiveChatFABState extends State<LiveChatFAB> {
                 children: [
                   FloatingActionButton(
                     backgroundColor: Colors.blueAccent,
-                    elevation: _isDragging ? 15 : 8, // L'ombre grandit quand on soulève la bulle
+                    elevation: _isDragging ? 15 : 8,
                     onPressed: () {
+                      playBloop();
                       _lastSeenMessageCount = currentCount;
+                      _notifiedMessageCount = currentCount;
                       _showChatSheet(context);
                     },
                     child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
