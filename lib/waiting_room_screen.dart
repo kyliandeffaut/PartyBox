@@ -137,13 +137,18 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 onPressed: () => Navigator.pop(context, false),
                 child: const Text('ANNULER', style: TextStyle(color: Colors.white54)),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pinkAccent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              Listener(
+                onPointerDown: (_) {
+                  playPop();
+                },
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('QUITTER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('QUITTER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -161,9 +166,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () => Navigator.maybePop(context), 
+          leading: Listener(
+            onPointerDown: (_) => playPop(),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+              onPressed: () => Navigator.maybePop(context), 
+            ),
           ),
         ),
         body: Stack(
@@ -219,6 +227,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
                                 // NOUVEAU BOUTON QR CODE
                                 GestureDetector(
+                                  onTapDown: (_) => playPop(),
                                   onTap: () => _showQRCodeDialog(context, widget.lobbyId, widget.password),
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
@@ -398,52 +407,57 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             padding: const EdgeInsets.all(30.0),
                             child: Column(
                               children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: someoneStillInGame ? Colors.grey : Colors.greenAccent,
-                                    minimumSize: const Size(double.infinity, 60),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                  ),
-                                  onPressed: someoneStillInGame
-                                      ? () {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text("Attends que tout le monde revienne au lobby avant de relancer ✅"),
-                                              backgroundColor: Colors.orangeAccent,
-                                            ),
-                                          );
-                                        }
-                                      : () async {
-                                    final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-                                    final doc = await docRef.get();
-                                    var currentData = doc.data() as Map<String, dynamic>;
-                                    List allPlayers = currentData['players'] ?? [];
-                                    
-                                    // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
-                                    List updatedPlayers = allPlayers.map((p) {
-                                      var newP = Map<String, dynamic>.from(p);
-                                      newP['hasVoted'] = false;
-                                      newP['lastVote'] = null;
-                                      newP['score'] = 0;
-                                      newP['voteTarget'] = null;
-                                      newP['tpChoice'] = null;
-                                      return newP;
-                                    }).toList();
-
-                                    await docRef.update({
-                                      'status': 'playing',
-                                      'activePlayers': updatedPlayers,
-                                      'players': updatedPlayers,
-                                      'jnjGameEnded': false,
-                                      'currentQuestion': null, // Force une nouvelle pioche
-                                      'lastChoice': null,
-                                      'showNextButton': false,
-                                      'currentPlayerIndex': 0,
-                                    });
+                                Listener(
+                                  onPointerDown: (_) {
+                                    if (!someoneStillInGame) playPop();
                                   },
-                                  child: Text(
-                                    someoneStillInGame ? "JOUEURS ENCORE EN JEU..." : "LANCER LA PARTIE",
-                                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: someoneStillInGame ? Colors.grey : Colors.greenAccent,
+                                      minimumSize: const Size(double.infinity, 60),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    ),
+                                    onPressed: someoneStillInGame
+                                        ? () {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text("Attends que tout le monde revienne au lobby avant de relancer ✅"),
+                                                backgroundColor: Colors.orangeAccent,
+                                              ),
+                                            );
+                                          }
+                                        : () async {
+                                      final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+                                      final doc = await docRef.get();
+                                      var currentData = doc.data() as Map<String, dynamic>;
+                                      List allPlayers = currentData['players'] ?? [];
+                                      
+                                      // ✅ RESET PARFAIT DE LA PARTIE (Pour ne plus retomber sur l'ancienne)
+                                      List updatedPlayers = allPlayers.map((p) {
+                                        var newP = Map<String, dynamic>.from(p);
+                                        newP['hasVoted'] = false;
+                                        newP['lastVote'] = null;
+                                        newP['score'] = 0;
+                                        newP['voteTarget'] = null;
+                                        newP['tpChoice'] = null;
+                                        return newP;
+                                      }).toList();
+
+                                      await docRef.update({
+                                        'status': 'playing',
+                                        'activePlayers': updatedPlayers,
+                                        'players': updatedPlayers,
+                                        'jnjGameEnded': false,
+                                        'currentQuestion': null, // Force une nouvelle pioche
+                                        'lastChoice': null,
+                                        'showNextButton': false,
+                                        'currentPlayerIndex': 0,
+                                      });
+                                    },
+                                    child: Text(
+                                      someoneStillInGame ? "JOUEURS ENCORE EN JEU..." : "LANCER LA PARTIE",
+                                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 15),
