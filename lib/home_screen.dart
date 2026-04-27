@@ -31,13 +31,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // 2. LA FONCTION QUI INTERCEPTE LA MISE EN ARRIÈRE-PLAN
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // On met en pause si l'app est réduite (mobile), cachée (web), ou inactive (appels/notifications)
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden || state == AppLifecycleState.inactive) {
-      globalBgmPlayer.pause();
-    } 
-    else if (state == AppLifecycleState.resumed) {
-      if (!isGlobalBgmMuted) {
-        globalBgmPlayer.resume();
+    if (kIsWeb) {
+      // COMPORTEMENT SUR LE WEB (Navigateur)
+      if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden || state == AppLifecycleState.inactive) {
+        globalBgmPlayer.pause();
+      } else if (state == AppLifecycleState.resumed) {
+        if (!isGlobalBgmMuted) globalBgmPlayer.resume();
+      }
+    } else {
+      // COMPORTEMENT SUR LE TÉLÉPHONE (iOS / Android)
+      // On ne coupe la musique QUE si l'application est totalement réduite en arrière-plan
+      if (state == AppLifecycleState.paused) {
+        globalBgmPlayer.pause();
+      } else if (state == AppLifecycleState.resumed) {
+        if (!isGlobalBgmMuted) globalBgmPlayer.resume();
       }
     }
   }
