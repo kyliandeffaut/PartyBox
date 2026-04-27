@@ -460,49 +460,52 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 15),
-                                OutlinedButton(
-                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: const Color(0xFF1A1A1D),
-                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                      builder: (BuildContext context) {
-                                        List<String> gameModes = [
-                                          'Action ou Vérité',
-                                          'Je n\'ai jamais',
-                                          'Le Tribunal',
-                                          'Tu préfères ?',
-                                        ];
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Text("CHOISIS UN JEU", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                                              const SizedBox(height: 15),
-                                              ...gameModes.map((mode) {
-                                                bool isSelected = data['gameMode'] == mode;
-                                                return Listener(
-                                                  onPointerDown: (_) => playPop(),
-                                                  child: ListTile(
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                                                    title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
-                                                    trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
-                                                    onTap: () {
-                                                      FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                );
-                                              }),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                                Listener(
+                                  onPointerDown: (_) => playPop(),
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: const Color(0xFF1A1A1D),
+                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+                                        builder: (BuildContext context) {
+                                          List<String> gameModes = [
+                                            'Action ou Vérité',
+                                            'Je n\'ai jamais',
+                                            'Le Tribunal',
+                                            'Tu préfères ?',
+                                          ];
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 20),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Text("CHOISIS UN JEU", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                                const SizedBox(height: 15),
+                                                ...gameModes.map((mode) {
+                                                  bool isSelected = data['gameMode'] == mode;
+                                                  return Listener(
+                                                    onPointerDown: (_) => playPop(),
+                                                    child: ListTile(
+                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                                                      title: Text(mode, style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white70, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 16)),
+                                                      trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
+                                                      onTap: () {
+                                                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'gameMode': mode});
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  );
+                                                }),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text("JEUX : ${data['gameMode'] ?? 'Action ou Vérité'}", style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                                  ),
                                 ),
                                 const SizedBox(height: 15),
                                 Listener(
