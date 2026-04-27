@@ -368,27 +368,33 @@ class _TribunalScreenState extends State<TribunalScreen> {
                                           borderRadius: BorderRadius.circular(16),
                                           border: Border.all(color: Colors.white10),
                                         ),
-                                        child: ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundColor: p.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
-                                            child: Text(p.name.isEmpty ? "?" : p.name[0], style: const TextStyle(color: Colors.white)),
-                                          ),
-                                          title: Text(
-                                            p.name + (isMe ? " (Moi)" : ""),
-                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                          ),
-                                          trailing: _hasVotedThisTurn
-                                              ? const Icon(Icons.lock, color: Colors.white24)
-                                              : const Icon(Icons.how_to_vote, color: Colors.purpleAccent),
-                                          onTap: _hasVotedThisTurn
-                                              ? null
-                                              : () {
-                                                  if (widget.isOnline) {
-                                                    _voteOnline(p.name);
-                                                  } else {
-                                                    _handleLocalVote(p.name); 
-                                                  }
-                                                },
+                                        child: Listener(
+                                          onPointerDown: (_) {
+                                            // 2. LE SON SE JOUE SEULEMENT SI ON N'A PAS ENCORE VOTÉ
+                                            if (!_hasVotedThisTurn) playPop(); 
+                                          },
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundColor: p.gender == 'H' ? Colors.blueAccent : Colors.pinkAccent,
+                                              child: Text(p.name.isEmpty ? "?" : p.name[0], style: const TextStyle(color: Colors.white)),
+                                            ),
+                                            title: Text(
+                                              p.name + (isMe ? " (Moi)" : ""),
+                                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            ),
+                                            trailing: _hasVotedThisTurn
+                                                ? const Icon(Icons.lock, color: Colors.white24)
+                                                : const Icon(Icons.how_to_vote, color: Colors.purpleAccent),
+                                            onTap: _hasVotedThisTurn
+                                                ? null
+                                                : () {
+                                                    if (widget.isOnline) {
+                                                      _voteOnline(p.name);
+                                                    } else {
+                                                      _handleLocalVote(p.name);
+                                                    }
+                                                  },
+                                        ),
                                         ),
                                       ).animate().fadeIn(delay: (i * 60).ms).slideX(begin: 0.15);
                                     },
