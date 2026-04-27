@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool _hasMusicStarted = false;
 
   // --- VARIABLES DE PARAMÈTRES ---
-  double _volume = 0.1;
+  double _volume = 0.5;
   bool _isMuted = false;
 
   @override
