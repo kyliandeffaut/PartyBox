@@ -55,7 +55,7 @@ void playSwoosh() {
 // --- LECTEUR DE MUSIQUE GLOBAL ---
 final AudioPlayer globalBgmPlayer = AudioPlayer();
 bool isBgmStarted = false;
-double globalBgmVolume = 0.1;
+double globalBgmVolume = 0.5;
 bool isGlobalBgmMuted = false;
 
 void startGlobalBgm() async {

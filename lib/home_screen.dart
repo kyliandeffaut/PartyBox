@@ -29,10 +29,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   // 2. LA FONCTION QUI INTERCEPTE LA MISE EN ARRIÈRE-PLAN
-@override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // ON NE CIBLE QUE 'PAUSED' MAINTENANT
-    if (state == AppLifecycleState.paused) {
+    // On met en pause si l'app est réduite (mobile), cachée (web), ou inactive (appels/notifications)
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden || state == AppLifecycleState.inactive) {
       globalBgmPlayer.pause();
     } 
     else if (state == AppLifecycleState.resumed) {
