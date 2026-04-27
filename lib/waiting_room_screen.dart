@@ -615,6 +615,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.white12,
                       onChanged: (val) {
+                        playPop();
                         setModalState(() => isSecret = val);
                         FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
                           'jnjVisibility': val ? 'invisible' : 'visible'
