@@ -317,6 +317,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                             isOnline: true,
                                             lobbyId: widget.lobbyId,
                                             currentPlayerName: widget.currentPlayerName,
+                                            hasMrWhite: data['mwHasMrWhite'] ?? true,
+                                            hasUndercover: data['mwHasUndercover'] ?? false,
                                           ); 
                                         } else {
                                           targetScreen = ActionVeriteScreen(
@@ -643,6 +645,41 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           'jnjVisibility': val ? 'invisible' : 'visible'
                         });
                       },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                if (mode == "Mr White") ...[
+                  Container(
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          title: const Text("Mr White 🕶️", style: TextStyle(color: Colors.white)),
+                          value: data['mwHasMrWhite'] ?? true,
+                          activeColor: Colors.blueGrey.shade400,
+                          onChanged: (val) {
+                            bool uc = data['mwHasUndercover'] ?? false;
+                            if (!val && !uc) return;
+                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwHasMrWhite': val});
+                          },
+                        ),
+                        SwitchListTile(
+                          title: const Text("L'Infiltré 🕵️‍♂️", style: TextStyle(color: Colors.white)),
+                          value: data['mwHasUndercover'] ?? false,
+                          activeColor: Colors.purpleAccent,
+                          onChanged: (val) {
+                            bool mw = data['mwHasMrWhite'] ?? true;
+                            if (!val && !mw) return;
+                            if (val && mw && (data['players'] as List).length < 4) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("4 joueurs min. pour avoir les 2 rôles !")));
+                              return;
+                            }
+                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwHasUndercover': val});
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 20),

@@ -555,23 +555,80 @@ class GameSelectionScreen extends StatelessWidget {
                 // --- MR WHITE ---
                 _menuCard(
                   context, 
-                  "Mr White", 
+                  "Le Mot Secret", 
                   "🕵️‍♂️", 
-                  Colors.blueGrey.shade400, // Une belle couleur grise/bleue pour l'infiltration
+                  Colors.blueGrey.shade400,
                   () {
                     if (players.length < 3) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Il faut au moins 3 joueurs pour jouer à Mr White !"),
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                      );
-                      return; // On bloque l'ouverture de la page
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Il faut au moins 3 joueurs !"), backgroundColor: Colors.orangeAccent));
+                      return;
                     }
-                    
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => MrWhiteScreen(players: players)
-                    ));
+
+                    // VARIABLES PAR DÉFAUT DU MENU
+                    bool hasMrWhite = true;
+                    bool hasUndercover = players.length >= 4; 
+
+                    showDialog(
+                      context: context,
+                      builder: (context) => StatefulBuilder(
+                        builder: (context, setModalState) {
+                          return AlertDialog(
+                            backgroundColor: const Color(0xFF1A1A1D),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            title: const Text("PARAMÈTRES DU JEU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SwitchListTile(
+                                  title: const Text("Mr White 🕶️", style: TextStyle(color: Colors.white)),
+                                  subtitle: const Text("Il n'a aucun mot.", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                                  value: hasMrWhite,
+                                  activeColor: Colors.blueGrey.shade400,
+                                  onChanged: (val) {
+                                    if (!val && !hasUndercover) return; // Empêche de tout désactiver
+                                    setModalState(() => hasMrWhite = val);
+                                  },
+                                ),
+                                SwitchListTile(
+                                  title: const Text("L'Infiltré 🕵️‍♂️", style: TextStyle(color: Colors.white)),
+                                  subtitle: const Text("Son mot est différent.", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                                  value: hasUndercover,
+                                  activeColor: Colors.purpleAccent,
+                                  onChanged: (val) {
+                                    if (!val && !hasMrWhite) return; // Empêche de tout désactiver
+                                    if (val && hasMrWhite && players.length < 4) {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("4 joueurs min. pour avoir les 2 !")));
+                                      return;
+                                    }
+                                    setModalState(() => hasUndercover = val);
+                                  },
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("ANNULER", style: TextStyle(color: Colors.white54)),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => MrWhiteScreen(
+                                      players: players,
+                                      hasMrWhite: hasMrWhite,
+                                      hasUndercover: hasUndercover,
+                                    )
+                                  ));
+                                },
+                                child: const Text("JOUER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                              )
+                            ],
+                          );
+                        }
+                      )
+                    );
                   }
                 ),
                 
