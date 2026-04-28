@@ -559,6 +559,16 @@ class GameSelectionScreen extends StatelessWidget {
                   "🕵️‍♂️", 
                   Colors.blueGrey.shade400, // Une belle couleur grise/bleue pour l'infiltration
                   () {
+                    if (players.length < 3) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Il faut au moins 3 joueurs pour jouer à Mr White !"),
+                          backgroundColor: Colors.orangeAccent,
+                        ),
+                      );
+                      return; // On bloque l'ouverture de la page
+                    }
+                    
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) => MrWhiteScreen(players: players)
                     ));

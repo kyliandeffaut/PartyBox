@@ -439,6 +439,19 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                       final doc = await docRef.get();
                                       var currentData = doc.data() as Map<String, dynamic>;
                                       List allPlayers = currentData['players'] ?? [];
+
+                                      String currentGameMode = currentData['gameMode'] ?? 'Action ou Vérité';
+                                      if (currentGameMode == 'Mr White' && allPlayers.length < 3) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text("Il faut au moins 3 joueurs connectés pour jouer à Mr White !"),
+                                              backgroundColor: Colors.orangeAccent,
+                                            ),
+                                          );
+                                        }
+                                        return;
+                                      }
                                       
                                       List updatedPlayers = allPlayers.map((p) {
                                         var newP = Map<String, dynamic>.from(p);

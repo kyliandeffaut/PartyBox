@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:math';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'main.dart';
 
 class MrWhiteScreen extends StatefulWidget {
@@ -23,15 +24,11 @@ class MrWhiteScreen extends StatefulWidget {
 }
 
 class _MrWhiteScreenState extends State<MrWhiteScreen> {
-  // --- BASE DE MOTS SECRETS (Tu pourras l'agrandir plus tard !) ---
-  final List<String> _words = [
-    'Téléphone', 'Guitare', 'Chocolat', 'Plage', 'Avion', 
-    'Dinosaure', 'Pizza', 'Cinéma', 'Livre', 'Vampire',
-    'Voiture', 'Piscine', 'Chien', 'Chat', 'Internet'
-  ];
+  // --- LISTES VIDES QUI SERONT REMPLIES PAR LE JSON ---
+  List<List<String>> _wordPairs = [];
+  List<List<String>> _remainingWordPairs = [];
 
   // --- ÉTATS DU JEU ---
-  // phases possibles : 'distribution', 'discussion', 'vote', 'resultat'
   String _phase = "distribution"; 
   bool _isLoading = true;
   // ignore: unused_field
@@ -39,16 +36,19 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   bool _canPop = false;
 
   // --- VARIABLES LOCALES (Pass & Play) ---
-  Map<String, String> _localRoles = {}; // Nom -> Mot (ou 'Mr White')
+  Map<String, String> _localRoles = {}; 
   List<String> _localAlivePlayers = [];
   int _localDistributionIndex = 0;
-  bool _isRoleHidden = true; // Pour cacher l'écran entre deux joueurs
+  bool _isRoleHidden = true; 
   Map<String, int> _localVotes = {};
   int _localVoteCount = 0;
   // ignore: unused_field
   bool _hasVotedThisTurn = false;
+  
   String _eliminatedPlayer = "";
-  String _gameResult = ""; // Qui a gagné ?
+  String _gameResult = ""; 
+  String _civilWord = ""; 
+  final TextEditingController _guessController = TextEditingController();
 
   @override
   void initState() {
@@ -56,7 +56,22 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     _initGame();
   }
 
+  // --- LECTURE DU FICHIER JSON ---
+  Future<void> _loadWords() async {
+    try {
+      final String response = await rootBundle.loadString('assets/mr_white.json');
+      final List<dynamic> data = json.decode(response);
+      
+      _wordPairs = data.map((pair) => List<String>.from(pair)).toList();
+      _remainingWordPairs = List.from(_wordPairs)..shuffle(); // On prépare la pioche
+    } catch (e) {
+      debugPrint("Erreur chargement mr_white.json: $e");
+    }
+  }
+
   Future<void> _initGame() async {
+    await _loadWords(); // 👈 ON ATTEND QUE LE JSON SOIT CHARGÉ AVANT DE CONTINUER
+    
     if (widget.isOnline && widget.lobbyId != null) {
       _listenLobby();
     } else {
@@ -75,18 +90,40 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _localDistributionIndex = 0;
       _isRoleHidden = true;
       _gameResult = "";
+      _guessController.clear();
     });
 
-    // 1. Piocher un mot au hasard
-    String secretWord = _words[Random().nextInt(_words.length)];
-    
-    // 2. Choisir Mr White au hasard
+    // Sécurité : si on a vidé la pioche, on la remplit à nouveau !
+    if (_remainingWordPairs.isEmpty) {
+      _remainingWordPairs = List.from(_wordPairs)..shuffle();
+    }
+
+    // 1. Piocher une paire de mots (SANS REMISE pour ne pas avoir 2 fois la même partie)
+    List<String> pair = List.from(_remainingWordPairs.removeLast());
+    pair.shuffle(); 
+    String civilWord = pair[0];
+    String undercoverWord = pair[1];
+    _civilWord = civilWord;
+
+    // 2. Choisir les rôles
     List<String> shuffledNames = List.from(_localAlivePlayers)..shuffle();
-    String mrWhiteName = shuffledNames.first;
+    String mrWhiteName = shuffledNames[0];
+    String? undercoverName;
+
+    // S'il y a 4 joueurs ou plus, on met un Infiltré !
+    if (_localAlivePlayers.length >= 4) {
+      undercoverName = shuffledNames[1];
+    }
 
     // 3. Distribuer les rôles
     for (String name in _localAlivePlayers) {
-      _localRoles[name] = (name == mrWhiteName) ? "Mr White" : secretWord;
+      if (name == mrWhiteName) {
+        _localRoles[name] = "Mr White";
+      } else if (name == undercoverName) {
+        _localRoles[name] = undercoverWord;
+      } else {
+        _localRoles[name] = civilWord;
+      }
     }
 
     setState(() => _isLoading = false);
@@ -97,7 +134,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _isRoleHidden = true;
       _localDistributionIndex++;
       if (_localDistributionIndex >= _localAlivePlayers.length) {
-        _phase = "discussion"; // Tout le monde a vu son rôle !
+        _phase = "discussion"; 
       }
     });
   }
@@ -115,7 +152,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   void _calculateLocalResult() {
-    // Trouver qui a le plus de votes
     String eliminated = "";
     int maxVotes = -1;
     _localVotes.forEach((key, value) {
@@ -128,15 +164,34 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     setState(() {
       _eliminatedPlayer = eliminated;
       _localAlivePlayers.remove(eliminated);
-      _phase = "resultat";
 
-      // Vérifier les conditions de victoire
+      // --- NOUVELLES CONDITIONS DE VICTOIRE ---
       if (_localRoles[eliminated] == "Mr White") {
-        _gameResult = "VICTOIRE DES CIVILS !";
-      } else if (_localAlivePlayers.length <= 2) {
-        _gameResult = "VICTOIRE DE MR WHITE !"; // Mr White a survécu jusqu'au bout
+        // Mr White est démasqué ! Mais il a le droit de deviner
+        _phase = "mr_white_guess";
       } else {
-        _gameResult = "CONTINUE"; // Le jeu continue
+        _phase = "resultat";
+        if (_localAlivePlayers.length <= 2) {
+          // S'il ne reste que 2 personnes et que Mr White est là, il a gagné
+          _gameResult = "VICTOIRE DE MR WHITE !";
+        } else {
+          // On a éliminé un Civil ou l'Infiltré, le jeu continue
+          _gameResult = "CONTINUE"; 
+        }
+      }
+    });
+  }
+
+  void _checkMrWhiteGuess() {
+    String guess = _guessController.text.trim().toLowerCase();
+    String actualWord = _civilWord.toLowerCase();
+
+    setState(() {
+      _phase = "resultat";
+      if (guess == actualWord) {
+        _gameResult = "MR WHITE A DEVINÉ LE MOT !\nIL VOLE LA VICTOIRE !";
+      } else {
+        _gameResult = "MAUVAISE RÉPONSE !\nVICTOIRE DES CIVILS !";
       }
     });
   }
@@ -152,15 +207,13 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   // ==========================================
-  // LOGIQUE MULTIJOUEUR EN LIGNE
+  // LOGIQUE MULTIJOUEUR EN LIGNE (En cours)
   // ==========================================
   void _listenLobby() {
     FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snap) {
       if (!snap.exists || snap.data() == null) return;
       final data = snap.data()!;
       final bool amIHost = (data['host'] ?? '').toString() == (widget.currentPlayerName ?? '');
-
-      // On lit la phase actuelle depuis Firebase
       String fbPhase = data['mwPhase'] ?? 'distribution';
 
       if (!mounted) return;
@@ -168,45 +221,15 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         _isHost = amIHost;
         _phase = fbPhase;
         _isLoading = false;
-        // On pourrait récupérer les rôles ici pour le mode en ligne
-        // (Pour l'instant la logique UI va se baser sur Firebase pour l'online)
       });
 
-      // Si le chef vient de lancer et qu'il n'y a pas encore de phase, on initialise
       if (amIHost && data['mwPhase'] == null) {
-        _startOnlineGame(data);
+        // Init logic online...
       }
-    });
-  }
-
-  Future<void> _startOnlineGame(Map<String, dynamic> currentData) async {
-    // Même logique de distribution mais envoyée sur Firebase
-    String secretWord = _words[Random().nextInt(_words.length)];
-    List activeP = List.from(currentData['activePlayers'] ?? []);
-    
-    if (activeP.isEmpty) return;
-
-    List<String> names = activeP.map((p) => p['name'].toString()).toList();
-    names.shuffle();
-    String mrWhiteName = names.first;
-
-    for (var p in activeP) {
-      if (p is Map) {
-        p['mwRole'] = (p['name'] == mrWhiteName) ? "Mr White" : secretWord;
-        p['isAlive'] = true;
-        p['hasVoted'] = false;
-        p['voteTarget'] = null;
-      }
-    }
-
-    await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-      'mwPhase': 'distribution',
-      'activePlayers': activeP,
     });
   }
 
   Future<void> _quit() async {
-    // Logique standard de déconnexion
     setState(() => _canPop = true);
     Navigator.pop(context);
   }
@@ -269,16 +292,13 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     if (_phase == "distribution") return _buildDistributionPhase();
     if (_phase == "discussion") return _buildDiscussionPhase();
     if (_phase == "vote") return _buildVotePhase();
+    if (_phase == "mr_white_guess") return _buildMrWhiteGuessPhase();
     if (_phase == "resultat") return _buildResultPhase();
     return const SizedBox();
   }
 
-  // --- 1. PHASE DE DISTRIBUTION ---
   Widget _buildDistributionPhase() {
-    if (widget.isOnline) {
-      // En mode en ligne, chacun voit son rôle directement (A coder plus tard pour le multi complet)
-      return const Center(child: Text("Mode en ligne en cours de dev...", style: TextStyle(color: Colors.white)));
-    }
+    if (widget.isOnline) return const Center(child: Text("Mode en ligne en cours de dev...", style: TextStyle(color: Colors.white)));
 
     String currentPlayer = _localAlivePlayers[_localDistributionIndex];
     String role = _localRoles[currentPlayer] ?? "Erreur";
@@ -336,7 +356,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     ).animate().fadeIn();
   }
 
-  // --- 2. PHASE DE DISCUSSION ---
   Widget _buildDiscussionPhase() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -367,12 +386,11 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     ).animate().fadeIn();
   }
 
-  // --- 3. PHASE DE VOTE ---
   Widget _buildVotePhase() {
     return Column(
       children: [
         const SizedBox(height: 20),
-        const Text("QUI EST MR WHITE ?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        const Text("QUI EST L'INTRUS ?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
         const SizedBox(height: 10),
         Text("Au tour de ${_localAlivePlayers[_localVoteCount].toUpperCase()} de voter", style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
@@ -402,67 +420,139 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     ).animate().fadeIn();
   }
 
-  // --- 4. PHASE DE RÉSULTAT ---
-  Widget _buildResultPhase() {
-    bool isMrWhite = _localRoles[_eliminatedPlayer] == "Mr White";
-    
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(_eliminatedPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.w900)),
-        const Text("A ÉTÉ ÉLIMINÉ !", style: TextStyle(color: Colors.white54, fontSize: 18, letterSpacing: 2)),
-        const SizedBox(height: 40),
-        _glassCard(
-          borderColor: isMrWhite ? Colors.greenAccent : Colors.redAccent,
-          child: Column(
-            children: [
-              Text("SON RÔLE ÉTAIT :", style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Text(
-                isMrWhite ? "MR WHITE 🕵️‍♂️" : "CIVIL 🧍‍♂️", 
-                style: TextStyle(color: isMrWhite ? Colors.greenAccent : Colors.redAccent, fontSize: 28, fontWeight: FontWeight.w900)
-              ),
-            ],
-          ),
-        ).animate().scale(curve: Curves.easeOutBack),
-        
-        const SizedBox(height: 40),
-        
-        if (_gameResult == "CONTINUE") ...[
-          const Text("MR WHITE EST TOUJOURS EN VIE...", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Listener(
-              onPointerDown: (_) => playPop(),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                onPressed: _nextRoundLocal,
-                child: const Text("TOUR SUIVANT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
-              ),
+  // --- NOUVELLE PHASE : MR WHITE DEVINE LE MOT ---
+  Widget _buildMrWhiteGuessPhase() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          const Text("DÉMASQUÉ !", style: TextStyle(color: Colors.redAccent, fontSize: 35, fontWeight: FontWeight.w900, letterSpacing: 2)),
+          const SizedBox(height: 10),
+          Text("$_eliminatedPlayer était Mr White 🕶️", style: const TextStyle(color: Colors.white70, fontSize: 18)),
+          const SizedBox(height: 30),
+          
+          _glassCard(
+            borderColor: Colors.amber,
+            child: Column(
+              children: [
+                const Text("DERNIÈRE CHANCE", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                const SizedBox(height: 15),
+                const Text("Si tu devines le mot des Civils,\ntu voles la victoire !", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 16)),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _guessController,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
+                    hintText: "Tape le mot ici...",
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    filled: true,
+                    fillColor: Colors.black45,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                  ),
+                ),
+              ],
             ),
-          )
-        ] else ...[
-          Text(_gameResult, style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
+          ).animate().scale(curve: Curves.easeOutBack),
+          
           const SizedBox(height: 40),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Listener(
-              onPointerDown: (_) => playPop(),
+              onPointerDown: (_) => playHammer(),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                onPressed: _startLocalGame, // On relance une partie
-                child: const Text("REJOUER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                onPressed: _checkMrWhiteGuess,
+                child: const Text("TENTER MA CHANCE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18)),
               ),
             ),
-          ),
-          const SizedBox(height: 15),
-          TextButton(
-            onPressed: _quit, 
-            child: const Text("Retour au menu", style: TextStyle(color: Colors.white54))
           )
-        ]
-      ],
-    ).animate().fadeIn();
+        ],
+      ).animate().fadeIn(),
+    );
+  }
+
+  Widget _buildResultPhase() {
+    bool isMrWhite = _localRoles[_eliminatedPlayer] == "Mr White";
+    bool isUndercover = _localRoles[_eliminatedPlayer] != "Mr White" && _localRoles[_eliminatedPlayer] != _civilWord;
+    
+    String roleText = "CIVIL 🧍";
+    Color roleColor = Colors.blueAccent;
+
+    if (isMrWhite) {
+      roleText = "MR WHITE 🕶️";
+      roleColor = Colors.redAccent;
+    } else if (isUndercover) {
+      roleText = "INFILTRÉ 🕵️‍♂️\n(Son mot était : ${_localRoles[_eliminatedPlayer]})";
+      roleColor = Colors.purpleAccent;
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          Text(_eliminatedPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.w900)),
+          const Text("A ÉTÉ ÉLIMINÉ !", style: TextStyle(color: Colors.white54, fontSize: 18, letterSpacing: 2)),
+          const SizedBox(height: 30),
+          
+          _glassCard(
+            borderColor: roleColor,
+            child: Column(
+              children: [
+                Text("SON RÔLE ÉTAIT :", style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Text(
+                  roleText, 
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: roleColor, fontSize: 24, fontWeight: FontWeight.w900)
+                ),
+              ],
+            ),
+          ).animate().scale(curve: Curves.easeOutBack),
+          
+          const SizedBox(height: 40),
+          
+          if (_gameResult == "CONTINUE") ...[
+            const Text("LE JEU N'EST PAS FINI...", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Listener(
+                onPointerDown: (_) => playPop(),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                  onPressed: _nextRoundLocal,
+                  child: const Text("TOUR SUIVANT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                ),
+              ),
+            )
+          ] else ...[
+            Text(_gameResult, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            const SizedBox(height: 10),
+            Text("Le mot secret était : $_civilWord", style: const TextStyle(color: Colors.white70, fontSize: 16, fontStyle: FontStyle.italic)),
+            const SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Listener(
+                onPointerDown: (_) => playPop(),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                  onPressed: _startLocalGame,
+                  child: const Text("REJOUER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextButton(
+              onPressed: _quit, 
+              child: const Text("Retour au menu", style: TextStyle(color: Colors.white54))
+            ),
+            const SizedBox(height: 40),
+          ]
+        ],
+      ).animate().fadeIn(),
+    );
   }
 }
