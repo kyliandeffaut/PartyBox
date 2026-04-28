@@ -404,16 +404,27 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     setState(() => _hasVotedThisTurn = true);
     
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-    var doc = await docRef.get();
     
-    List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
-    for (var p in activeP) {
-      if (p['name'] == widget.currentPlayerName) {
-        p['hasVoted'] = true;
-        p['voteTarget'] = targetName;
-      }
+    try {
+      // Empêche les joueurs d'écraser les votes des autres s'ils cliquent en même temps !
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        var snapshot = await transaction.get(docRef);
+        if (!snapshot.exists) return;
+        
+        List activeP = (snapshot.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+        
+        for (var p in activeP) {
+          if (p['name'] == widget.currentPlayerName) {
+            p['hasVoted'] = true;
+            p['voteTarget'] = targetName;
+          }
+        }
+        
+        transaction.update(docRef, {'activePlayers': activeP});
+      });
+    } catch (e) {
+      debugPrint("Erreur lors du vote en ligne : $e");
     }
-    await docRef.update({'activePlayers': activeP});
   }
 
   Future<void> _checkOnlineMrWhiteGuess() async {
