@@ -33,10 +33,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   List<List<String>> _wordPairs = [];
   List<List<String>> _remainingWordPairs = [];
 
-  String _phase = "word_entry"; // On attaque direct !
+  String _phase = "distribution"; 
   bool _isLoading = true;
   bool _canPop = false;
-  // ignore: unused_field
   bool _isHost = false;
 
   // --- VARIABLES COMMUNES ---
@@ -49,10 +48,11 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   // --- VARIABLES LOCALES (Pass & Play) ---
   Map<String, String> _localRoles = {}; 
   List<String> _localAlivePlayers = [];
-  Map<String, List<String>> _localPlayerWords = {}; // 👈 NOUVEAU : Stocke les mots saisis
+  Map<String, List<String>> _localPlayerWords = {}; 
+  int _localDistributionIndex = 0;
   int _localCurrentRound = 1;
   int _localTurnIndex = 0;
-  bool _isRoleHidden = true; // Cacher l'écran entre 2 joueurs
+  bool _isRoleHidden = true; 
   Map<String, int> _localVotes = {};
   int _localVoteCount = 0;
   // ignore: unused_field
@@ -96,13 +96,14 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   // ==========================================
   void _startLocalGame() {
     setState(() {
-      _phase = "word_entry";
+      _phase = "distribution";
       _localRoles.clear();
       _localPlayerWords.clear();
       _localAlivePlayers = widget.players.map((p) => p.name).toList();
       for (var p in _localAlivePlayers) {
         _localPlayerWords[p] = [];
       }
+      _localDistributionIndex = 0;
       _localCurrentRound = 1;
       _localTurnIndex = 0;
       _isRoleHidden = true;
@@ -149,15 +150,25 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     setState(() => _isLoading = false);
   }
 
+  void _nextLocalDistribution() {
+    setState(() {
+      _isRoleHidden = true;
+      _localDistributionIndex++;
+      // Si tout le monde a vu son rôle, on passe à l'écriture !
+      if (_localDistributionIndex >= _localAlivePlayers.length) {
+        _phase = "word_entry";
+      }
+    });
+  }
+
   void _submitLocalWord() {
     String word = _wordEntryController.text.trim();
-    if (word.isEmpty) return; // Empêche de valider à vide
+    if (word.isEmpty) return;
 
     setState(() {
       String currentPlayer = _localAlivePlayers[_localTurnIndex];
-      _localPlayerWords[currentPlayer]!.add(word); // On enregistre le mot
+      _localPlayerWords[currentPlayer]!.add(word); 
       _wordEntryController.clear();
-      _isRoleHidden = true; // On cache pour le prochain joueur
 
       _localTurnIndex++;
       if (_localTurnIndex >= _localAlivePlayers.length) {
@@ -165,7 +176,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         _localCurrentRound++;
       }
 
-      // Si on a atteint le nombre de mots défini, on passe au vote !
       if (_localCurrentRound > widget.maxWords) {
         _phase = "vote";
       }
@@ -240,16 +250,15 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
 
   void _nextRoundLocal() {
     setState(() {
-      _phase = "word_entry"; // On repart pour un tour d'écriture
+      _phase = "word_entry"; // On repart directement à l'écriture
       _localCurrentRound = 1;
       _localTurnIndex = 0;
-      _isRoleHidden = true;
       _localVotes.clear();
       _localVoteCount = 0;
       _hasVotedThisTurn = false;
       _eliminatedPlayer = "";
       for (var p in _localAlivePlayers) {
-        _localPlayerWords[p] = []; // On efface les anciens mots
+        _localPlayerWords[p] = []; 
       }
     });
   }
@@ -262,7 +271,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       if (!snap.exists || snap.data() == null) return;
       final data = snap.data()!;
       final bool amIHost = (data['host'] ?? '').toString() == (widget.currentPlayerName ?? '');
-      String fbPhase = data['mwPhase'] ?? 'word_entry';
+      String fbPhase = data['mwPhase'] ?? 'distribution';
 
       if (!mounted) return;
       setState(() {
@@ -332,16 +341,16 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         p['isAlive'] = true;
         p['hasVoted'] = false;
         p['voteTarget'] = null;
-        p['mwWords'] = []; // 👈 Initialise la liste de mots vide
+        p['mwWords'] = []; 
       }
     }
 
     await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-      'mwPhase': 'word_entry',
+      'mwPhase': 'distribution',
       'mwRound': 1,
       'mwTurnIndex': 0,
       'activePlayers': activeP,
-      'mwCivilWord': civilWord, // On le stocke pour la vérification à la fin
+      'mwCivilWord': civilWord, 
     });
   }
 
@@ -408,7 +417,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     );
   }
 
-  // 👇 LA GRILLE DE MOTS STYLÉE (Kylian et en dessous ses 3 mots)
   Widget _buildWordsList(List<String> alivePlayers, Map<String, List<String>> wordsMap) {
     return ListView.builder(
       shrinkWrap: true,
@@ -488,6 +496,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   Widget _buildCurrentPhase() {
+    if (_phase == "distribution") return _buildDistributionPhase();
     if (_phase == "word_entry") return _buildWordEntryPhase();
     if (_phase == "vote") return _buildVotePhase();
     if (_phase == "mr_white_guess") return _buildMrWhiteGuessPhase();
@@ -495,19 +504,107 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     return const SizedBox();
   }
 
-  // --- 1. PHASE DE SAISIE DES MOTS ---
+  // --- 1. PHASE DE DISTRIBUTION (ON REGARDE LE MOT UNE SEULE FOIS) ---
+  Widget _buildDistributionPhase() {
+    if (widget.isOnline) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text("MÉMORISE TON RÔLE", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 2)),
+          const SizedBox(height: 20),
+          _glassCard(
+            borderColor: _onlineMyRole == "Mr White" ? Colors.redAccent : Colors.blueAccent,
+            child: Column(
+              children: [
+                Text(_onlineMyRole == "Mr White" ? "TU ES" : "TON MOT EST", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Text(_onlineMyRole, textAlign: TextAlign.center, style: TextStyle(color: _onlineMyRole == "Mr White" ? Colors.redAccent : Colors.blueAccent, fontSize: 32, fontWeight: FontWeight.w900)),
+              ],
+            ),
+          ).animate().scale(curve: Curves.easeOutBack),
+          const SizedBox(height: 40),
+          if (_isHost)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Listener(
+                onPointerDown: (_) => playPop(),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                  onPressed: () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwPhase': 'word_entry'}),
+                  child: const Text("TOUT LE MONDE EST PRÊT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                ),
+              ),
+            )
+          else
+            const Text("En attente du chef pour commencer...", style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic))
+        ],
+      );
+    }
+
+    // MODE LOCAL
+    int safeDistIndex = _localDistributionIndex < _localAlivePlayers.length ? _localDistributionIndex : 0;
+    String currentPlayer = _localAlivePlayers[safeDistIndex];
+    String role = _localRoles[currentPlayer] ?? "Erreur";
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.visibility_off, color: Colors.white54, size: 40),
+        const SizedBox(height: 20),
+        Text("AU TOUR DE", style: TextStyle(color: Colors.amber.shade200, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        Text(currentPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 40),
+
+        if (_isRoleHidden) ...[
+          _glassCard(
+            child: const Text("Passez le téléphone à ce joueur.\nLui seul doit regarder l'écran !", textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 16)),
+          ),
+          const SizedBox(height: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Listener(
+              onPointerDown: (_) => playSwoosh(),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                onPressed: () => setState(() => _isRoleHidden = false),
+                child: const Text("VOIR MON RÔLE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18)),
+              ),
+            ),
+          )
+        ] else ...[
+          _glassCard(
+            borderColor: role == "Mr White" ? Colors.redAccent : Colors.blueAccent,
+            child: Column(
+              children: [
+                Text(role == "Mr White" ? "TU ES" : "TON MOT EST", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                const SizedBox(height: 10),
+                Text(role, textAlign: TextAlign.center, style: TextStyle(color: role == "Mr White" ? Colors.redAccent : Colors.blueAccent, fontSize: 32, fontWeight: FontWeight.w900)),
+              ],
+            ),
+          ).animate().scale(curve: Curves.easeOutBack),
+          const SizedBox(height: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Listener(
+              onPointerDown: (_) => playPop(),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                onPressed: _nextLocalDistribution,
+                child: const Text("J'AI MÉMORISÉ ! CACHER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18)),
+              ),
+            ),
+          )
+        ]
+      ],
+    ).animate().fadeIn();
+  }
+
+  // --- 2. PHASE DE SAISIE DES MOTS (SANS MONTRER LE RÔLE !) ---
   Widget _buildWordEntryPhase() {
     if (widget.isOnline) {
-      // MODE EN LIGNE
       bool isMyTurn = _onlineTurnPlayer == widget.currentPlayerName;
       return Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            color: Colors.black45,
-            width: double.infinity,
-            child: Text("TON MOT SECRET : ${_onlineMyRole.toUpperCase()}", textAlign: TextAlign.center, style: TextStyle(color: _onlineMyRole == "Mr White" ? Colors.redAccent : Colors.blueAccent, fontWeight: FontWeight.bold, letterSpacing: 1)),
-          ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -521,7 +618,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                       borderColor: Colors.greenAccent,
                       child: Column(
                         children: [
-                          const Text("À TON TOUR", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
+                          const Text("À TON TOUR D'ÉCRIRE", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 15),
                           TextField(
                             controller: _wordEntryController,
@@ -563,10 +660,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       );
     } 
 
-    // MODE LOCAL (1 Téléphone)
-    int safeDistIndex = _localTurnIndex < _localAlivePlayers.length ? _localTurnIndex : 0;
-    String currentPlayer = _localAlivePlayers[safeDistIndex];
-    String role = _localRoles[currentPlayer] ?? "Erreur";
+    // MODE LOCAL
+    int safeTurnIndex = _localTurnIndex < _localAlivePlayers.length ? _localTurnIndex : 0;
+    String currentPlayer = _localAlivePlayers[safeTurnIndex];
 
     return Expanded(
       child: SingleChildScrollView(
@@ -576,62 +672,38 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
             Text("TOUR $_localCurrentRound / ${widget.maxWords}", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w900, letterSpacing: 2)),
             const SizedBox(height: 20),
 
-            if (_isRoleHidden) ...[
-              const Icon(Icons.visibility_off, color: Colors.white54, size: 40),
-              const SizedBox(height: 10),
-              _glassCard(
-                child: Column(
-                  children: [
-                    Text("AU TOUR DE", style: TextStyle(color: Colors.amber.shade200, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                    Text(currentPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 20),
-                    const Text("Prends le téléphone, regarde ton rôle\net écris ton mot !", textAlign: TextAlign.center, style: TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 20),
-                    Listener(
-                      onPointerDown: (_) => playPop(),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        onPressed: () => setState(() => _isRoleHidden = false),
-                        child: const Text("VOIR MON MOT ET JOUER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
-                      ),
-                    )
-                  ],
-                ),
-              ).animate().scale(curve: Curves.easeOutBack),
-            ] else ...[
-              _glassCard(
-                borderColor: role == "Mr White" ? Colors.redAccent : Colors.blueAccent,
-                child: Column(
-                  children: [
-                    Text(role == "Mr White" ? "TU ES" : "TON MOT EST", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                    const SizedBox(height: 5),
-                    Text(role, textAlign: TextAlign.center, style: TextStyle(color: role == "Mr White" ? Colors.redAccent : Colors.blueAccent, fontSize: 32, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _wordEntryController,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                      decoration: InputDecoration(
-                        hintText: "Tape ton mot...",
-                        hintStyle: const TextStyle(color: Colors.white38),
-                        filled: true,
-                        fillColor: Colors.black45,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                      ),
+            _glassCard(
+              borderColor: Colors.amber,
+              child: Column(
+                children: [
+                  const Text("À TON TOUR", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Text(currentPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _wordEntryController,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                    decoration: InputDecoration(
+                      hintText: "Tape un mot...",
+                      hintStyle: const TextStyle(color: Colors.white38),
+                      filled: true,
+                      fillColor: Colors.black45,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                     ),
-                    const SizedBox(height: 15),
-                    Listener(
-                      onPointerDown: (_) => playSwoosh(),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        onPressed: _submitLocalWord,
-                        child: const Text("VALIDER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
-                      ),
-                    )
-                  ],
-                ),
-              ).animate().scale(curve: Curves.easeOutBack),
-            ],
+                  ),
+                  const SizedBox(height: 15),
+                  Listener(
+                    onPointerDown: (_) => playSwoosh(),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                      onPressed: _submitLocalWord,
+                      child: const Text("VALIDER ET PASSER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                    ),
+                  )
+                ],
+              ),
+            ).animate().scale(curve: Curves.easeOutBack),
 
             const SizedBox(height: 30),
             _buildWordsList(_localAlivePlayers, _localPlayerWords),
@@ -641,7 +713,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     );
   }
 
-  // --- 2. PHASE DE VOTE ---
+  // --- 3. PHASE DE VOTE ---
   Widget _buildVotePhase() {
     List<String> aliveP = widget.isOnline ? _onlineWordsMap.keys.toList() : _localAlivePlayers;
 
@@ -650,7 +722,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         children: [
           const SizedBox(height: 10),
           const Text("VOTE", style: TextStyle(color: Colors.redAccent, fontSize: 25, fontWeight: FontWeight.w900, letterSpacing: 4)),
-          const Text("Qui est l'imposteur ?", style: TextStyle(color: Colors.white70)),
+          const Text("Observez les mots. Qui est l'imposteur ?", style: TextStyle(color: Colors.white70)),
           const SizedBox(height: 10),
 
           if (!widget.isOnline)
@@ -696,6 +768,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     );
   }
 
+  // --- 4. DERNIÈRE CHANCE DE MR WHITE ---
   Widget _buildMrWhiteGuessPhase() {
     return SingleChildScrollView(
       child: Column(
@@ -748,6 +821,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     );
   }
 
+  // --- 5. RÉSULTATS ---
   Widget _buildResultPhase() {
     bool isMrWhite = _localRoles[_eliminatedPlayer] == "Mr White";
     bool isUndercover = _localRoles[_eliminatedPlayer] != "Mr White" && _localRoles[_eliminatedPlayer] != _civilWord;

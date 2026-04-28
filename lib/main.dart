@@ -553,7 +553,7 @@ class GameSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 20), // Ajoute cet espace
 
                 // --- MR WHITE ---
-                // --- 👇 NOUVEAU JEU : MR WHITE (AVEC PARAMÈTRES) 👇 ---
+                // --- NOUVEAU JEU : MR WHITE (AVEC PARAMÈTRES) ---
                 _menuCard(
                   context, 
                   "Le Mot Secret", 
