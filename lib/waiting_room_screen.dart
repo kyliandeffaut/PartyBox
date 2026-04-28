@@ -319,7 +319,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                             currentPlayerName: widget.currentPlayerName,
                                             hasMrWhite: data['mwHasMrWhite'] ?? true,
                                             hasUndercover: data['mwHasUndercover'] ?? false,
-                                          ); 
+                                            maxWords: data['mwMaxWords'] ?? 3,
+                                          );
                                         } else {
                                           targetScreen = ActionVeriteScreen(
                                             lobbyId: widget.lobbyId,
@@ -662,12 +663,8 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           onChanged: (val) {
                             bool uc = data['mwHasUndercover'] ?? false;
                             if (!val && !uc) return;
-                            
                             Map<String, dynamic> updates = {'mwHasMrWhite': val};
-                            // Bascule auto pour Firebase
-                            if (val && (data['players'] as List).length < 4) {
-                              updates['mwHasUndercover'] = false;
-                            }
+                            if (val && (data['players'] as List).length < 4) updates['mwHasUndercover'] = false;
                             FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update(updates);
                           },
                         ),
@@ -678,15 +675,30 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           onChanged: (val) {
                             bool mw = data['mwHasMrWhite'] ?? true;
                             if (!val && !mw) return;
-                            
                             Map<String, dynamic> updates = {'mwHasUndercover': val};
-                            // Bascule auto pour Firebase
-                            if (val && (data['players'] as List).length < 4) {
-                              updates['mwHasMrWhite'] = false;
-                            }
+                            if (val && (data['players'] as List).length < 4) updates['mwHasMrWhite'] = false;
                             FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update(updates);
                           },
                         ),
+                        const Divider(color: Colors.white10),
+                        // 👇 SÉLECTEUR DE MOTS ONLINE
+                        ListTile(
+                          title: const Text("Mots par joueur", style: TextStyle(color: Colors.white)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove, color: Colors.pinkAccent), 
+                                onPressed: (data['mwMaxWords'] ?? 3) > 1 ? () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) - 1}) : null
+                              ),
+                              Text("${data['mwMaxWords'] ?? 3}", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: const Icon(Icons.add, color: Colors.greenAccent), 
+                                onPressed: (data['mwMaxWords'] ?? 3) < 5 ? () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) + 1}) : null
+                              ),
+                            ]
+                          )
+                        )
                       ],
                     ),
                   ),

@@ -553,10 +553,11 @@ class GameSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 20), // Ajoute cet espace
 
                 // --- MR WHITE ---
+                // --- 👇 NOUVEAU JEU : MR WHITE (AVEC PARAMÈTRES) 👇 ---
                 _menuCard(
                   context, 
                   "Le Mot Secret", 
-                  "🕵️‍♂️", 
+                  "🕶️", 
                   Colors.blueGrey.shade400,
                   () {
                     if (players.length < 3) {
@@ -567,6 +568,7 @@ class GameSelectionScreen extends StatelessWidget {
                     // VARIABLES PAR DÉFAUT DU MENU
                     bool hasMrWhite = true;
                     bool hasUndercover = players.length >= 4; 
+                    int maxWords = 3; // LA NOUVELLE VARIABLE !
 
                     showDialog(
                       context: context,
@@ -585,11 +587,10 @@ class GameSelectionScreen extends StatelessWidget {
                                   value: hasMrWhite,
                                   activeColor: Colors.blueGrey.shade400,
                                   onChanged: (val) {
-                                    if (!val && !hasUndercover) return; // Empêche de tout désactiver
+                                    if (!val && !hasUndercover) return; 
                                     setModalState(() {
                                       hasMrWhite = val;
-                                      // On désactive l'Infiltré auto si on est que 3
-                                      if (val && players.length < 4) hasUndercover = false;
+                                      if (val && players.length < 4) hasUndercover = false; // Bascule auto
                                     });
                                   },
                                 ),
@@ -599,14 +600,26 @@ class GameSelectionScreen extends StatelessWidget {
                                   value: hasUndercover,
                                   activeColor: Colors.purpleAccent,
                                   onChanged: (val) {
-                                    if (!val && !hasMrWhite) return; // Empêche de tout désactiver
+                                    if (!val && !hasMrWhite) return; 
                                     setModalState(() {
                                       hasUndercover = val;
-                                      // On désactive Mr White auto si on est que 3
-                                      if (val && players.length < 4) hasMrWhite = false;
+                                      if (val && players.length < 4) hasMrWhite = false; // Bascule auto
                                     });
                                   },
                                 ),
+                                const Divider(color: Colors.white24),
+                                // LE SÉLECTEUR DE MOTS
+                                ListTile(
+                                  title: const Text("Mots par joueur", style: TextStyle(color: Colors.white)),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(icon: const Icon(Icons.remove, color: Colors.pinkAccent), onPressed: maxWords > 1 ? () => setModalState(() => maxWords--) : null),
+                                      Text("$maxWords", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                      IconButton(icon: const Icon(Icons.add, color: Colors.greenAccent), onPressed: maxWords < 5 ? () => setModalState(() => maxWords++) : null),
+                                    ]
+                                  )
+                                )
                               ],
                             ),
                             actions: [
@@ -623,6 +636,7 @@ class GameSelectionScreen extends StatelessWidget {
                                       players: players,
                                       hasMrWhite: hasMrWhite,
                                       hasUndercover: hasUndercover,
+                                      maxWords: maxWords,
                                     )
                                   ));
                                 },
