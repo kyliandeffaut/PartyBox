@@ -600,7 +600,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
 
   Widget _buildParamsSheet(Map<String, dynamic> data) {
     String mode = data['gameMode'] ?? 'Action ou Vérité';
-    String currentCategory = data['category'] ?? 'Soft'; // ✅ On récupère la catégorie en cours
+    String currentCategory = data['category'] ?? 'Soft'; 
     
     bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
 
@@ -611,7 +611,9 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     final List<Map<String, dynamic>> jnjCats = [
       {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '+18', 'e': '🌶️'}, 
     ];
-    final bool hasCategories = mode == 'Action ou Vérité' || mode == "Je n'ai jamais";
+    
+    // NOUVELLE RÈGLE : Gère correctement les catégories pour éviter les conflits d'affichage
+    final bool hasCategories = mode == 'Action ou Vérité' || mode == "Je n'ai jamais" || mode == "Tu préfères ?";
     final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
 
     return StatefulBuilder(
@@ -625,6 +627,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 Text("PARAMÈTRES : ${mode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(height: 20),
 
+                // 1. PARAMÈTRES JE N'AI JAMAIS
                 if (mode == "Je n'ai jamais") ...[
                   Container(
                     decoration: BoxDecoration(
@@ -651,6 +654,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   const SizedBox(height: 20),
                 ],
 
+                // 2. PARAMÈTRES MR WHITE
                 if (mode == "Mr White") ...[
                   Container(
                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
@@ -681,7 +685,6 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           },
                         ),
                         const Divider(color: Colors.white10),
-                        // 👇 SÉLECTEUR DE MOTS ONLINE
                         ListTile(
                           title: const Text("Mots par joueur", style: TextStyle(color: Colors.white)),
                           trailing: Row(
@@ -703,9 +706,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                ],
-
-                if (hasCategories) ...[
+                ] 
+                
+                // 3. PARAMÈTRES POUR JEUX AVEC CATÉGORIES (SINON SI)
+                else if (hasCategories && mode != 'Tu préfères ?') ...[
                   const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 10),
                   ...cats.map((c) {
@@ -715,7 +719,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                       child: ListTile(
                         leading: Text(c['e'], style: const TextStyle(fontSize: 24)),
                         title: Text(c['n'], style: TextStyle(color: isSelected ? Colors.pinkAccent : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-                        trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null, // AFFICHE LA COCHE ROSE
+                        trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.pinkAccent) : null,
                         onTap: () {
                           FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'category': c['n']});
                           Navigator.pop(context);
@@ -723,7 +727,10 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                       ),
                     );
                   }),
-                ] else ...[
+                ] 
+                
+                // 4. SI AUCUN DE CES PARAMÈTRES (SINON)
+                else ...[
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
