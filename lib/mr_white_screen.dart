@@ -246,7 +246,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         _eliminatedRole = data['mwEliminatedRole'] ?? "";
         _gameResult = data['mwGameResult'] ?? "";
         
-        if (_phase != 'vote') _hasVotedThisTurn = false; // Reset local vote state
+        if (_phase != 'vote') _hasVotedThisTurn = false; 
 
         int turnIdx = data['mwTurnIndex'] ?? 0;
         List activeP = data['activePlayers'] ?? [];
@@ -272,9 +272,10 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         if (data['mwPhase'] == null) {
           _startOnlineGame(data);
         } else if (fbPhase == 'vote' && data['mwEliminated'] == null) {
-          // Calcul des votes
-          List activeP = data['activePlayers'] ?? [];
+          // 🛠️ SÉCURITÉ DE DEEP COPY ICI POUR DÉVERROUILLER FIREBASE
+          List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
           var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
+          
           if (aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true)) {
             Map<String, int> votes = {};
             for (var p in aliveP) {
@@ -319,7 +320,8 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     String civilWord = pair[0];
     String undercoverWord = pair[1];
 
-    List activeP = List.from(currentData['activePlayers'] ?? []);
+    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
+    List activeP = (currentData['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     if (activeP.isEmpty) return;
 
     List<String> names = activeP.map((p) => p['name'].toString()).toList();
@@ -333,16 +335,14 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     if (widget.hasUndercover && roleIndex < names.length) undercoverName = names[roleIndex];
 
     for (var p in activeP) {
-      if (p is Map) {
-        if (p['name'] == mrWhiteName) p['mwRole'] = "Mr White";
-        else if (p['name'] == undercoverName) p['mwRole'] = undercoverWord;
-        else p['mwRole'] = civilWord;
-        
-        p['isAlive'] = true;
-        p['hasVoted'] = false;
-        p['voteTarget'] = null;
-        p['mwWords'] = []; 
-      }
+      if (p['name'] == mrWhiteName) p['mwRole'] = "Mr White";
+      else if (p['name'] == undercoverName) p['mwRole'] = undercoverWord;
+      else p['mwRole'] = civilWord;
+      
+      p['isAlive'] = true;
+      p['hasVoted'] = false;
+      p['voteTarget'] = null;
+      p['mwWords'] = []; 
     }
 
     await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
@@ -359,7 +359,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
       var doc = await docRef.get();
       var data = doc.data()!;
-      List activeP = List.from(data['activePlayers']);
+      
+      // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
+      List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
       List aliveNames = activeP.where((p) => p['isAlive'] == true).map((p) => p['name']).toList();
 
       for (var p in activeP) {
@@ -378,7 +380,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       await docRef.update(updates);
       _wordEntryController.clear();
     } catch (e) {
-      debugPrint("Erreur: $e");
+      debugPrint("Erreur soumission mot: $e");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -390,7 +392,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
-    List activeP = List.from(doc.data()!['activePlayers']);
+    
+    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
+    List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     for (var p in activeP) {
       if (p['name'] == widget.currentPlayerName) {
         p['hasVoted'] = true;
@@ -424,7 +428,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   Future<void> _nextRoundOnline() async {
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
-    List activeP = List.from(doc.data()!['activePlayers']);
+    
+    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
+    List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     for (var p in activeP) {
        p['hasVoted'] = false;
        p['voteTarget'] = null;
@@ -443,8 +449,24 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   Future<void> _quit() async {
-    setState(() => _canPop = true);
-    Navigator.pop(context);
+    if (widget.isOnline && widget.lobbyId != null) {
+      try {
+        var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+        var doc = await docRef.get();
+        if (doc.exists) {
+          // 🛠️ SÉCURITÉ DE DEEP COPY ICI AUSSI
+          List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+          activeP.removeWhere((p) => p['name'] == widget.currentPlayerName);
+          await docRef.update({'activePlayers': activeP});
+        }
+      } catch (e) {
+        debugPrint("Erreur déconnexion: $e");
+      }
+    }
+    if (mounted) {
+      setState(() => _canPop = true);
+      Navigator.pop(context);
+    }
   }
 
   // ==========================================

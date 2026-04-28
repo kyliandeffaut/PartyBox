@@ -542,7 +542,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                         context: context,
                                         backgroundColor: const Color(0xFF1A1A1D),
                                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
-                                        builder: (context) => _buildParamsSheet(data),
+                                        builder: (context) => _buildParamsSheet(),
                                       );
                                     },
                                     child: const Row(
@@ -598,12 +598,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     );
   }
 
-  Widget _buildParamsSheet(Map<String, dynamic> data) {
-    String mode = data['gameMode'] ?? 'Action ou Vérité';
-    String currentCategory = data['category'] ?? 'Soft'; 
-    
-    bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
-
+  Widget _buildParamsSheet() {
     final List<Map<String, dynamic>> actionCats = [
       {'n': 'Soft', 'e': '🍭'},{'n': 'Bar', 'e': '🍻'}, {'n': 'Sans Filtre', 'e': '🙊'}, {'n': 'Séduction', 'e': '🫦'},
       {'n': 'Couple', 'e': '💞'}, {'n': 'Hot', 'e': '🔥'},
@@ -611,13 +606,23 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     final List<Map<String, dynamic>> jnjCats = [
       {'n': 'Soft', 'e': '😇'}, {'n': 'Interdit', 'e': '🚫'}, {'n': '+18', 'e': '🌶️'}, 
     ];
-    
-    // NOUVELLE RÈGLE : Gère correctement les catégories pour éviter les conflits d'affichage
-    final bool hasCategories = mode == 'Action ou Vérité' || mode == "Je n'ai jamais" || mode == "Tu préfères ?";
-    final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
 
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setModalState) {
+    // 👇 LA MAGIE EST LÀ : La fenêtre écoute Firebase en direct !
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+           return const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator(color: Colors.white)));
+        }
+        var data = snapshot.data!.data() as Map<String, dynamic>;
+
+        String mode = data['gameMode'] ?? 'Action ou Vérité';
+        String currentCategory = data['category'] ?? 'Soft'; 
+        bool isSecret = (data['jnjVisibility'] ?? 'visible') == 'invisible'; 
+        
+        final bool hasCategories = mode == 'Action ou Vérité' || mode == "Je n'ai jamais" || mode == "Tu préfères ?";
+        final cats = mode == 'Action ou Vérité' ? actionCats : jnjCats;
+
         return Container(
           padding: const EdgeInsets.all(25),
           child: SingleChildScrollView(
@@ -627,34 +632,27 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                 Text("PARAMÈTRES : ${mode.toUpperCase()}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(height: 20),
 
-                // 1. PARAMÈTRES JE N'AI JAMAIS
+                // --- 1. JEU : JE N'AI JAMAIS ---
                 if (mode == "Je n'ai jamais") ...[
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.white10),
-                    ),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
                     child: SwitchListTile(
                       title: const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      subtitle: const Text("Cache les scores et les réponses jusqu'à la fin", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      subtitle: const Text("Cache les scores et les réponses", style: TextStyle(color: Colors.white54, fontSize: 12)),
                       value: isSecret,
                       activeColor: Colors.purpleAccent,
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.white12,
                       onChanged: (val) {
                         playPop();
-                        setModalState(() => isSecret = val);
-                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-                          'jnjVisibility': val ? 'invisible' : 'visible'
-                        });
+                        FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'jnjVisibility': val ? 'invisible' : 'visible'});
                       },
                     ),
                   ),
                   const SizedBox(height: 20),
                 ],
 
-                // 2. PARAMÈTRES MR WHITE
+                // --- 2. JEU : MR WHITE ---
                 if (mode == "Mr White") ...[
                   Container(
                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
@@ -665,6 +663,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           value: data['mwHasMrWhite'] ?? true,
                           activeColor: Colors.blueGrey.shade400,
                           onChanged: (val) {
+                            playPop();
                             bool uc = data['mwHasUndercover'] ?? false;
                             if (!val && !uc) return;
                             Map<String, dynamic> updates = {'mwHasMrWhite': val};
@@ -677,6 +676,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           value: data['mwHasUndercover'] ?? false,
                           activeColor: Colors.purpleAccent,
                           onChanged: (val) {
+                            playPop();
                             bool mw = data['mwHasMrWhite'] ?? true;
                             if (!val && !mw) return;
                             Map<String, dynamic> updates = {'mwHasUndercover': val};
@@ -692,12 +692,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.remove, color: Colors.pinkAccent), 
-                                onPressed: (data['mwMaxWords'] ?? 3) > 1 ? () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) - 1}) : null
+                                onPressed: (data['mwMaxWords'] ?? 3) > 1 ? () { playPop(); FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) - 1}); } : null
                               ),
                               Text("${data['mwMaxWords'] ?? 3}", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                               IconButton(
                                 icon: const Icon(Icons.add, color: Colors.greenAccent), 
-                                onPressed: (data['mwMaxWords'] ?? 3) < 5 ? () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) + 1}) : null
+                                onPressed: (data['mwMaxWords'] ?? 3) < 5 ? () { playPop(); FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwMaxWords': (data['mwMaxWords'] ?? 3) + 1}); } : null
                               ),
                             ]
                           )
@@ -708,7 +708,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   const SizedBox(height: 20),
                 ] 
                 
-                // 3. PARAMÈTRES POUR JEUX AVEC CATÉGORIES (SINON SI)
+                // --- 3. JEUX À CATÉGORIES (Action/Vérité, Tribunal...) ---
                 else if (hasCategories && mode != 'Tu préfères ?') ...[
                   const Text("CHOISIR L'INTENSITÉ :", style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 10),
@@ -729,25 +729,16 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                   }),
                 ] 
                 
-                // 4. SI AUCUN DE CES PARAMÈTRES (SINON)
+                // --- 4. AUTRES JEUX (Aucun paramètre) ---
                 else ...[
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.white10),
-                    ),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
                     child: const Row(
                       children: [
                         Icon(Icons.info_outline, color: Colors.white54),
                         SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            "Aucun paramètre pour ce mode.",
-                            style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
-                          ),
-                        ),
+                        Expanded(child: Text("Aucun paramètre pour ce mode.", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600))),
                       ],
                     ),
                   ),
