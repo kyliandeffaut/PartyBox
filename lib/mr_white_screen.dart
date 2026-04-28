@@ -10,8 +10,6 @@ class MrWhiteScreen extends StatefulWidget {
   final bool isOnline;
   final String? lobbyId;
   final String? currentPlayerName;
-  
-  // 👇 LES DEUX NOUVEAUX PARAMÈTRES
   final bool hasMrWhite;
   final bool hasUndercover;
 

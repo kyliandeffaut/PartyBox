@@ -662,7 +662,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           onChanged: (val) {
                             bool uc = data['mwHasUndercover'] ?? false;
                             if (!val && !uc) return;
-                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwHasMrWhite': val});
+                            
+                            Map<String, dynamic> updates = {'mwHasMrWhite': val};
+                            // Bascule auto pour Firebase
+                            if (val && (data['players'] as List).length < 4) {
+                              updates['mwHasUndercover'] = false;
+                            }
+                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update(updates);
                           },
                         ),
                         SwitchListTile(
@@ -672,11 +678,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                           onChanged: (val) {
                             bool mw = data['mwHasMrWhite'] ?? true;
                             if (!val && !mw) return;
-                            if (val && mw && (data['players'] as List).length < 4) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("4 joueurs min. pour avoir les 2 rôles !")));
-                              return;
+                            
+                            Map<String, dynamic> updates = {'mwHasUndercover': val};
+                            // Bascule auto pour Firebase
+                            if (val && (data['players'] as List).length < 4) {
+                              updates['mwHasMrWhite'] = false;
                             }
-                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwHasUndercover': val});
+                            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update(updates);
                           },
                         ),
                       ],

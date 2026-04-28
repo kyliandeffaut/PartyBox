@@ -586,7 +586,11 @@ class GameSelectionScreen extends StatelessWidget {
                                   activeColor: Colors.blueGrey.shade400,
                                   onChanged: (val) {
                                     if (!val && !hasUndercover) return; // Empêche de tout désactiver
-                                    setModalState(() => hasMrWhite = val);
+                                    setModalState(() {
+                                      hasMrWhite = val;
+                                      // On désactive l'Infiltré auto si on est que 3
+                                      if (val && players.length < 4) hasUndercover = false;
+                                    });
                                   },
                                 ),
                                 SwitchListTile(
@@ -596,11 +600,11 @@ class GameSelectionScreen extends StatelessWidget {
                                   activeColor: Colors.purpleAccent,
                                   onChanged: (val) {
                                     if (!val && !hasMrWhite) return; // Empêche de tout désactiver
-                                    if (val && hasMrWhite && players.length < 4) {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("4 joueurs min. pour avoir les 2 !")));
-                                      return;
-                                    }
-                                    setModalState(() => hasUndercover = val);
+                                    setModalState(() {
+                                      hasUndercover = val;
+                                      // On désactive Mr White auto si on est que 3
+                                      if (val && players.length < 4) hasMrWhite = false;
+                                    });
                                   },
                                 ),
                               ],
