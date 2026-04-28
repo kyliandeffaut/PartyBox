@@ -77,10 +77,17 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       final String response = await rootBundle.loadString('assets/mr_white.json');
       final List<dynamic> data = json.decode(response);
       _wordPairs = data.map((pair) => List<String>.from(pair)).toList();
-      _remainingWordPairs = List.from(_wordPairs)..shuffle();
     } catch (e) {
       debugPrint("Erreur chargement mr_white.json: $e");
+      // 🛡️ SÉCURITÉ ABSOLUE : Si le JSON ne charge pas (problème Web), on utilise une liste de secours !
+      _wordPairs = [
+        ['Téléphone', 'Tablette'], ['Guitare', 'Banjo'], ['Pomme', 'Poire'], 
+        ['Plage', 'Piscine'], ['Avion', 'Hélicoptère'], ['Cinéma', 'Théâtre'], 
+        ['Livre', 'Magazine'], ['Chien', 'Loup'], ['Voiture', 'Moto'],
+        ['Chocolat', 'Bonbon'], ['Cuisine', 'Salle de bain'], ['Facebook', 'Instagram']
+      ];
     }
+    _remainingWordPairs = List.from(_wordPairs)..shuffle();
   }
 
   Future<void> _initGame() async {
@@ -262,7 +269,11 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
            }
         }
         _onlineAlivePlayers = aliveNames;
-        if (aliveNames.isNotEmpty && turnIdx < aliveNames.length) _onlineTurnPlayer = aliveNames[turnIdx];
+        if (aliveNames.isNotEmpty && turnIdx < aliveNames.length) {
+            _onlineTurnPlayer = aliveNames[turnIdx];
+        } else {
+            _onlineTurnPlayer = "";
+        }
         
         _isLoading = false;
       });
@@ -272,7 +283,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         if (data['mwPhase'] == null) {
           _startOnlineGame(data);
         } else if (fbPhase == 'vote' && data['mwEliminated'] == null) {
-          // 🛠️ SÉCURITÉ DE DEEP COPY ICI POUR DÉVERROUILLER FIREBASE
           List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
           var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
           
@@ -314,13 +324,17 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   Future<void> _startOnlineGame(Map<String, dynamic> currentData) async {
-    if (_remainingWordPairs.isEmpty) _remainingWordPairs = List.from(_wordPairs)..shuffle();
+    // Si la liste est vide, on la remplit de force
+    if (_remainingWordPairs.isEmpty) {
+        if (_wordPairs.isEmpty) _wordPairs = [['Erreur', 'Bug']]; // Sécurité extrême
+        _remainingWordPairs = List.from(_wordPairs)..shuffle();
+    }
+    
     List<String> pair = List.from(_remainingWordPairs.removeLast());
     pair.shuffle(); 
     String civilWord = pair[0];
     String undercoverWord = pair[1];
 
-    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
     List activeP = (currentData['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     if (activeP.isEmpty) return;
 
@@ -360,7 +374,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       var doc = await docRef.get();
       var data = doc.data()!;
       
-      // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
       List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
       List aliveNames = activeP.where((p) => p['isAlive'] == true).map((p) => p['name']).toList();
 
@@ -393,7 +406,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
     
-    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
     List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     for (var p in activeP) {
       if (p['name'] == widget.currentPlayerName) {
@@ -429,7 +441,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
     
-    // 🛠️ SÉCURITÉ DE DEEP COPY ICI !
     List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
     for (var p in activeP) {
        p['hasVoted'] = false;
@@ -454,7 +465,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
         var doc = await docRef.get();
         if (doc.exists) {
-          // 🛠️ SÉCURITÉ DE DEEP COPY ICI AUSSI
           List activeP = (doc.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
           activeP.removeWhere((p) => p['name'] == widget.currentPlayerName);
           await docRef.update({'activePlayers': activeP});
@@ -642,109 +652,113 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   // --- 2. PHASE DE SAISIE ---
+  // 🛠️ CORRECTION : Ajout du composant Column pour éviter l'écran gris sur le Web
   Widget _buildWordEntryPhase() {
     bool isOnlineMyTurn = widget.isOnline && _onlineTurnPlayer == widget.currentPlayerName;
     int safeTurnIndex = _localTurnIndex < _localAlivePlayers.length ? _localTurnIndex : 0;
     String currentPlayer = widget.isOnline ? _onlineTurnPlayer : _localAlivePlayers[safeTurnIndex];
     int round = widget.isOnline ? _onlineRound : _localCurrentRound;
 
-    return Expanded(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text("TOUR $round / ${widget.maxWords}", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w900, letterSpacing: 2)),
-            const SizedBox(height: 20),
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Text("TOUR $round / ${widget.maxWords}", style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                const SizedBox(height: 20),
 
-            if (!widget.isOnline || isOnlineMyTurn) ...[
-              _glassCard(
-                borderColor: Colors.amber,
-                child: Column(
-                  children: [
-                    const Text("À TON TOUR", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 5),
-                    Text(currentPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _wordEntryController, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                      decoration: InputDecoration(hintText: "Tape un mot...", hintStyle: const TextStyle(color: Colors.white38), filled: true, fillColor: Colors.black45, border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none)),
+                if (!widget.isOnline || isOnlineMyTurn) ...[
+                  _glassCard(
+                    borderColor: Colors.amber,
+                    child: Column(
+                      children: [
+                        const Text("À TON TOUR", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 5),
+                        Text(currentPlayer.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: _wordEntryController, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                          decoration: InputDecoration(hintText: "Tape un mot...", hintStyle: const TextStyle(color: Colors.white38), filled: true, fillColor: Colors.black45, border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none)),
+                        ),
+                        const SizedBox(height: 15),
+                        Listener(
+                          onPointerDown: (_) => playSwoosh(),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                            onPressed: widget.isOnline ? (_isSubmitting ? null : _submitOnlineWord) : _submitLocalWord,
+                            child: const Text("VALIDER ET PASSER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                          ),
+                        )
+                      ],
                     ),
-                    const SizedBox(height: 15),
-                    Listener(
-                      onPointerDown: (_) => playSwoosh(),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade600, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                        onPressed: widget.isOnline ? (_isSubmitting ? null : _submitOnlineWord) : _submitLocalWord,
-                        child: const Text("VALIDER ET PASSER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
-                      ),
-                    )
-                  ],
-                ),
-              ).animate().scale(curve: Curves.easeOutBack),
-            ] else ...[
-              _glassCard(child: Text("Au tour de ${_onlineTurnPlayer.toUpperCase()}...", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontStyle: FontStyle.italic))),
-            ],
+                  ).animate().scale(curve: Curves.easeOutBack),
+                ] else ...[
+                  _glassCard(child: Text("Au tour de ${_onlineTurnPlayer.toUpperCase()}...", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontStyle: FontStyle.italic))),
+                ],
 
-            const SizedBox(height: 30),
-            _buildWordsList(widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers, widget.isOnline ? _onlineWordsMap : _localPlayerWords),
-          ],
+                const SizedBox(height: 30),
+                _buildWordsList(widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers, widget.isOnline ? _onlineWordsMap : _localPlayerWords),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
   // --- 3. PHASE DE VOTE ---
+  // 🛠️ CORRECTION : Ajout du composant Column pour éviter l'écran gris sur le Web
   Widget _buildVotePhase() {
     List<String> aliveP = widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers;
     bool hasVoted = widget.isOnline ? _hasVotedThisTurn : false;
 
-    return Expanded(
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Text("VOTE", style: TextStyle(color: Colors.redAccent, fontSize: 25, fontWeight: FontWeight.w900, letterSpacing: 4)),
-          const Text("Observez les mots. Qui est l'imposteur ?", style: TextStyle(color: Colors.white70)),
-          const SizedBox(height: 10),
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        const Text("VOTE", style: TextStyle(color: Colors.redAccent, fontSize: 25, fontWeight: FontWeight.w900, letterSpacing: 4)),
+        const Text("Observez les mots. Qui est l'imposteur ?", style: TextStyle(color: Colors.white70)),
+        const SizedBox(height: 10),
 
-          if (!widget.isOnline)
-            Builder(
-              builder: (context) {
-                int safeVoteIndex = _localVoteCount < _localAlivePlayers.length ? _localVoteCount : 0;
-                return Text("Au tour de ${_localAlivePlayers[safeVoteIndex].toUpperCase()} de voter", style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold));
-              }
-            )
-          else if (hasVoted)
-            const Text("Tu as voté. En attente des autres...", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic)),
-
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column(
-                children: [
-                  _buildWordsList(aliveP, widget.isOnline ? _onlineWordsMap : _localPlayerWords),
-                  const SizedBox(height: 20),
-                  const Divider(color: Colors.white24),
-                  const SizedBox(height: 10),
-                  
-                  ...aliveP.map((target) => Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
-                    child: Listener(
-                      onPointerDown: (_) => playHammer(),
-                      child: ListTile(
-                        title: Text(target, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                        trailing: const Icon(Icons.how_to_vote, color: Colors.redAccent),
-                        onTap: () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
-                      ),
-                    ),
-                  )).toList()
-                ],
-              ),
-            ),
+        if (!widget.isOnline)
+          Builder(
+            builder: (context) {
+              int safeVoteIndex = _localVoteCount < _localAlivePlayers.length ? _localVoteCount : 0;
+              return Text("Au tour de ${_localAlivePlayers[safeVoteIndex].toUpperCase()} de voter", style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold));
+            }
           )
-        ],
-      ).animate().fadeIn(),
-    );
+        else if (hasVoted)
+          const Text("Tu as voté. En attente des autres...", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic)),
+
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              children: [
+                _buildWordsList(aliveP, widget.isOnline ? _onlineWordsMap : _localPlayerWords),
+                const SizedBox(height: 20),
+                const Divider(color: Colors.white24),
+                const SizedBox(height: 10),
+                
+                ...aliveP.map((target) => Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
+                  child: Listener(
+                    onPointerDown: (_) => playHammer(),
+                    child: ListTile(
+                      title: Text(target, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                      trailing: const Icon(Icons.how_to_vote, color: Colors.redAccent),
+                      onTap: () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
+                    ),
+                  ),
+                )).toList()
+              ],
+            ),
+          ),
+        )
+      ],
+    ).animate().fadeIn();
   }
 
   // --- 4. DERNIÈRE CHANCE ---
@@ -793,8 +807,8 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
              _glassCard(child: Text("Mr White ( $_eliminatedPlayer ) réfléchit et tente de deviner votre mot...", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontStyle: FontStyle.italic))),
           ]
         ],
-      ).animate().fadeIn(),
-    );
+      ), // 👈 LA PARENTHÈSE MANQUANTE ÉTAIT LÀ (Ferme la Column)
+    ).animate().fadeIn(); // (Ferme le SingleChildScrollView)
   }
 
   // --- 5. RÉSULTATS ---
@@ -863,7 +877,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
             const SizedBox(height: 40),
           ]
         ],
-      ).animate().fadeIn(),
-    );
+      ),
+    ).animate().fadeIn();
   }
 }
