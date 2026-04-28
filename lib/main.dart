@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'mr_white_screen.dart';
 
 // --- GESTIONNAIRE DE BRUITAGES (SFX) ---
 final AudioPlayer globalSfxPlayer = AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
@@ -545,6 +546,21 @@ class GameSelectionScreen extends StatelessWidget {
                   () {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) => TuPrefereScreen(players: players)
+                    ));
+                  }
+                ),
+
+                const SizedBox(height: 20), // Ajoute cet espace
+
+                // --- MR WHITE ---
+                _menuCard(
+                  context, 
+                  "Mr White", 
+                  "🕵️‍♂️", 
+                  Colors.blueGrey.shade400, // Une belle couleur grise/bleue pour l'infiltration
+                  () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => MrWhiteScreen(players: players)
                     ));
                   }
                 ),

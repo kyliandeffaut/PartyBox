@@ -8,6 +8,7 @@ import 'tribunal_screen.dart';
 import 'tu_prefere_screen.dart';
 import 'main.dart';
 import 'live_chat_fab.dart';
+import 'mr_white_screen.dart';
 
 class WaitingRoomScreen extends StatefulWidget {
   final String lobbyId;
@@ -310,6 +311,13 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                             lobbyId: widget.lobbyId,
                                             currentPlayerName: widget.currentPlayerName,
                                           );
+                                        } else if (gameMode == "Mr White") {
+                                          targetScreen = MrWhiteScreen(
+                                            players: (data['players'] as List).map((p) => Player(name: p['name'], gender: p['gender'], score: p['score'] ?? 0)).toList(),
+                                            isOnline: true,
+                                            lobbyId: widget.lobbyId,
+                                            currentPlayerName: widget.currentPlayerName,
+                                          ); 
                                         } else {
                                           targetScreen = ActionVeriteScreen(
                                             lobbyId: widget.lobbyId,
@@ -475,6 +483,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                             'Je n\'ai jamais',
                                             'Le Tribunal',
                                             'Tu préfères ?',
+                                            'Mr White',
                                           ];
                                           return Padding(
                                             padding: const EdgeInsets.symmetric(vertical: 20),
