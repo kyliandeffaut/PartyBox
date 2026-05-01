@@ -66,7 +66,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   Map<String, List<String>> _onlineWordsMap = {};
   bool _isSubmitting = false;
   
-  // 🛠️ NOUVEAU : Compteurs pour l'affichage en temps réel
   int _onlineVoteCount = 0;
   int _onlineAliveCount = 0;
 
@@ -297,47 +296,8 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       if (amIHost && data['mwPhase'] == null) {
         _startOnlineGame(data);
       }
-
-      // 🛠️ SÉCURITÉ : N'IMPORTE QUEL JOUEUR PEUT VALIDER LES VOTES !
-      // Si la base de données confirme que tout le monde a voté, n'importe quel appareil 
-      // réveillé pousse le résultat pour débloquer les autres.
-      if (fbPhase == 'vote' && data['mwEliminated'] == null) {
-        List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
-        var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
-        
-        if (aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true)) {
-          Map<String, int> votes = {};
-          for (var p in aliveP) {
-            String t = p['voteTarget'] ?? '';
-            votes[t] = (votes[t] ?? 0) + 1;
-          }
-          String eliminated = "";
-          int maxV = -1;
-          votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
-
-          var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
-          String elimRole = elimPlayer['mwRole'] ?? '';
-
-          for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
-
-          int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
-          bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
-          bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
-
-          String nextPhase = 'resultat';
-          String gameRes = "CONTINUE";
-
-          if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
-          else {
-            if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
-            else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
-          }
-
-          FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-            'mwPhase': nextPhase, 'mwEliminated': eliminated, 'mwEliminatedRole': elimRole, 'mwGameResult': gameRes, 'activePlayers': activeP,
-          });
-        }
-      }
+      
+      // FINI : ON NE FAIT PLUS DE CALCUL DE VOTE ICI ! LA TRANSACTION S'EN OCCUPE EN BAS.
     });
   }
 
@@ -416,7 +376,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     }
   }
 
-  // --- LA TRANSACTION GÈRE L'ÉCRITURE ---
+  // 🛠️ TRANSACTION PROPRE ET UNIQUE POUR LE VOTE
   Future<void> _handleOnlineVote(String targetName) async {
     if (_hasVotedThisTurn) return;
 
@@ -430,21 +390,68 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         
         List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
         
+        // 1. On enregistre le vote
         for (var p in activeP) {
           if (p['name'] == widget.currentPlayerName) {
             p['hasVoted'] = true;
             p['voteTarget'] = targetName;
           }
         }
-        transaction.update(docRef, {'activePlayers': activeP});
+        
+        // 2. Vérification immédiate du nombre de votants
+        var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
+        bool everyoneVoted = aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true);
+
+        if (everyoneVoted) {
+          // Si tout le monde a voté, on fait les comptes et on passe à la suite direct !
+          Map<String, int> votes = {};
+          for (var p in aliveP) {
+            String t = p['voteTarget'] ?? '';
+            if (t.isNotEmpty) votes[t] = (votes[t] ?? 0) + 1;
+          }
+
+          String eliminated = "";
+          int maxV = -1;
+          votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
+
+          var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
+          String elimRole = elimPlayer['mwRole'] ?? '';
+
+          for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
+
+          int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
+          bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
+          bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
+
+          String nextPhase = 'resultat';
+          String gameRes = "CONTINUE";
+
+          if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
+          else {
+            if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
+            else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
+          }
+
+          transaction.update(docRef, {
+            'activePlayers': activeP,
+            'mwPhase': nextPhase,
+            'mwEliminated': eliminated,
+            'mwEliminatedRole': elimRole,
+            'mwGameResult': gameRes,
+          });
+        } else {
+          // Sinon, on met juste à jour la liste avec le nouveau vote
+          transaction.update(docRef, {'activePlayers': activeP});
+        }
       });
+      
       if (mounted) setState(() => _hasVotedThisTurn = true);
     } catch (e) {
       debugPrint("Erreur lors du vote en ligne : $e");
     }
   }
 
-  // 🛠️ LE BOUTON MAGIQUE : Forcer la fin des votes si un appareil dort
+  // Bouton de secours au cas où un joueur quitte la partie brusquement
   Future<void> _forceEndVoteOnline() async {
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     var doc = await docRef.get();
@@ -460,7 +467,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       if (t.isNotEmpty) votes[t] = (votes[t] ?? 0) + 1;
     }
 
-    if (votes.isEmpty) return; // Sécurité si aucun vote n'a été reçu
+    if (votes.isEmpty) return;
 
     String eliminated = "";
     int maxV = -1;
@@ -790,7 +797,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         const SizedBox(height: 10),
         const Text("VOTE", style: TextStyle(color: Colors.redAccent, fontSize: 25, fontWeight: FontWeight.w900, letterSpacing: 4)),
         
-        // 🛠️ NOUVEAU : COMPTEUR DE VOTES EN TEMPS RÉEL
         if (widget.isOnline)
           Text("Votes reçus : $_onlineVoteCount / $_onlineAliveCount", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
           
@@ -831,7 +837,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                   ),
                 )).toList(),
 
-                // 🛠️ LE BOUTON MAGIQUE POUR TOUT LE MONDE (On a retiré la restriction "_isHost")
+                // LE BOUTON MAGIQUE POUR TOUT LE MONDE
                 if (widget.isOnline) ...[
                   const SizedBox(height: 30),
                   TextButton.icon(
