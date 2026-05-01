@@ -463,6 +463,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                         newP['score'] = 0;
                                         newP['voteTarget'] = null;
                                         newP['tpChoice'] = null;
+                                        newP['isReady'] = false;
                                         return newP;
                                       }).toList();
 
@@ -475,6 +476,14 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                         'lastChoice': null,
                                         'showNextButton': false,
                                         'currentPlayerIndex': 0,
+
+                                        'mwPhase': FieldValue.delete(),
+                                        'mwRound': FieldValue.delete(),
+                                        'mwTurnIndex': FieldValue.delete(),
+                                        'mwCivilWord': FieldValue.delete(),
+                                        'mwEliminated': FieldValue.delete(),
+                                        'mwEliminatedRole': FieldValue.delete(),
+                                        'mwGameResult': FieldValue.delete(),
                                       });
                                     },
                                     child: Text(
