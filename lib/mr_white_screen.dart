@@ -79,7 +79,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _wordPairs = data.map((pair) => List<String>.from(pair)).toList();
     } catch (e) {
       debugPrint("Erreur chargement mr_white.json: $e");
-      // 🛡️ SÉCURITÉ ABSOLUE : Si le JSON ne charge pas (problème Web), on utilise une liste de secours !
       _wordPairs = [
         ['Téléphone', 'Tablette'], ['Guitare', 'Banjo'], ['Pomme', 'Poire'], 
         ['Plage', 'Piscine'], ['Avion', 'Hélicoptère'], ['Cinéma', 'Théâtre'], 
@@ -278,55 +277,16 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         _isLoading = false;
       });
 
-      // --- LE CHEF GÈRE LES CALCULS SERVEUR ---
-      if (amIHost) {
-        if (data['mwPhase'] == null) {
-          _startOnlineGame(data);
-        } else if (fbPhase == 'vote' && data['mwEliminated'] == null) {
-          List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
-          var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
-          
-          if (aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true)) {
-            Map<String, int> votes = {};
-            for (var p in aliveP) {
-              String t = p['voteTarget'] ?? '';
-              votes[t] = (votes[t] ?? 0) + 1;
-            }
-            String eliminated = "";
-            int maxV = -1;
-            votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
-
-            var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
-            String elimRole = elimPlayer['mwRole'] ?? '';
-
-            for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
-
-            int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
-            bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
-            bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
-
-            String nextPhase = 'resultat';
-            String gameRes = "CONTINUE";
-
-            if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
-            else {
-              if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
-              else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
-            }
-
-            FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
-              'mwPhase': nextPhase, 'mwEliminated': eliminated, 'mwEliminatedRole': elimRole, 'mwGameResult': gameRes, 'activePlayers': activeP,
-            });
-          }
-        }
+      // --- INITIALISATION DU JEU (Seul le chef le fait) ---
+      if (amIHost && data['mwPhase'] == null) {
+        _startOnlineGame(data);
       }
     });
   }
 
   Future<void> _startOnlineGame(Map<String, dynamic> currentData) async {
-    // Si la liste est vide, on la remplit de force
     if (_remainingWordPairs.isEmpty) {
-        if (_wordPairs.isEmpty) _wordPairs = [['Erreur', 'Bug']]; // Sécurité extrême
+        if (_wordPairs.isEmpty) _wordPairs = [['Erreur', 'Bug']];
         _remainingWordPairs = List.from(_wordPairs)..shuffle();
     }
     
@@ -399,20 +359,21 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     }
   }
 
+  // 🛠️ LE COEUR DE LA SOLUTION : LA TRANSACTION INTÉGRALE
   Future<void> _handleOnlineVote(String targetName) async {
     if (_hasVotedThisTurn) return;
-    setState(() => _hasVotedThisTurn = true);
-    
+
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     
     try {
-      // Empêche les joueurs d'écraser les votes des autres s'ils cliquent en même temps !
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         var snapshot = await transaction.get(docRef);
         if (!snapshot.exists) return;
+        var data = snapshot.data()!;
         
-        List activeP = (snapshot.data()?['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+        List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
         
+        // 1. On enregistre le vote
         for (var p in activeP) {
           if (p['name'] == widget.currentPlayerName) {
             p['hasVoted'] = true;
@@ -420,11 +381,102 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           }
         }
         
-        transaction.update(docRef, {'activePlayers': activeP});
+        // 2. On vérifie en temps réel si TOUT LE MONDE a voté
+        var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
+        bool everyoneVoted = aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true);
+
+        if (everyoneVoted) {
+          // 3. SI C'EST LE DERNIER VOTE, ON CALCULE IMMÉDIATEMENT LE RÉSULTAT !
+          Map<String, int> votes = {};
+          for (var p in aliveP) {
+            String t = p['voteTarget'] ?? '';
+            if (t.isNotEmpty) votes[t] = (votes[t] ?? 0) + 1;
+          }
+
+          String eliminated = "";
+          int maxV = -1;
+          votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
+
+          var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
+          String elimRole = elimPlayer['mwRole'] ?? '';
+
+          for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
+
+          int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
+          bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
+          bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
+
+          String nextPhase = 'resultat';
+          String gameRes = "CONTINUE";
+
+          if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
+          else {
+            if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
+            else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
+          }
+
+          transaction.update(docRef, {
+            'activePlayers': activeP,
+            'mwPhase': nextPhase,
+            'mwEliminated': eliminated,
+            'mwEliminatedRole': elimRole,
+            'mwGameResult': gameRes,
+          });
+        } else {
+          // Si ce n'est pas le dernier, on sauvegarde juste le vote
+          transaction.update(docRef, {'activePlayers': activeP});
+        }
       });
+
+      if (mounted) setState(() => _hasVotedThisTurn = true);
     } catch (e) {
       debugPrint("Erreur lors du vote en ligne : $e");
     }
+  }
+
+  // 🛠️ LE BOUTON MAGIQUE POUR LE CHEF
+  Future<void> _forceEndVoteOnline() async {
+    var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+    var doc = await docRef.get();
+    if (!doc.exists) return;
+    var data = doc.data()!;
+
+    List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+    var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
+
+    Map<String, int> votes = {};
+    for (var p in aliveP) {
+      String t = p['voteTarget'] ?? '';
+      if (t.isNotEmpty) votes[t] = (votes[t] ?? 0) + 1;
+    }
+
+    if (votes.isEmpty) return; 
+
+    String eliminated = "";
+    int maxV = -1;
+    votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
+
+    var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
+    String elimRole = elimPlayer['mwRole'] ?? '';
+
+    for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
+
+    int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
+    bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
+    bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
+
+    String nextPhase = 'resultat';
+    String gameRes = "CONTINUE";
+
+    if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
+    else {
+      if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
+      else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
+    }
+
+    await docRef.update({
+      'mwPhase': nextPhase, 'mwEliminated': eliminated, 'mwEliminatedRole': elimRole, 'mwGameResult': gameRes, 'activePlayers': activeP,
+    });
   }
 
   Future<void> _checkOnlineMrWhiteGuess() async {
@@ -663,7 +715,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   // --- 2. PHASE DE SAISIE ---
-  // 🛠️ CORRECTION : Ajout du composant Column pour éviter l'écran gris sur le Web
   Widget _buildWordEntryPhase() {
     bool isOnlineMyTurn = widget.isOnline && _onlineTurnPlayer == widget.currentPlayerName;
     int safeTurnIndex = _localTurnIndex < _localAlivePlayers.length ? _localTurnIndex : 0;
@@ -720,7 +771,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   }
 
   // --- 3. PHASE DE VOTE ---
-  // 🛠️ CORRECTION : Ajout du composant Column pour éviter l'écran gris sur le Web
   Widget _buildVotePhase() {
     List<String> aliveP = widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers;
     bool hasVoted = widget.isOnline ? _hasVotedThisTurn : false;
@@ -763,7 +813,17 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                       onTap: () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
                     ),
                   ),
-                )).toList()
+                )).toList(),
+
+                // 🛠️ LE BOUTON MAGIQUE POUR LE CHEF
+                if (widget.isOnline && _isHost) ...[
+                  const SizedBox(height: 30),
+                  TextButton.icon(
+                    onPressed: _forceEndVoteOnline,
+                    icon: const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+                    label: const Text("Forcer la fin des votes", style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                  )
+                ]
               ],
             ),
           ),
@@ -818,8 +878,8 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
              _glassCard(child: Text("Mr White ( $_eliminatedPlayer ) réfléchit et tente de deviner votre mot...", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontStyle: FontStyle.italic))),
           ]
         ],
-      ), // 👈 LA PARENTHÈSE MANQUANTE ÉTAIT LÀ (Ferme la Column)
-    ).animate().fadeIn(); // (Ferme le SingleChildScrollView)
+      ), 
+    ).animate().fadeIn(); 
   }
 
   // --- 5. RÉSULTATS ---
@@ -888,7 +948,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
             const SizedBox(height: 40),
           ]
         ],
-      ),
-    ).animate().fadeIn();
+      ), 
+    ).animate().fadeIn(); 
   }
 }
