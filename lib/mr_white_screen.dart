@@ -66,8 +66,14 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   Map<String, List<String>> _onlineWordsMap = {};
   bool _isSubmitting = false;
   
+  // Compteurs en ligne
   int _onlineVoteCount = 0;
   int _onlineAliveCount = 0;
+  int _onlineReadyCount = 0;
+  int _onlineTotalPlayers = 0;
+  
+  bool _amIAlive = true;
+  bool _amIReady = false;
 
   @override
   void initState() {
@@ -263,18 +269,26 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         
         int vCount = 0;
         int aCount = 0;
+        int rCount = 0;
+        bool amIAlive = false;
+        bool amIReady = false;
         
         _onlineWordsMap.clear();
 
         for (var p in activeP) {
+           if (p['isReady'] == true) rCount++;
+
            if (p['isAlive'] == true) {
                aliveNames.add(p['name']);
                aCount++;
                if (p['hasVoted'] == true) vCount++;
            }
            _onlineWordsMap[p['name']] = List<String>.from(p['mwWords'] ?? []);
+           
            if (p['name'] == widget.currentPlayerName) {
               _onlineMyRole = p['mwRole'] ?? "Erreur";
+              amIAlive = p['isAlive'] ?? false;
+              amIReady = p['isReady'] ?? false;
               if (_phase == 'vote') _hasVotedThisTurn = p['hasVoted'] ?? false;
            }
         }
@@ -282,6 +296,10 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         _onlineAlivePlayers = aliveNames;
         _onlineVoteCount = vCount;
         _onlineAliveCount = aCount;
+        _onlineReadyCount = rCount;
+        _onlineTotalPlayers = activeP.length;
+        _amIAlive = amIAlive;
+        _amIReady = amIReady;
         
         if (aliveNames.isNotEmpty && turnIdx < aliveNames.length) {
             _onlineTurnPlayer = aliveNames[turnIdx];
@@ -296,8 +314,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       if (amIHost && data['mwPhase'] == null) {
         _startOnlineGame(data);
       }
-      
-      // FINI : ON NE FAIT PLUS DE CALCUL DE VOTE ICI ! LA TRANSACTION S'EN OCCUPE EN BAS.
     });
   }
 
@@ -332,6 +348,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       
       p['isAlive'] = true;
       p['hasVoted'] = false;
+      p['isReady'] = false;
       p['voteTarget'] = null;
       p['mwWords'] = []; 
     }
@@ -339,6 +356,45 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     await FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({
       'mwPhase': 'distribution', 'mwRound': 1, 'mwTurnIndex': 0, 'activePlayers': activeP, 'mwCivilWord': civilWord, 
     });
+  }
+
+  // 🛠️ SYSTEME "PRÊT" ATOMIQUE
+  Future<void> _setReadyOnline() async {
+    if (_amIReady) return;
+    
+    var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
+    
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        var snapshot = await transaction.get(docRef);
+        if (!snapshot.exists) return;
+        var data = snapshot.data()!;
+        
+        List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
+        
+        // 1. On valide que le joueur est prêt
+        for (var p in activeP) {
+          if (p['name'] == widget.currentPlayerName) {
+            p['isReady'] = true;
+          }
+        }
+        
+        // 2. Vérification immédiate si tout le monde est prêt
+        bool everyoneReady = activeP.isNotEmpty && activeP.every((p) => p['isReady'] == true);
+
+        if (everyoneReady) {
+          transaction.update(docRef, {
+            'activePlayers': activeP,
+            'mwPhase': 'word_entry'
+          });
+        } else {
+          transaction.update(docRef, {'activePlayers': activeP});
+        }
+      });
+      if (mounted) setState(() => _amIReady = true);
+    } catch (e) {
+      debugPrint("Erreur set ready : $e");
+    }
   }
 
   Future<void> _submitOnlineWord() async {
@@ -378,7 +434,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
 
   // 🛠️ TRANSACTION PROPRE ET UNIQUE POUR LE VOTE
   Future<void> _handleOnlineVote(String targetName) async {
-    if (_hasVotedThisTurn) return;
+    if (_hasVotedThisTurn || !_amIAlive) return;
 
     var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
     
@@ -449,51 +505,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     } catch (e) {
       debugPrint("Erreur lors du vote en ligne : $e");
     }
-  }
-
-  // Bouton de secours au cas où un joueur quitte la partie brusquement
-  Future<void> _forceEndVoteOnline() async {
-    var docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
-    var doc = await docRef.get();
-    if (!doc.exists) return;
-    var data = doc.data()!;
-
-    List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
-    var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
-
-    Map<String, int> votes = {};
-    for (var p in aliveP) {
-      String t = p['voteTarget'] ?? '';
-      if (t.isNotEmpty) votes[t] = (votes[t] ?? 0) + 1;
-    }
-
-    if (votes.isEmpty) return;
-
-    String eliminated = "";
-    int maxV = -1;
-    votes.forEach((k, v) { if (v > maxV) { maxV = v; eliminated = k; } });
-
-    var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
-    String elimRole = elimPlayer['mwRole'] ?? '';
-
-    for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
-
-    int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
-    bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
-    bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
-
-    String nextPhase = 'resultat';
-    String gameRes = "CONTINUE";
-
-    if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
-    else {
-      if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
-      else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
-    }
-
-    await docRef.update({
-      'mwPhase': nextPhase, 'mwEliminated': eliminated, 'mwEliminatedRole': elimRole, 'mwGameResult': gameRes, 'activePlayers': activeP,
-    });
   }
 
   Future<void> _checkOnlineMrWhiteGuess() async {
@@ -657,21 +668,26 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
               ],
             ),
           ).animate().scale(curve: Curves.easeOutBack),
-          const SizedBox(height: 40),
-          if (_isHost)
+          const SizedBox(height: 30),
+          
+          // 🛠️ NOUVEAU : SYSTÈME DE PRÊT POUR TOUS LES JOUEURS
+          Text("Joueurs prêts : $_onlineReadyCount / $_onlineTotalPlayers", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 15),
+
+          if (!_amIReady)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Listener(
                 onPointerDown: (_) => playPop(),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.white, minimumSize: const Size(double.infinity, 60), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                  onPressed: () => FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).update({'mwPhase': 'word_entry'}),
-                  child: const Text("TOUT LE MONDE EST PRÊT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                  onPressed: _setReadyOnline,
+                  child: const Text("JE SUIS PRÊT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
                 ),
               ),
             )
           else
-            const Text("En attente du chef pour commencer...", style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic))
+            const Text("En attente des autres joueurs...", style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic))
         ],
       );
     }
@@ -791,6 +807,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   Widget _buildVotePhase() {
     List<String> aliveP = widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers;
     bool hasVoted = widget.isOnline ? _hasVotedThisTurn : false;
+    
+    // 🛠️ NOUVEAU : SAVOIR SI ON EST SPECTATEUR
+    bool isSpectator = widget.isOnline && !_amIAlive;
 
     return Column(
       children: [
@@ -811,6 +830,8 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
               return Text("Au tour de ${_localAlivePlayers[safeVoteIndex].toUpperCase()} de voter", style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold));
             }
           )
+        else if (isSpectator)
+          const Text("Tu es éliminé. Observe les votes...", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic))
         else if (hasVoted)
           const Text("Tu as voté. En attente des autres...", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic)),
 
@@ -828,24 +849,22 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
                   child: Listener(
-                    onPointerDown: (_) => playHammer(),
+                    onPointerDown: (_) {
+                      // Seuls les joueurs vivants et n'ayant pas voté entendent le son
+                      if (!isSpectator && !hasVoted) playHammer();
+                    },
                     child: ListTile(
                       title: Text(target, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                      trailing: const Icon(Icons.how_to_vote, color: Colors.redAccent),
-                      onTap: () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
+                      trailing: Icon(
+                        isSpectator || hasVoted ? Icons.lock : Icons.how_to_vote, 
+                        color: isSpectator || hasVoted ? Colors.white24 : Colors.redAccent
+                      ),
+                      onTap: (isSpectator || hasVoted) 
+                          ? null 
+                          : () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
                     ),
                   ),
                 )).toList(),
-
-                // LE BOUTON MAGIQUE POUR TOUT LE MONDE
-                if (widget.isOnline) ...[
-                  const SizedBox(height: 30),
-                  TextButton.icon(
-                    onPressed: _forceEndVoteOnline,
-                    icon: const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
-                    label: const Text("Forcer les résultats (si qqn a buggé)", style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
-                  )
-                ]
               ],
             ),
           ),
