@@ -358,7 +358,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     });
   }
 
-  // 🛠️ SYSTEME "PRÊT" ATOMIQUE
   Future<void> _setReadyOnline() async {
     if (_amIReady) return;
     
@@ -372,14 +371,12 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         
         List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
         
-        // 1. On valide que le joueur est prêt
         for (var p in activeP) {
           if (p['name'] == widget.currentPlayerName) {
             p['isReady'] = true;
           }
         }
         
-        // 2. Vérification immédiate si tout le monde est prêt
         bool everyoneReady = activeP.isNotEmpty && activeP.every((p) => p['isReady'] == true);
 
         if (everyoneReady) {
@@ -432,7 +429,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     }
   }
 
-  // 🛠️ TRANSACTION PROPRE ET UNIQUE POUR LE VOTE
   Future<void> _handleOnlineVote(String targetName) async {
     if (_hasVotedThisTurn || !_amIAlive) return;
 
@@ -446,7 +442,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
         
         List activeP = (data['activePlayers'] as List? ?? []).map((p) => Map<String, dynamic>.from(p as Map)).toList();
         
-        // 1. On enregistre le vote
         for (var p in activeP) {
           if (p['name'] == widget.currentPlayerName) {
             p['hasVoted'] = true;
@@ -454,12 +449,10 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           }
         }
         
-        // 2. Vérification immédiate du nombre de votants
         var aliveP = activeP.where((p) => p['isAlive'] == true).toList();
         bool everyoneVoted = aliveP.isNotEmpty && aliveP.every((p) => p['hasVoted'] == true);
 
         if (everyoneVoted) {
-          // Si tout le monde a voté, on fait les comptes et on passe à la suite direct !
           Map<String, int> votes = {};
           for (var p in aliveP) {
             String t = p['voteTarget'] ?? '';
@@ -496,7 +489,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
             'mwGameResult': gameRes,
           });
         } else {
-          // Sinon, on met juste à jour la liste avec le nouveau vote
           transaction.update(docRef, {'activePlayers': activeP});
         }
       });
@@ -670,7 +662,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           ).animate().scale(curve: Curves.easeOutBack),
           const SizedBox(height: 30),
           
-          // 🛠️ NOUVEAU : SYSTÈME DE PRÊT POUR TOUS LES JOUEURS
           Text("Joueurs prêts : $_onlineReadyCount / $_onlineTotalPlayers", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 15),
 
@@ -808,7 +799,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     List<String> aliveP = widget.isOnline ? _onlineAlivePlayers : _localAlivePlayers;
     bool hasVoted = widget.isOnline ? _hasVotedThisTurn : false;
     
-    // 🛠️ NOUVEAU : SAVOIR SI ON EST SPECTATEUR
     bool isSpectator = widget.isOnline && !_amIAlive;
 
     return Column(
@@ -850,7 +840,6 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
                   child: Listener(
                     onPointerDown: (_) {
-                      // Seuls les joueurs vivants et n'ayant pas voté entendent le son
                       if (!isSpectator && !hasVoted) playHammer();
                     },
                     child: ListTile(
@@ -884,7 +873,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           const SizedBox(height: 40),
           const Text("DÉMASQUÉ !", style: TextStyle(color: Colors.redAccent, fontSize: 35, fontWeight: FontWeight.w900, letterSpacing: 2)),
           const SizedBox(height: 10),
-          Text("$_eliminatedPlayer était Mr White 🕶️", style: const TextStyle(color: Colors.white70, fontSize: 18)),
+          Text("$_eliminatedPlayer était Mr White", style: const TextStyle(color: Colors.white70, fontSize: 18)),
           const SizedBox(height: 30),
           
           if (!widget.isOnline || amIEliminatedWhite) ...[
@@ -928,10 +917,10 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     bool isMrWhite = _eliminatedRole == "Mr White";
     bool isUndercover = _eliminatedRole != "Mr White" && _eliminatedRole != _civilWord;
     
-    String roleText = "CIVIL 🧍";
+    String roleText = "CIVIL";
     Color roleColor = Colors.blueAccent;
-    if (isMrWhite) { roleText = "MR WHITE 🕶️"; roleColor = Colors.redAccent; } 
-    else if (isUndercover) { roleText = "INFILTRÉ 🕵️‍♂️\n(Son mot : $_eliminatedRole)"; roleColor = Colors.purpleAccent; }
+    if (isMrWhite) { roleText = "MR WHITE"; roleColor = Colors.redAccent; } 
+    else if (isUndercover) { roleText = "INFILTRÉ\n(Son mot : $_eliminatedRole)"; roleColor = Colors.purpleAccent; }
 
     return SingleChildScrollView(
       child: Column(
