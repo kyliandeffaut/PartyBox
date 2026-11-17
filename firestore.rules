@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Codes VIP : on peut vérifier un code précis, mais jamais lister ni modifier la collection.
+    match /vipCodes/{code} {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // ⚠️ À REMPLACER à l'étape 2 par tes règles actuelles sécurisées.
+    // Ce bloc garde le fonctionnement actuel des lobbys (ouvert) pour ne rien casser en attendant.
+    match /lobbies/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
