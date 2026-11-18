@@ -46,3 +46,6 @@ app.*.map.json
 
 # Cache Firebase Hosting (généré par firebase deploy)
 .firebase/
+
+# Build Android (généré)
+/android/build/
