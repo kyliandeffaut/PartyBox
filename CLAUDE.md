@@ -2,6 +2,8 @@
 
 Appli de jeux de soirée **Flutter / Dart + Firebase Firestore**, publiée sur le Play Store (`com.deffautstudio.partybox`, projet Firebase `partybox-98bce`, plan Spark). Modes : local (1 téléphone, Pass & Play) et en ligne (lobbys Firestore en temps réel). Réponds en français, style direct.
 
+**Plateformes** : Android (Play Store) + **version web sur Firebase Hosting**, qui sert de version iOS (pas de compte Apple Developer : les joueurs iPhone jouent depuis le navigateur). Les deux partagent la même base Firestore et doivent pouvoir jouer ensemble dans un même lobby. Toute fonctionnalité doit donc marcher **aussi sur Flutter Web** : Auth anonyme web, pas de plugin Android-only sans repli web, et pas de paiement Play Billing côté web (prévoir une autre solution pour le VIP).
+
 ## Avant de commencer / à la fin d'une session
 
 - **Mémoire du projet** : `C:/Obsidian/SecondCerveau/40_Dev_Projets/PartyBox.md` (feuille de route, décisions, section « Reprendre ici »). Lis-la au début si elle est accessible ; à la fin, mets à jour « Reprendre ici » et ajoute une ligne au journal. Ne relis pas l'historique des conversations : cette note fait foi.
