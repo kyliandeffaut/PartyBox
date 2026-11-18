@@ -200,22 +200,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         actions: [
           TextButton(
             onPressed: () async {
-              if (secretController.text == "KYKS606") {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('isPremium', true);
-                if (context.mounted) {
-                  setState(() => _isPremiumUnlocked = true);
-                  Navigator.pop(context);
+              final code = secretController.text.trim();
+              String? action;
+              if (code.isNotEmpty && !code.contains('/')) {
+                try {
+                  // Les codes VIP sont stockés dans Firestore : vipCodes/{CODE} avec un champ "action" ("unlock" ou "lock").
+                  // Les règles n'autorisent que la lecture d'un document précis (get), jamais la liste des codes.
+                  final doc = await FirebaseFirestore.instance.collection('vipCodes').doc(code).get();
+                  if (doc.exists) action = doc.data()?['action'] as String?;
+                } catch (e) {
+                  debugPrint("Vérification du code VIP impossible : $e");
                 }
-              } else if (secretController.text == "DEFF606") {
+              }
+              if (action == 'unlock' || action == 'lock') {
+                final unlocked = action == 'unlock';
                 final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('isPremium', false);
+                await prefs.setBool('isPremium', unlocked);
                 if (context.mounted) {
-                  setState(() => _isPremiumUnlocked = false);
+                  setState(() => _isPremiumUnlocked = unlocked);
                   Navigator.pop(context);
                 }
               } else {
-                Navigator.pop(context);
+                if (context.mounted) Navigator.pop(context);
               }
             },
             child: const Text("VALIDER", style: TextStyle(color: Colors.pinkAccent)),

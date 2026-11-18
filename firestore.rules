@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Codes VIP ----------
+    // On peut vérifier UN code précis, jamais lister la collection ni l'écrire depuis l'appli.
+    match /vipCodes/{code} {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // ---------- Lobbys ----------
+    // Règles intermédiaires (sans Auth) : l'appli fonctionne comme avant,
+    // mais on bloque le vandalisme et le spam. La vraie sécurité arrive avec l'Auth anonyme.
+    match /lobbies/{lobbyId} {
+
+      function isText(v, maxLen) {
+        return v is string && v.size() > 0 && v.size() <= maxLen;
+      }
+      function playersOk(data) {
+        return !('players' in data) || (data.players is list && data.players.size() <= 20);
+      }
+
+      allow read: if true;
+
+      // Création : uniquement les champs prévus, avec des tailles raisonnables.
+      allow create: if request.resource.data.keys().hasOnly(
+                         ['lobbyName', 'password', 'status', 'host', 'gameMode', 'players', 'createdAt'])
+                    && isText(request.resource.data.lobbyName, 40)
+                    && isText(request.resource.data.password, 40)
+                    && isText(request.resource.data.host, 30)
+                    && request.resource.data.status == 'waiting'
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.players is list
+                    && request.resource.data.players.size() == 1;
+
+      // Mise à jour : le jeu peut modifier l'état, mais pas le nom, le mot de passe ni la date de création.
+      allow update: if !request.resource.data.diff(resource.data).affectedKeys()
+                         .hasAny(['lobbyName', 'password', 'createdAt'])
+                    && playersOk(request.resource.data);
+
+      // Suppression : seulement un lobby avec 1 joueur max (le dernier qui part) ou vieux de plus de 24 h.
+      allow delete: if !('players' in resource.data)
+                    || resource.data.players.size() <= 1
+                    || resource.data.createdAt < request.time - duration.value(24, 'h');
+
+      // ---------- Chat du lobby ----------
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasOnly(['text', 'sender', 'timestamp'])
+                      && isText(request.resource.data.text, 500)
+                      && isText(request.resource.data.sender, 30)
+                      && request.resource.data.timestamp == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    // Tout le reste est fermé par défaut.
+  }
+}
