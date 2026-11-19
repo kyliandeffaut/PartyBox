@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_setup.dart';
 
 class LiveChatWidget extends StatefulWidget {
   final String lobbyId;
@@ -31,6 +32,7 @@ class _LiveChatWidgetState extends State<LiveChatWidget> {
           .add({
         'text': text,
         'sender': widget.currentPlayerName,
+        'senderUid': await ensureSignedIn(),
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -73,6 +75,7 @@ class _LiveChatWidgetState extends State<LiveChatWidget> {
                   .orderBy('timestamp', descending: true) // Les plus récents en bas
                   .snapshots(),
               builder: (context, snapshot) {
+                if (snapshot.hasError) return const Center(child: Text("Chat indisponible", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.blueAccent));
                 var messages = snapshot.data!.docs;
                 if (messages.isEmpty) return const Center(child: Text("Sois le premier à parler...", style: TextStyle(color: Colors.white38, fontStyle: FontStyle.italic)));

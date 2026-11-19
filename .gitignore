@@ -49,3 +49,6 @@ app.*.map.json
 
 # Build Android (généré)
 /android/build/
+
+# Tests des règles Firestore (npm)
+node_modules/

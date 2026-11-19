@@ -254,7 +254,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   // LOGIQUE MULTIJOUEUR EN LIGNE
   // ==========================================
   void _listenLobby() {
-    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snap) {
+    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().handleError((Object e) => debugPrint("Flux du lobby interrompu : $e")).listen((snap) {
       if (!snap.exists || snap.data() == null) return;
       final data = snap.data()!;
       final bool amIHost = (data['host'] ?? '').toString() == (widget.currentPlayerName ?? '');

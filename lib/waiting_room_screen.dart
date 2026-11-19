@@ -9,6 +9,7 @@ import 'tu_prefere_screen.dart';
 import 'main.dart';
 import 'live_chat_fab.dart';
 import 'mr_white_screen.dart';
+import 'firebase_setup.dart';
 
 class WaitingRoomScreen extends StatefulWidget {
   final String lobbyId;
@@ -43,22 +44,39 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
     });
 
     try {
+      final uid = currentUid;
+      if (uid == null) return;
       final docRef = FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId);
       final doc = await docRef.get();
       if (!doc.exists) return;
 
-      var data = doc.data() as Map<String, dynamic>;
-      List players = List.from(data['players'] ?? []);
-      String currentHost = data['host'] ?? '';
-
+      final data = doc.data()!;
+      final List players = List.from(data['players'] ?? []);
       players.removeWhere((p) => p['name'] == widget.currentPlayerName);
 
-      if (players.isEmpty) {
-        await docRef.delete();
+      // "Dernier ou non" se décide sur `members` (les règles font pareil), pas sur `players`.
+      final otherMembers = Map<String, dynamic>.from(data['members'] ?? {})..remove(uid);
+
+      if (otherMembers.isEmpty) {
+        // Dernier membre : on supprime le lobby, ses messages et son nom.
+        await deleteLobbyCompletely(docRef, data);
       } else {
-        Map<String, dynamic> updates = {'players': players};
-        if (widget.currentPlayerName == currentHost) {
-          updates['host'] = players[0]['name']; 
+        final Map<String, dynamic> updates = {
+          'players': players,
+          'members.$uid': FieldValue.delete(),
+        };
+        if (data['hostUid'] == uid) {
+          // Transfert du chef : premier joueur restant qui est membre, sinon n'importe quel membre.
+          String newHostUid = otherMembers.keys.first;
+          for (final p in players) {
+            final match = otherMembers.entries.where((e) => e.value == p['name']);
+            if (match.isNotEmpty) {
+              newHostUid = match.first.key;
+              break;
+            }
+          }
+          updates['hostUid'] = newHostUid;
+          updates['host'] = otherMembers[newHostUid];
         }
         await docRef.update(updates);
       }
@@ -258,7 +276,21 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                             child: StreamBuilder<DocumentSnapshot>(
                               stream: FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots(),
                               builder: (context, snapshot) {
-                                if (snapshot.hasError) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
+                                if (snapshot.hasError) {
+                                  // Après une exclusion, les règles retirent l'accès au lobby : le flux renvoie permission-denied.
+                                  final err = snapshot.error;
+                                  final lostAccess = err is FirebaseException && err.code == 'permission-denied';
+                                  if (!lostAccess) return const Center(child: Text("Erreur", style: TextStyle(color: Colors.white)));
+                                  if (!_isLeavingManually && !_isNavigatingToGame) {
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tu n'as plus accès à ce lobby ❌"), backgroundColor: Colors.redAccent));
+                                      }
+                                    });
+                                  }
+                                  return const Center(child: Text("Lobby inaccessible", style: TextStyle(color: Colors.redAccent, fontSize: 18)));
+                                }
                                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.pinkAccent));
 
                                 var data = snapshot.data!.data() as Map<String, dynamic>?;
@@ -386,7 +418,12 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                                                     pList.removeWhere((p) => p['name'] == name);
                                                     List aList = List.from(doc.data()?['activePlayers'] ?? []);
                                                     aList.removeWhere((p) => p['name'] == name);
-                                                    await doc.reference.update({'players': pList, 'activePlayers': aList});
+                                                    // On retire aussi son accès (members), sinon il pourrait toujours lire le lobby.
+                                                    final members = Map<String, dynamic>.from(doc.data()?['members'] ?? {});
+                                                    final kickedUids = members.entries.where((e) => e.value == name).map((e) => e.key);
+                                                    final Map<String, dynamic> updates = {'players': pList, 'activePlayers': aList};
+                                                    if (kickedUids.isNotEmpty) updates['members.${kickedUids.first}'] = FieldValue.delete();
+                                                    await doc.reference.update(updates);
                                                   }
                                                 },
                                               ),
