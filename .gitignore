@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Cache Firebase Hosting (généré par firebase deploy)
+.firebase/
+
+# Build Android (généré)
+/android/build/
