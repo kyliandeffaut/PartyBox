@@ -649,7 +649,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                       title: const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       subtitle: const Text("Cache les scores et les réponses", style: TextStyle(color: Colors.white54, fontSize: 12)),
                       value: isSecret,
-                      activeColor: Colors.purpleAccent,
+                      activeThumbColor: Colors.purpleAccent,
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.white12,
                       onChanged: (val) {
@@ -670,7 +670,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         SwitchListTile(
                           title: const Text("Mr White 🕶️", style: TextStyle(color: Colors.white)),
                           value: data['mwHasMrWhite'] ?? true,
-                          activeColor: Colors.blueGrey.shade400,
+                          activeThumbColor: Colors.blueGrey.shade400,
                           onChanged: (val) {
                             playPop();
                             bool uc = data['mwHasUndercover'] ?? false;
@@ -683,7 +683,7 @@ class _WaitingRoomScreenState extends State<WaitingRoomScreen> {
                         SwitchListTile(
                           title: const Text("L'Infiltré 🕵️‍♂️", style: TextStyle(color: Colors.white)),
                           value: data['mwHasUndercover'] ?? false,
-                          activeColor: Colors.purpleAccent,
+                          activeThumbColor: Colors.purpleAccent,
                           onChanged: (val) {
                             playPop();
                             bool mw = data['mwHasMrWhite'] ?? true;

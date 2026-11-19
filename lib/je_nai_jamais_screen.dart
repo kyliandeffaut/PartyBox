@@ -26,7 +26,7 @@ class JeNaiJamaisScreen extends StatefulWidget {
 
 class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   Map<String, dynamic> allQuestions = {};
-  Map<String, List<dynamic>> _remainingQuestions = {};
+  final Map<String, List<dynamic>> _remainingQuestions = {};
   String currentQuestion = "Chargement...";
   String selectedCategory = "";
   bool isLoading = true;
@@ -413,7 +413,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
                 const Text("Mode Secret 🤫", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 Switch(
                   value: _localSecretMode,
-                  activeColor: Colors.purpleAccent,
+                  activeThumbColor: Colors.purpleAccent,
                   inactiveThumbColor: Colors.grey,
                   inactiveTrackColor: Colors.white12,
                   onChanged: (val) {

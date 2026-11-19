@@ -140,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateToHome();
   }
 
-  _navigateToHome() async {
+  Future<void> _navigateToHome() async {
     // Le splash screen dure exactement 3.5 secondes
     await Future.delayed(const Duration(milliseconds: 3500));
     
@@ -585,7 +585,7 @@ class GameSelectionScreen extends StatelessWidget {
                                   title: const Text("Mr White 🕶️", style: TextStyle(color: Colors.white)),
                                   subtitle: const Text("Il n'a aucun mot.", style: TextStyle(color: Colors.white54, fontSize: 12)),
                                   value: hasMrWhite,
-                                  activeColor: Colors.blueGrey.shade400,
+                                  activeThumbColor: Colors.blueGrey.shade400,
                                   onChanged: (val) {
                                     if (!val && !hasUndercover) return; 
                                     setModalState(() {
@@ -598,7 +598,7 @@ class GameSelectionScreen extends StatelessWidget {
                                   title: const Text("L'Infiltré 🕵️‍♂️", style: TextStyle(color: Colors.white)),
                                   subtitle: const Text("Son mot est différent.", style: TextStyle(color: Colors.white54, fontSize: 12)),
                                   value: hasUndercover,
-                                  activeColor: Colors.purpleAccent,
+                                  activeThumbColor: Colors.purpleAccent,
                                   onChanged: (val) {
                                     if (!val && !hasMrWhite) return; 
                                     setModalState(() {

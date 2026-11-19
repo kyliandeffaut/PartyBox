@@ -48,14 +48,14 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   bool _hasVotedThisTurn = false;
 
   // --- VARIABLES LOCALES (Pass & Play) ---
-  Map<String, String> _localRoles = {}; 
+  final Map<String, String> _localRoles = {}; 
   List<String> _localAlivePlayers = [];
-  Map<String, List<String>> _localPlayerWords = {}; 
+  final Map<String, List<String>> _localPlayerWords = {}; 
   int _localDistributionIndex = 0;
   int _localCurrentRound = 1;
   int _localTurnIndex = 0;
   bool _isRoleHidden = true; 
-  Map<String, int> _localVotes = {};
+  final Map<String, int> _localVotes = {};
   int _localVoteCount = 0;
   
   // --- VARIABLES MULTIJOUEUR ---
@@ -63,7 +63,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
   String _onlineTurnPlayer = "";
   String _onlineMyRole = "";
   List<String> _onlineAlivePlayers = [];
-  Map<String, List<String>> _onlineWordsMap = {};
+  final Map<String, List<String>> _onlineWordsMap = {};
   bool _isSubmitting = false;
   
   // Compteurs en ligne
@@ -116,7 +116,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _localRoles.clear();
       _localPlayerWords.clear();
       _localAlivePlayers = widget.players.map((p) => p.name).toList();
-      for (var p in _localAlivePlayers) _localPlayerWords[p] = [];
+      for (var p in _localAlivePlayers) {
+        _localPlayerWords[p] = [];
+      }
       _localDistributionIndex = 0;
       _localCurrentRound = 1;
       _localTurnIndex = 0;
@@ -148,8 +150,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     if (widget.hasUndercover && roleIndex < shuffledNames.length) undercoverName = shuffledNames[roleIndex];
 
     for (String name in _localAlivePlayers) {
-      if (name == mrWhiteName) _localRoles[name] = "Mr White";
-      else if (name == undercoverName) _localRoles[name] = undercoverWord;
+      if (name == mrWhiteName) {
+        _localRoles[name] = "Mr White";
+      } else if (name == undercoverName) _localRoles[name] = undercoverWord;
       else _localRoles[name] = _civilWord;
     }
     setState(() => _isLoading = false);
@@ -202,8 +205,11 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _eliminatedRole = _localRoles[eliminated] ?? "";
       _localAlivePlayers.remove(eliminated);
 
-      if (_eliminatedRole == "Mr White") _phase = "mr_white_guess";
-      else _checkLocalWinConditions();
+      if (_eliminatedRole == "Mr White") {
+        _phase = "mr_white_guess";
+      } else {
+        _checkLocalWinConditions();
+      }
     });
   }
 
@@ -213,8 +219,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
 
     setState(() {
       _phase = "resultat";
-      if (!mwAlive && !ucAlive) _gameResult = "VICTOIRE DES CIVILS !";
-      else if (_localAlivePlayers.length <= 2) _gameResult = "VICTOIRE DES IMPOSTEURS !"; 
+      if (!mwAlive && !ucAlive) {
+        _gameResult = "VICTOIRE DES CIVILS !";
+      } else if (_localAlivePlayers.length <= 2) _gameResult = "VICTOIRE DES IMPOSTEURS !"; 
       else _gameResult = "CONTINUE"; 
     });
   }
@@ -237,7 +244,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       _localVoteCount = 0;
       _hasVotedThisTurn = false;
       _eliminatedPlayer = "";
-      for (var p in _localAlivePlayers) _localPlayerWords[p] = []; 
+      for (var p in _localAlivePlayers) {
+        _localPlayerWords[p] = [];
+      } 
     });
   }
 
@@ -342,8 +351,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
     if (widget.hasUndercover && roleIndex < names.length) undercoverName = names[roleIndex];
 
     for (var p in activeP) {
-      if (p['name'] == mrWhiteName) p['mwRole'] = "Mr White";
-      else if (p['name'] == undercoverName) p['mwRole'] = undercoverWord;
+      if (p['name'] == mrWhiteName) {
+        p['mwRole'] = "Mr White";
+      } else if (p['name'] == undercoverName) p['mwRole'] = undercoverWord;
       else p['mwRole'] = civilWord;
       
       p['isAlive'] = true;
@@ -466,7 +476,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           var elimPlayer = activeP.firstWhere((p) => p['name'] == eliminated, orElse: () => {});
           String elimRole = elimPlayer['mwRole'] ?? '';
 
-          for (var p in activeP) if (p['name'] == eliminated) p['isAlive'] = false;
+          for (var p in activeP) {
+            if (p['name'] == eliminated) p['isAlive'] = false;
+          }
 
           int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
           bool mwAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] == 'Mr White');
@@ -475,10 +487,12 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
           String nextPhase = 'resultat';
           String gameRes = "CONTINUE";
 
-          if (elimRole == 'Mr White') nextPhase = 'mr_white_guess';
-          else {
-            if (!mwAlive && !ucAlive) gameRes = "VICTOIRE DES CIVILS !";
-            else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
+          if (elimRole == 'Mr White') {
+            nextPhase = 'mr_white_guess';
+          } else {
+            if (!mwAlive && !ucAlive) {
+              gameRes = "VICTOIRE DES CIVILS !";
+            } else if (aliveCount <= 2) gameRes = "VICTOIRE DES IMPOSTEURS !";
           }
 
           transaction.update(docRef, {
@@ -513,8 +527,9 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
       List activeP = data['activePlayers'] ?? [];
       int aliveCount = activeP.where((p) => p['isAlive'] == true).length;
       bool ucAlive = activeP.any((p) => p['isAlive'] == true && p['mwRole'] != 'Mr White' && p['mwRole'] != data['mwCivilWord']);
-      if (!ucAlive) res = "MAUVAISE RÉPONSE !\nVICTOIRE DES CIVILS !";
-      else if (aliveCount <= 2) res = "VICTOIRE DES IMPOSTEURS !";
+      if (!ucAlive) {
+        res = "MAUVAISE RÉPONSE !\nVICTOIRE DES CIVILS !";
+      } else if (aliveCount <= 2) res = "VICTOIRE DES IMPOSTEURS !";
       else res = "CONTINUE";
     }
     await docRef.update({'mwPhase': 'resultat', 'mwGameResult': res});
@@ -853,7 +868,7 @@ class _MrWhiteScreenState extends State<MrWhiteScreen> {
                           : () => widget.isOnline ? _handleOnlineVote(target) : _handleLocalVote(target),
                     ),
                   ),
-                )).toList(),
+                )),
               ],
             ),
           ),
