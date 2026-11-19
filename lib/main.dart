@@ -7,6 +7,7 @@ import 'tu_prefere_screen.dart';
 import 'home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'firebase_setup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'mr_white_screen.dart';
@@ -77,6 +78,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await configureEmulators();
 
   await AudioPlayer.global.setAudioContext(AudioContext(
     iOS: AudioContextIOS(
@@ -98,7 +100,10 @@ void main() async {
   await globalSfxPlayer.setSource(AssetSource('audio/bloop.mp3'));
   await globalSfxPlayer.setSource(AssetSource('audio/bloop_notif.mp3'));
   await globalSfxPlayer.setSource(AssetSource('audio/swoosh.mp3'));
-  cleanOldLobbies();
+  // Connexion anonyme en arrière-plan : le mode local doit marcher même hors ligne.
+  ensureSignedIn()
+      .then((_) => cleanOldLobbies())
+      .catchError((Object e) => debugPrint("Connexion anonyme impossible : $e"));
   runApp(const ActionVeriteApp());
 }
 
@@ -716,22 +721,23 @@ class GameSelectionScreen extends StatelessWidget {
   }
 }
 
+/// Supprime quelques lobbys expirés (avec leurs messages et leur nom).
+/// Les règles n'autorisent à lister que les lobbys dont `expireAt` est passé.
 Future<void> cleanOldLobbies() async {
-  debugPrint("🧹 Nettoyage des vieux lobbys en cours...");
-  
-  // On calcule l'heure d'il y a 24 heures
-  DateTime twentyFourHoursAgo = DateTime.now().subtract(const Duration(hours: 24));
+  try {
+    // Marge de 10 min : si l'horloge du téléphone avance, la requête resterait refusée par les règles.
+    final limit = Timestamp.fromDate(DateTime.now().subtract(const Duration(minutes: 10)));
+    final oldLobbies = await FirebaseFirestore.instance
+        .collection('lobbies')
+        .where('expireAt', isLessThan: limit)
+        .limit(20)
+        .get();
 
-  // On récupère les lobbys plus vieux que ça
-  var oldLobbies = await FirebaseFirestore.instance
-      .collection('lobbies')
-      .where('createdAt', isLessThan: twentyFourHoursAgo)
-      .get();
-
-  // On les supprime un par un
-  for (var doc in oldLobbies.docs) {
-    await doc.reference.delete();
+    for (final doc in oldLobbies.docs) {
+      await deleteLobbyCompletely(doc.reference, doc.data());
+    }
+    debugPrint("Nettoyage terminé : ${oldLobbies.docs.length} lobbys expirés supprimés.");
+  } catch (e) {
+    debugPrint("Nettoyage des lobbys impossible : $e");
   }
-  
-  debugPrint("✅ Nettoyage terminé : ${oldLobbies.docs.length} lobbys supprimés.");
 }

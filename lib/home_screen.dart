@@ -6,6 +6,7 @@ import 'waiting_room_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'qr_scanner_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'firebase_setup.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -206,6 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 try {
                   // Les codes VIP sont stockés dans Firestore : vipCodes/{CODE} avec un champ "action" ("unlock" ou "lock").
                   // Les règles n'autorisent que la lecture d'un document précis (get), jamais la liste des codes.
+                  await ensureSignedIn();
                   final doc = await FirebaseFirestore.instance.collection('vipCodes').doc(code).get();
                   if (doc.exists) action = doc.data()?['action'] as String?;
                 } catch (e) {
@@ -380,22 +382,6 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     String name = _nameController.text.trim();
     String password = _passwordController.text.trim();
     String pseudo = _pseudoController.text.trim(); // 3. Récupère le pseudo
-    String lobbyName = _nameController.text.trim();
-
-    // 1. Vérifier si le nom est déjà pris
-    var existingLobby = await FirebaseFirestore.instance
-        .collection('lobbies')
-        .where('lobbyName', isEqualTo: lobbyName)
-        .get();
-
-    if (existingLobby.docs.isNotEmpty) {
-      // Si la liste n'est pas vide, le nom existe déjà
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
-      );
-      return; // On arrête la fonction ici
-    }
-
     if (name.isEmpty || password.isEmpty || pseudo.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -407,18 +393,56 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Création du Lobby
-      DocumentReference lobbyRef = await FirebaseFirestore.instance.collection('lobbies').add({
+      final String uid;
+      try {
+        uid = await ensureSignedIn();
+      } catch (e) {
+        debugPrint("Connexion anonyme impossible : $e");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Connexion impossible. Vérifie ta connexion internet.")),
+          );
+        }
+        return;
+      }
+
+      final db = FirebaseFirestore.instance;
+      final nameKey = lobbyNameKey(name);
+      final nameRef = db.collection('lobbyNames').doc(nameKey);
+
+      // 1. Vérifier si le nom est déjà pris (par un lobby pas encore expiré)
+      final existingName = await nameRef.get();
+      final existingExpire = existingName.data()?['expireAt'];
+      if (existingName.exists &&
+          (existingExpire is! Timestamp || existingExpire.toDate().isAfter(DateTime.now()))) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Ce nom de lobby est déjà utilisé !")),
+        );
+        return;
+      }
+
+      // 2. Création du lobby + réservation du nom, en une seule écriture atomique
+      final lobbyRef = db.collection('lobbies').doc();
+      final expireAt = newLobbyExpireAt();
+      final batch = db.batch();
+      batch.set(lobbyRef, {
         'lobbyName': name,
+        'nameKey': nameKey,
         'password': password,
         'status': 'waiting',
         'host': pseudo,
+        'hostUid': uid,
+        'members': {uid: pseudo},
         'gameMode': 'Action ou Vérité',
         'players': [
           {'name': pseudo, 'gender': _selectedGender}
         ],
         'createdAt': FieldValue.serverTimestamp(),
+        'expireAt': expireAt,
       });
+      batch.set(nameRef, {'lobbyId': lobbyRef.id, 'expireAt': expireAt});
+      await batch.commit();
 
       if (!mounted) return;
 
@@ -438,6 +462,14 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
 
     } catch (e) {
       debugPrint("Erreur lors de la création : $e");
+      if (mounted) {
+        final taken = e is FirebaseException && e.code == 'permission-denied';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(taken
+              ? "Ce nom de lobby est déjà utilisé !"
+              : "Impossible de créer le lobby. Réessaie.")),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -567,6 +599,53 @@ class _CreateLobbyScreenState extends State<CreateLobbyScreen> {
   }
 }
 
+/// Rejoint un lobby en un seul batch : preuve du mot de passe (`joins/{uid}`) + ajout dans
+/// `members` et `players`. Les règles Firestore vérifient le mot de passe et le pseudo.
+/// Renvoie le nom du lobby.
+Future<String> joinLobbyById({
+  required String lobbyId,
+  required String password,
+  required String pseudo,
+  required String gender,
+}) async {
+  final uid = await ensureSignedIn();
+  final db = FirebaseFirestore.instance;
+  final lobbyRef = db.collection('lobbies').doc(lobbyId);
+  final joinRef = lobbyRef.collection('joins').doc(uid);
+
+  final batch = db.batch();
+  batch.set(joinRef, {'password': password});
+  batch.update(lobbyRef, {
+    'members.$uid': pseudo,
+    'players': FieldValue.arrayUnion([
+      {'name': pseudo, 'gender': gender}
+    ]),
+  });
+  await batch.commit();
+
+  // La preuve ne sert plus : on la supprime (personne ne peut la lire de toute façon).
+  try {
+    await joinRef.delete();
+  } catch (e) {
+    debugPrint("Suppression de la preuve de mot de passe impossible : $e");
+  }
+
+  final snap = await lobbyRef.get();
+  return (snap.data()?['lobbyName'] as String?) ?? 'Lobby';
+}
+
+/// Message d'erreur lisible pour un échec de connexion à un lobby.
+String joinErrorMessage(Object e) {
+  if (e is FirebaseException) {
+    if (e.code == 'permission-denied') {
+      return "Mauvais mot de passe, ou pseudo déjà pris dans ce lobby.";
+    }
+    if (e.code == 'not-found') return "Lobby introuvable.";
+    if (e.code == 'unavailable') return "Connexion impossible. Vérifie ta connexion internet.";
+  }
+  return "Impossible de rejoindre le lobby. Réessaie.";
+}
+
 class JoinLobbyScreen extends StatefulWidget {
   const JoinLobbyScreen({super.key});
 
@@ -597,29 +676,29 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var query = await FirebaseFirestore.instance
-          .collection('lobbies')
-          .where('lobbyName', isEqualTo: lobbyName)
-          .where('password', isEqualTo: password)
-          .limit(1)
+      await ensureSignedIn();
+      // Le nom mène à l'id du lobby via l'index public lobbyNames (les lobbys eux-mêmes ne sont pas listables).
+      final nameDoc = await FirebaseFirestore.instance
+          .collection('lobbyNames')
+          .doc(lobbyNameKey(lobbyName))
           .get();
+      final docId = nameDoc.data()?['lobbyId'] as String?;
+      final expireAt = nameDoc.data()?['expireAt'];
+      final expired = expireAt is Timestamp && expireAt.toDate().isBefore(DateTime.now());
 
-      if (query.docs.isEmpty) {
+      if (docId == null || expired) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Lobby introuvable ou mauvais mot de passe.")),
           );
         }
       } else {
-        var doc = query.docs.first;
-        String docId = doc.id;
-
-        // Étape B : On envoie le pseudo ET le genre sélectionné
-        await FirebaseFirestore.instance.collection('lobbies').doc(docId).update({
-          'players': FieldValue.arrayUnion([
-            {'name': pseudo, 'gender': _selectedGender} 
-          ])
-        });
+        final realName = await joinLobbyById(
+          lobbyId: docId,
+          password: password,
+          pseudo: pseudo,
+          gender: _selectedGender,
+        );
 
         if (!mounted) return;
 
@@ -628,7 +707,7 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
           MaterialPageRoute(
             builder: (context) => WaitingRoomScreen(
               lobbyId: docId,
-              lobbyName: lobbyName,
+              lobbyName: realName,
               currentPlayerName: pseudo,
               currentPlayerGender: _selectedGender,
               isHost: false,
@@ -639,6 +718,11 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
       }
     } catch (e) {
       debugPrint("Erreur : $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(joinErrorMessage(e))),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -771,33 +855,25 @@ class _JoinLobbyScreenState extends State<JoinLobbyScreen> {
                         }
 
                         try {
-                          var doc = await FirebaseFirestore.instance.collection('lobbies').doc(scannedLobbyId).get();
-                          
-                          // VÉRIFICATION 2 : Est-ce que le lobby existe sur Firebase ?
-                          if (!doc.exists) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lobby introuvable sur Firebase (ID: $scannedLobbyId)"), backgroundColor: Colors.red));
-                          } 
-                          // VÉRIFICATION 3 : Est-ce que le mot de passe est bon ?
-                          else if (doc.data()?['password'] != scannedPassword) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mauvais mot de passe dans le QR !"), backgroundColor: Colors.red));
-                          } 
-                          // TOUT EST BON : ON CONNECTE !
-                          else {
-                            String lobbyName = doc.data()?['lobbyName'] ?? 'Lobby';
-                            await doc.reference.update({
-                              'players': FieldValue.arrayUnion([{'name': pseudo, 'gender': _selectedGender}])
-                            });
+                          // Le mot de passe est vérifié par les règles Firestore (le lobby n'est plus lisible avant d'y entrer).
+                          final lobbyName = await joinLobbyById(
+                            lobbyId: scannedLobbyId,
+                            password: scannedPassword,
+                            pseudo: pseudo,
+                            gender: _selectedGender,
+                          );
 
-                            if (!mounted) return;
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => WaitingRoomScreen(
-                                  lobbyId: scannedLobbyId, lobbyName: lobbyName,
-                                  currentPlayerName: pseudo, currentPlayerGender: _selectedGender,
-                                  isHost: false, password: scannedPassword,
-                            )));
-                          }
+                          if (!context.mounted) return;
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => WaitingRoomScreen(
+                                lobbyId: scannedLobbyId, lobbyName: lobbyName,
+                                currentPlayerName: pseudo, currentPlayerGender: _selectedGender,
+                                isHost: false, password: scannedPassword,
+                          )));
                         } catch (e) {
-                          // VÉRIFICATION 4 : Erreur de connexion / Firebase
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur système: $e"), backgroundColor: Colors.red));
+                          debugPrint("Erreur QR : $e");
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(joinErrorMessage(e)), backgroundColor: Colors.red));
+                          }
                         } finally {
                           if (mounted) setState(() => _isLoading = false);
                         }

@@ -2,56 +2,192 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ---------- Outils communs ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isText(v, maxLen) {
+      return v is string && v.size() > 0 && v.size() <= maxLen;
+    }
+    function lobbyPath(id) {
+      return /databases/$(database)/documents/lobbies/$(id);
+    }
+    // Membre d'un lobby = son uid est une clé de la map `members` ({uid: pseudo}).
+    function isMemberOf(data) {
+      return signedIn() && ('members' in data) && data.members is map
+             && request.auth.uid in data.members;
+    }
+    function expired(data) {
+      return ('expireAt' in data) && data.expireAt < request.time;
+    }
+
     // ---------- Codes VIP ----------
     // On peut vérifier UN code précis, jamais lister la collection ni l'écrire depuis l'appli.
     match /vipCodes/{code} {
-      allow get: if true;
+      allow get: if signedIn();
       allow list, write: if false;
     }
 
+    // ---------- Index des noms de lobby ----------
+    // lobbyNames/{nameKey} -> {lobbyId, expireAt}. Sert à rejoindre par nom et à garantir l'unicité du nom.
+    match /lobbyNames/{nameKey} {
+      function nameDocOk() {
+        let d = request.resource.data;
+        let lobby = getAfter(lobbyPath(d.lobbyId)).data;
+        return signedIn()
+               && d.keys().hasOnly(['lobbyId', 'expireAt'])
+               && d.lobbyId is string
+               && d.expireAt == lobby.expireAt
+               && lobby.hostUid == request.auth.uid
+               && lobby.nameKey == nameKey;
+      }
+
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if nameDocOk();
+      // Reprendre un nom libre : son lobby n'existe plus ou a expiré.
+      allow update: if nameDocOk()
+                    && (!exists(lobbyPath(resource.data.lobbyId)) || expired(resource.data));
+      // Supprimer avec le lobby (même batch) ou après expiration.
+      allow delete: if signedIn()
+                    && (!existsAfter(lobbyPath(resource.data.lobbyId)) || expired(resource.data));
+    }
+
     // ---------- Lobbys ----------
-    // Règles intermédiaires (sans Auth) : l'appli fonctionne comme avant,
-    // mais on bloque le vandalisme et le spam. La vraie sécurité arrive avec l'Auth anonyme.
     match /lobbies/{lobbyId} {
 
-      function isText(v, maxLen) {
-        return v is string && v.size() > 0 && v.size() <= maxLen;
+      function newData() {
+        return request.resource.data;
       }
-      function playersOk(data) {
-        return !('players' in data) || (data.players is list && data.players.size() <= 20);
+      function oldData() {
+        return resource.data;
+      }
+      function affected() {
+        return newData().diff(oldData()).affectedKeys();
+      }
+      function membersDiff() {
+        return newData().members.diff(oldData().members);
+      }
+      function isHost() {
+        return oldData().hostUid == request.auth.uid;
+      }
+      function playerOk(p, name) {
+        return p is map && p.keys().hasOnly(['name', 'gender'])
+               && p.name == name && p.gender in ['H', 'F'];
       }
 
-      allow read: if true;
+      // Champs fixés à la création.
+      function immutableOk() {
+        return !affected().hasAny(['lobbyName', 'nameKey', 'password', 'createdAt', 'expireAt']);
+      }
+      function sizesOk() {
+        return (!('players' in newData()) || (newData().players is list && newData().players.size() <= 20))
+               && newData().members is map && newData().members.size() <= 20;
+      }
 
-      // Création : uniquement les champs prévus, avec des tailles raisonnables.
-      allow create: if request.resource.data.keys().hasOnly(
-                         ['lobbyName', 'password', 'status', 'host', 'gameMode', 'players', 'createdAt'])
-                    && isText(request.resource.data.lobbyName, 40)
-                    && isText(request.resource.data.password, 40)
-                    && isText(request.resource.data.host, 30)
-                    && request.resource.data.status == 'waiting'
-                    && request.resource.data.createdAt == request.time
-                    && request.resource.data.players is list
-                    && request.resource.data.players.size() == 1;
+      // Membre : `members` inchangé, ou départ (sa propre clé), ou exclusion par le chef (une seule clé).
+      function membersChangeOk() {
+        return !affected().hasAny(['members'])
+               || (membersDiff().addedKeys().size() == 0
+                   && membersDiff().changedKeys().size() == 0
+                   && membersDiff().removedKeys().size() == 1
+                   && (membersDiff().removedKeys().hasOnly([request.auth.uid]) || isHost()));
+      }
+      // Seul le chef peut transmettre son rôle, et uniquement à un membre.
+      function hostChangeOk() {
+        return !affected().hasAny(['host', 'hostUid'])
+               || (isHost()
+                   && newData().hostUid in newData().members
+                   && newData().host == newData().members[newData().hostUid]);
+      }
 
-      // Mise à jour : le jeu peut modifier l'état, mais pas le nom, le mot de passe ni la date de création.
-      allow update: if !request.resource.data.diff(resource.data).affectedKeys()
-                         .hasAny(['lobbyName', 'password', 'createdAt'])
-                    && playersOk(request.resource.data);
+      // Non-membre qui rejoint : il s'ajoute lui seul (members + players) et prouve le mot de passe
+      // via lobbies/{id}/joins/{uid}, écrit dans le même batch.
+      function joinOk() {
+        let added = membersDiff().addedKeys();
+        let pseudo = newData().members[request.auth.uid];
+        let oldCount = oldData().players.size();
+        return affected().hasOnly(['members', 'players'])
+               && added.size() == 1 && added.hasOnly([request.auth.uid])
+               && membersDiff().removedKeys().size() == 0
+               && membersDiff().changedKeys().size() == 0
+               && isText(pseudo, 30)
+               && !(pseudo in oldData().members.values())
+               && newData().players.size() == oldCount + 1
+               && newData().players[0:oldCount] == oldData().players
+               && playerOk(newData().players[oldCount], pseudo)
+               && getAfter(/databases/$(database)/documents/lobbies/$(lobbyId)/joins/$(request.auth.uid)).data.password
+                  == oldData().password;
+      }
 
-      // Suppression : seulement un lobby avec 1 joueur max (le dernier qui part) ou vieux de plus de 24 h.
-      allow delete: if !('players' in resource.data)
-                    || resource.data.players.size() <= 1
-                    || resource.data.createdAt < request.time - duration.value(24, 'h');
+      // Lecture : membres seulement. Un lobby inexistant reste "lisible" (snapshot vide) pour
+      // que l'appli voie la suppression au lieu d'une erreur.
+      allow get: if signedIn() && (resource == null || isMemberOf(resource.data));
+      // Liste : uniquement les lobbys expirés (nettoyage par les clients).
+      allow list: if signedIn() && resource.data.expireAt < request.time;
+
+      allow create: if signedIn()
+                    && newData().keys().hasOnly(['lobbyName', 'nameKey', 'password', 'status', 'host', 'hostUid',
+                                                 'members', 'gameMode', 'players', 'createdAt', 'expireAt'])
+                    && newData().keys().hasAll(['lobbyName', 'nameKey', 'password', 'status', 'host', 'hostUid',
+                                                'members', 'gameMode', 'players', 'createdAt', 'expireAt'])
+                    && isText(newData().lobbyName, 40)
+                    && isText(newData().nameKey, 200)
+                    && isText(newData().password, 40)
+                    && isText(newData().host, 30)
+                    && isText(newData().gameMode, 40)
+                    && newData().status == 'waiting'
+                    && newData().hostUid == request.auth.uid
+                    && newData().members is map
+                    && newData().members.size() == 1
+                    && newData().members[request.auth.uid] == newData().host
+                    && newData().players is list
+                    && newData().players.size() == 1
+                    && playerOk(newData().players[0], newData().host)
+                    && newData().createdAt == request.time
+                    && newData().expireAt is timestamp
+                    && newData().expireAt > request.time
+                    && newData().expireAt <= request.time + duration.value(48, 'h');
+
+      allow update: if signedIn() && immutableOk() && sizesOk()
+                    && ((isMemberOf(oldData()) && membersChangeOk() && hostChangeOk())
+                        || (!isMemberOf(oldData()) && joinOk()));
+
+      // Suppression : par le dernier membre (on ne se fie pas à `players`, modifiable par tout membre),
+      // ou par n'importe qui une fois expiré.
+      allow delete: if signedIn()
+                    && ((isMemberOf(oldData()) && oldData().members.size() <= 1) || expired(oldData()));
+
+      // ---------- Preuve du mot de passe ----------
+      match /joins/{joinUid} {
+        allow read: if false;
+        allow create, update: if signedIn() && request.auth.uid == joinUid
+                              && request.resource.data.keys().hasOnly(['password'])
+                              && isText(request.resource.data.password, 40);
+        allow delete: if signedIn() && request.auth.uid == joinUid;
+      }
 
       // ---------- Chat du lobby ----------
       match /messages/{messageId} {
-        allow read: if true;
-        allow create: if request.resource.data.keys().hasOnly(['text', 'sender', 'timestamp'])
+        function lobbyData() {
+          return get(lobbyPath(lobbyId)).data;
+        }
+        // Lobby supprimé ou expiré : messages accessibles pour le nettoyage.
+        function lobbyGoneOrExpired() {
+          return !exists(lobbyPath(lobbyId)) || expired(lobbyData());
+        }
+
+        allow read: if signedIn() && (lobbyGoneOrExpired() || isMemberOf(lobbyData()));
+        allow create: if isMemberOf(lobbyData())
+                      && request.resource.data.keys().hasOnly(['text', 'sender', 'senderUid', 'timestamp'])
                       && isText(request.resource.data.text, 500)
-                      && isText(request.resource.data.sender, 30)
+                      && request.resource.data.senderUid == request.auth.uid
+                      && request.resource.data.sender == lobbyData().members[request.auth.uid]
                       && request.resource.data.timestamp == request.time;
-        allow update, delete: if false;
+        allow update: if false;
+        allow delete: if signedIn()
+                      && (lobbyGoneOrExpired()
+                          || (isMemberOf(lobbyData()) && lobbyData().members.size() <= 1));
       }
     }
 

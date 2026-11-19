@@ -14,6 +14,8 @@ Appli de jeux de soirée **Flutter / Dart + Firebase Firestore**, publiée sur l
 - `flutter pub get` · `flutter analyze` · `flutter test` · `dart format lib test`
 - Build Android : `flutter build appbundle` · Web : `flutter build web` (Firebase Hosting → `build/web`)
 - Règles Firestore : `firestore.rules` (déployées à la main depuis la console, **jamais** de `firebase deploy` sans accord explicite)
+- Émulateurs : `firebase emulators:start` (Auth 9099, Firestore 8080, UI `localhost:4000`) · appli sur les émulateurs : `flutter run --dart-define=USE_EMULATORS=true` (web → `localhost`, émulateur Android → `10.0.2.2`, vrai téléphone → `--dart-define=EMULATOR_HOST=<IP du PC>`). Ne jamais déployer un `build/web` compilé avec `USE_EMULATORS`.
+- Tests des règles : `cd firestore-tests && npm install && npm test` (émulateur Firestore lancé). **Toute modif de `firestore.rules` doit passer ces tests**, et en ajouter pour le nouveau comportement.
 
 **Toujours lancer `flutter analyze` (et `flutter test` s'il y a des tests concernés) avant de dire qu'une tâche est finie.**
 
@@ -21,7 +23,8 @@ Appli de jeux de soirée **Flutter / Dart + Firebase Firestore**, publiée sur l
 
 | Fichier | Rôle |
 |---|---|
-| `main.dart` | Entrée, sons globaux (`playSfx`, `startGlobalBgm`…), nettoyage des lobbys > 24 h (à remplacer par un TTL) |
+| `main.dart` | Entrée, sons globaux (`playSfx`, `startGlobalBgm`…), nettoyage des lobbys expirés (`expireAt`, côté client : le TTL Firestore exige Blaze) |
+| `firebase_setup.dart` | Émulateurs, Auth anonyme (`ensureSignedIn`, `currentUid`), `lobbyNameKey`, suppression complète d'un lobby |
 | `home_screen.dart` | Accueil, création / rejoindre un lobby, QR, easter egg VIP (7 taps sur le titre) |
 | `waiting_room_screen.dart` | Lobby : joueurs, kick, choix du jeu par le chef, lancement / reset de partie |
 | `action_verite_screen.dart`, `je_nai_jamais_screen.dart`, `tribunal_screen.dart`, `tu_prefere_screen.dart`, `mr_white_screen.dart` | Un écran par jeu, logique locale + en ligne dans le même fichier |
@@ -32,12 +35,18 @@ Contenu des jeux : `assets/*.json` (`action_verite`, `je_nai_jamais` par catégo
 
 ## Schéma Firestore
 
-- `lobbies/{id}` — création : `lobbyName`, `password`, `status` (`waiting` | `playing`), `host` (pseudo), `gameMode` (`Action ou Vérité` | `Je n'ai jamais` | `Le Tribunal` | `Tu préfères ?` | `Mr White`), `players` [{`name`, `gender` H/F}], `createdAt` (serverTimestamp)
+Tout accès demande l'**Auth anonyme** (`ensureSignedIn()` avant toute opération en ligne).
+
+- `lobbies/{id}` — lisible **par ses membres seulement**. Création (batch avec `lobbyNames`) : `lobbyName`, `nameKey`, `password`, `status` (`waiting` | `playing`), `host` (pseudo), `hostUid`, `members` {uid: pseudo}, `gameMode` (`Action ou Vérité` | `Je n'ai jamais` | `Le Tribunal` | `Tu préfères ?` | `Mr White`), `players` [{`name`, `gender` H/F}], `createdAt` (serverTimestamp), `expireAt` (+24 h)
+  - Figés : `lobbyName`, `nameKey`, `password`, `createdAt`, `expireAt`. `host`/`hostUid` : seul le chef les transmet. `members` : on rejoint (soi seul, avec le mot de passe), on part (soi), le chef exclut (un autre).
+  - Rejoindre = un batch : `joins/{uid}` {`password`} + `members.{uid}` + `players: arrayUnion` ; puis suppression de `joins/{uid}` (illisible).
   - En jeu : `activePlayers` [...], `currentQuestion`, `currentPlayerIndex`, `jnjVisibility`, `jnjGameEnded`, `tpChoice`, champs Mr White `mw*` (`mwPhase`, `mwRound`, `mwTurnIndex`, `mwCivilWord`, `mwRole`, `mwWords`, `mwMaxWords`, `mwHasMrWhite`, `mwHasUndercover`, `mwEliminated`, `mwEliminatedRole`, `mwGameResult`)
-  - Sous-collection `messages/{id}` : `text`, `sender`, `timestamp`
+  - Sous-collection `messages/{id}` : `text`, `sender` (= `members[uid]`), `senderUid`, `timestamp`
+  - Suppression : par le dernier membre (`members.size() <= 1`, avec messages et nom) ou par n'importe qui après `expireAt`.
+- `lobbyNames/{nameKey}` — `lobbyId`, `expireAt`. `nameKey = lobbyNameKey(nom)` (minuscules, encodé). `get` seulement : sert à rejoindre par nom et à garantir l'unicité.
 - `vipCodes/{code}` — `action` = `unlock` | `lock`. L'appli fait un `get` sur le code tapé ; jamais de `list`.
 
-Les joueurs sont identifiés par leur **pseudo** (pas d'Auth pour l'instant). Toute modif de schéma doit rester compatible avec `firestore.rules` : si tu ajoutes un champ à la création d'un lobby ou d'un message, mets à jour `hasOnly([...])` dans les règles.
+Dans les jeux, les joueurs restent identifiés par leur **pseudo** (`players`, `activePlayers`) ; l'uid sert aux droits (`members`, `hostUid`). Toute modif de schéma doit rester compatible avec `firestore.rules` : si tu ajoutes un champ à la création d'un lobby ou d'un message, mets à jour `hasOnly([...])` dans les règles **et** les tests `firestore-tests/`.
 
 ## Règles de travail
 
@@ -49,7 +58,7 @@ Les joueurs sont identifiés par leur **pseudo** (pas d'Auth pour l'instant). To
 
 ## Connu / en cours (détails dans la note Obsidian)
 
-- Mots de passe des lobbys lisibles (lobbys en lecture publique) → phase 1 : Auth anonyme + règles basées sur `request.auth.uid`.
-- Supprimer un lobby laisse ses `messages` orphelins.
+- Les règles ne valident pas l'état de jeu : un membre peut modifier `players`, `activePlayers`, `currentQuestion`… (phase 3).
+- Les messages d'un lobby expiré ou supprimé sont lisibles par tout utilisateur connecté (nécessaire au nettoyage côté client).
 - Pas de détection de déconnexion ; le reset de partie et le bouton retour du lobby sont fragiles.
 - `test/widget_test.dart` est le test par défaut (cassé).

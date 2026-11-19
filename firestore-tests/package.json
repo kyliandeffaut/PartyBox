@@ -1,0 +1,13 @@
+{
+  "name": "partybox-firestore-rules-tests",
+  "private": true,
+  "type": "module",
+  "description": "Tests des règles Firestore de PartyBox, à lancer contre l'émulateur (firebase emulators:start).",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 rules.test.mjs"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "firebase": "^12.19.0"
+  }
+}

@@ -175,7 +175,7 @@ class _JeNaiJamaisScreenState extends State<JeNaiJamaisScreen> {
   }
 
   void _listenToLobby() {
-    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snapshot) {
+    FirebaseFirestore.instance.collection('lobbies').doc(widget.lobbyId).snapshots().handleError((Object e) => debugPrint("Flux du lobby interrompu : $e")).listen((snapshot) {
       if (snapshot.exists && snapshot.data() != null) {
         var data = snapshot.data()!;
         if (mounted) {
